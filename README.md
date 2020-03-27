@@ -38,4 +38,3 @@ A cooperative project to write an android card game.
 ### Issues
 
 ### Yet in plan
-
