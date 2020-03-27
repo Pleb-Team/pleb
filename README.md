@@ -28,7 +28,7 @@ A cooperative project to write an android card game.
 (still early version of drawing, and directly [editable](https://www.draw.io/?mode=github))
 
 ### CI
-* travis](https://travis-ci.org/) as release builder one day :grin:
+* [travis](https://travis-ci.org/) as release builder one day :grin: or never
 * f-droid as deployment: [Publishing Nightly Builds](https://f-droid.org/de/docs/Publishing_Nightly_Builds/)
 
 ### Goals
