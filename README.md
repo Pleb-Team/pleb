@@ -15,6 +15,8 @@ A cooperative project to write an android card game.
 
 ### Development
 * help with github changes on private email,  [remote: error: GH007: Your push would publish a private email address](https://www.masterdevops.eu/2019/04/14/git-error-gh007-your-push-would-publish-a-private-email-address/)
+* for [architecture graph](#development) look for [diagrams github support](https://www.diagrams.net/blog/github-support)
+* setup ssh github key :grin: in github user settings
 
 ### Documentation
 
@@ -25,7 +27,7 @@ A cooperative project to write an android card game.
 ### Architecture
 ![Diagram](PlebArchitecture.svg)
 
-(still early version of drawing, and directly [editable](https://www.diagrams.net/?mode=github))
+(still early version of drawing, and [editable](https://app.diagrams.net/?mode=github)
 
 ### CI
 * [travis](https://travis-ci.org/) as release builder one day :grin: or never
