@@ -25,7 +25,7 @@ A cooperative project to write an android card game.
 ### Architecture
 ![Diagram](PlebArchitecture.svg)
 
-(still early version of drawing, and directly [editable](https://www.draw.io/?mode=github))
+(still early version of drawing, and directly [editable](https://www.diagrams.net/?mode=github))
 
 ### CI
 * [travis](https://travis-ci.org/) as release builder one day :grin: or never
