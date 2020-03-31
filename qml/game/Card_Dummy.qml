@@ -4,7 +4,7 @@ import QtGraphicalEffects 1.0
 import "../scenes"
 
 EntityBase {
-  id: card
+  id: cardDummy
   entityType: "card"
   width: 82
   height: 134
