@@ -57,3 +57,7 @@ ios {
     # Uncomment for using iOS plugin libraries
     # FELGO_PLUGINS += facebook onesignal flurry admob chartboost soomla
 }
+
+DISTFILES += \
+    qml/game/Card_Dummy.qml \
+    qml/game/Deck_Dummy.qml

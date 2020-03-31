@@ -68,7 +68,7 @@ SceneBase {
         width: 37
         height: 60
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "../../assets/img/cards/skip_red.png"
+        source: "../../assets/img/cards/one/skip_red.png"
         smooth: true
       }
 
@@ -96,7 +96,7 @@ SceneBase {
         width: 37
         height: 60
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "../../assets/img/cards/reverse_red.png"
+        source: "../../assets/img/cards/one/reverse_red.png"
         smooth: true
       }
 
@@ -124,7 +124,7 @@ SceneBase {
         width: 37
         height: 60
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "../../assets/img/cards/draw2_red.png"
+        source: "../../assets/img/cards/one/draw2_red.png"
         smooth: true
       }
 

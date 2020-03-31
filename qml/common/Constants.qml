@@ -46,7 +46,7 @@ Item {
   readonly property string currency5000PackId: "<your-pack4-storeproduct-id>"
 
   // game configuration
-  readonly property bool enableStoreAndAds: true // whether in-game store and ads are enabled, if set to false the game is 100% free to play
-  readonly property bool simulateStore: true     // if the store should be simulated locally or actually use the soomla plugin to purchase goods
+  readonly property bool enableStoreAndAds: false // whether in-game store and ads are enabled, if set to false the game is 100% free to play
+  readonly property bool simulateStore: false     // if the store should be simulated locally or actually use the soomla plugin to purchase goods
   readonly property bool lockScreenForInterstitial: false // locks screen to prevent user-action while interstitial is opening up
 }
