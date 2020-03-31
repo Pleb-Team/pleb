@@ -10,9 +10,9 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 	
     // Add this line to match your application identifier:
-    app.setOrganizationDomain("de.stuggi.hackaton.Pleb");
+    app.setOrganizationDomain("de.stuggi.hackaton.pleb");
     // Set your app's current version number here:
-    app.setApplicationVersion("0.1");
+    app.setApplicationVersion("0.0.1");
 
     FelgoApplication felgo;
 
