@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Felgo 3.0
-import "../common"
+import "../../common"
 
 // enables when the player has 2 or less cards in his hand
 Item {
@@ -16,7 +16,7 @@ Item {
   SoundEffect {
     volume: 0.5
     id: onuSound
-    source: "../../assets/snd/onu.wav"
+    source: "../../../assets/snd/onu.wav"
   }
 
   // button starts the fade animation when enabled changes
@@ -29,8 +29,8 @@ Item {
     onClicked: {
       // do not react to clicks if ONUButton is set invisible (= removed from the game / not available for users)
       if(onuButton.visible) {
-        ga.logEvent("User", "ONU", "singlePlayer", multiplayer.singlePlayer)
-        flurry.logEvent("User.ONU", "singlePlayer", multiplayer.singlePlayer)
+//        ga.logEvent("User", "ONU", "singlePlayer", multiplayer.singlePlayer)
+//        flurry.logEvent("User.ONU", "singlePlayer", multiplayer.singlePlayer)
         button.enabled = false
         onu(multiplayer.localPlayer.userId)
       }
@@ -49,7 +49,7 @@ Item {
   Image {
     id: onuButton1
     anchors.fill: parent
-    source: "../../assets/img/ONUButton1.png"
+    source: "../../../assets/img/ONUButton1.png"
     smooth: true
   }
 
@@ -57,7 +57,7 @@ Item {
   Image {
     id: onuButton2
     anchors.fill: parent
-    source: "../../assets/img/ONUButton2.png"
+    source: "../../../assets/img/ONUButton2.png"
     opacity: 0
     smooth: true
   }

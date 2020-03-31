@@ -101,9 +101,9 @@ Item {
     text: "Connect"
 
     onClicked: {
-      ga.logEvent("User", "Connect Facebook")
-      flurry.logEvent("User.ConnectFacebook")
-      gameNetwork.connectFacebookUser()
+//      ga.logEvent("User", "Connect Facebook")
+//      flurry.logEvent("User.ConnectFacebook")
+//      gameNetwork.connectFacebookUser()
       gameNetwork.showProfileView()
       window.state = "gn"
       connectFacebook.visible = false

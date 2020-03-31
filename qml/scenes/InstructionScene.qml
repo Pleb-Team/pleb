@@ -182,8 +182,8 @@ SceneBase {
 
   onVisibleChanged: {
     if(visible) {
-      ga.logScreen("InstructionScene")
-      flurry.logEvent("Screen.InstructionScene")
+//      ga.logScreen("InstructionScene")
+//      flurry.logEvent("Screen.InstructionScene")
     }
   }
 }

@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Felgo 3.0
-import "../common"
+import "../../common"
 
 // select the color for wild and wild4 cards
 Item {
@@ -17,7 +17,7 @@ Item {
   Image {
     id: colorImage
     anchors.fill: parent
-    source: "../../assets/img/ColorPicker.png"
+    source: "../../../assets/img/ColorPicker.png"
     smooth: true
   }
 

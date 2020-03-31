@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Felgo 3.0
 import QtGraphicalEffects 1.0
-import "../scenes"
+import "../../scenes"
 
 EntityBase {
   id: card
@@ -48,7 +48,7 @@ EntityBase {
     anchors.centerIn: parent
     width: parent.width * 1.3
     height: parent.height * 1.2
-    source: "../../assets/img/cards/one/glow.png"
+    source: "../../../assets/img/cards/one/glow.png"
     visible: false
     smooth: true
   }
@@ -57,7 +57,7 @@ EntityBase {
   Image {
     id: cardImage
     anchors.fill: parent
-    source: "../../assets/img/cards/one/back.png"
+    source: "../../../assets/img/cards/one/back.png"
     smooth: true
 
     // changes the cards hue according to the cardColor
@@ -161,14 +161,14 @@ EntityBase {
     // hidden cards show the back side without effect
     if (hidden){
       cardImage.layer.enabled = false // deactivate coloring of card
-      cardImage.source = "../../assets/img/cards/one/back.png"
+      cardImage.source = "../../../assets/img/cards/one/back.png"
       // wild and wild4 cards use normal multicolor images without effect
     } else if (variationType == "wild" || variationType == "wild4"){
       card.hue = 0
       card.saturation = 0
       card.lightness = 0.0
       cardImage.layer.enabled = true // enable coloring of card
-      cardImage.source = "../../assets/img/cards/one/" + variationType + "_" + cardColor + ".png"
+      cardImage.source = "../../../assets/img/cards/one/" + variationType + "_" + cardColor + ".png"
       // the numbered cards, skip and draw2 are colored with the help of HueSaturation
     } else {
       cardImage.layer.enabled = true // enable coloring of card
@@ -186,7 +186,7 @@ EntityBase {
         card.hue = 220/360
         card.saturation = -0.1
       }
-      cardImage.source = "../../assets/img/cards/one/" + variationType + "_red.png"
+      cardImage.source = "../../../assets/img/cards/one/" + variationType + "_red.png"
     }
   }
 }

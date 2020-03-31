@@ -104,8 +104,8 @@ Item {
     text: "Rate"
     onClicked: {
       // open the store site to rate the game instead
-      ga.logEvent("User", "Rate in Store")
-      flurry.logEvent("User.RateInStore")
+//      ga.logEvent("User", "Rate in Store")
+//      flurry.logEvent("User.RateInStore")
 
       nativeUtils.openUrl(Constants.ratingUrl)
       rating.visible = false

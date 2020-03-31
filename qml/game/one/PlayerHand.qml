@@ -29,28 +29,28 @@ Item {
   SoundEffect {
     volume: 0.5
     id: drawSound
-    source: "../../assets/snd/draw.wav"
+    source: "../../../assets/snd/draw.wav"
   }
 
   // sound effect plays when depositing a card
   SoundEffect {
     volume: 0.5
     id: depositSound
-    source: "../../assets/snd/deposit.wav"
+    source: "../../../assets/snd/deposit.wav"
   }
 
   // sound effect plays when winning the game
   SoundEffect {
     volume: 0.5
     id: winSound
-    source: "../../assets/snd/win.wav"
+    source: "../../../assets/snd/win.wav"
   }
 
   // playerHand background image
   // the image changes for the active player
   Image {
     id: playerHandImage
-    source: multiplayer.activePlayer === player && !gameLogic.acted? "../../assets/img/PlayerHand2.png" : "../../assets/img/PlayerHand1.png"
+    source: multiplayer.activePlayer === player && !gameLogic.acted? "../../../assets/img/PlayerHand2.png" : "../../../assets/img/PlayerHand1.png"
     width: parent.width / 400 * 560
     height: parent.height / 134 * 260
     anchors.horizontalCenter: parent.horizontalCenter
@@ -69,7 +69,7 @@ Item {
   Image {
     anchors.bottom: parent.bottom
     anchors.horizontalCenter: parent.horizontalCenter
-    source: "../../assets/img/Blocked.png"
+    source: "../../../assets/img/Blocked.png"
     width: 170
     height: width
     z: 100
@@ -81,7 +81,7 @@ Item {
   Image {
     anchors.top: parent.top
     anchors.right: parent.right
-    source: "../../assets/img/Bubble.png"
+    source: "../../../assets/img/Bubble.png"
     rotation: parent.rotation * (-1)
     width: 60
     height: width

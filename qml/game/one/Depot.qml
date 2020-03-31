@@ -24,14 +24,14 @@ Item {
   SoundEffect {
     volume: 0.5
     id: skipSound
-    source: "../../assets/snd/skip.wav"
+    source: "../../../assets/snd/skip.wav"
   }
 
   // sound effect plays when a player gets skipped
   SoundEffect {
     volume: 0.5
     id: reverseSound
-    source: "../../assets/snd/reverse.wav"
+    source: "../../../assets/snd/reverse.wav"
   }
 
   // blocks the player for a short period of time and trigger a new turn when he gets skipped

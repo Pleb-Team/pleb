@@ -280,7 +280,7 @@ SceneBase {
 
   // convenienc function to send additional data to flurry like the currency and local price
   function sendPurchaseEvent(name, pack) {
-    flurry.logEvent(name, {"currencyAmount": pack.currencyAmount, "marketPriceAndCurrency": pack.purchaseType.marketPriceAndCurrency})
+//    flurry.logEvent(name, {"currencyAmount": pack.currencyAmount, "marketPriceAndCurrency": pack.purchaseType.marketPriceAndCurrency})
   }
 
   function takeTokens(amount) {
@@ -315,7 +315,7 @@ SceneBase {
       simulatedTokens.balance += amount
     else {
       // can either be gameTokensEarnedByDay or gameTokensEarnedPerVideoWatch - useful to analyze what is called how often
-      flurry.logEvent("IAP.GiveTokens", "currencyAmount", amount)
+//      flurry.logEvent("IAP.GiveTokens", "currencyAmount", amount)
       store.giveItem(tokenCurrency.itemId, amount)
     }
   }

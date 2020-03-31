@@ -25,7 +25,7 @@ Item {
   SoundEffect {
     volume: 0.5
     id: shuffleSound
-    source: "../../assets/snd/shuffle.wav"
+    source: "../../../assets/snd/shuffle.wav"
   }
 
   // the leader creates the deck in the beginning of the game
