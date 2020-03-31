@@ -177,7 +177,7 @@ GameWindow {
     Timer {
       id: loadingTimer
       interval: 500
-      onTriggered: sceneLoader.source = Qt.resolvedUrl("PlebMainItem.qml")
+      onTriggered: sceneLoader.source = Qt.resolvedUrl("MainItem.qml")
     }
   }
 

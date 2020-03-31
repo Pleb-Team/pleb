@@ -59,5 +59,5 @@ ios {
 }
 
 DISTFILES += \
-    qml/game/Card_Dummy.qml \
-    qml/game/Deck_Dummy.qml
+    qml/game/blatt52/Card_52.qml \
+    qml/game/blatt52/Deck_52.qml
