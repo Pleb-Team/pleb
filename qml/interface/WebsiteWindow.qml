@@ -108,8 +108,8 @@ Item {
     text: "Yes"
     onClicked: {
       // open the website instead
-      ga.logEvent("User", "Felgo")
-      flurry.logEvent("User.Felgo")
+//      ga.logEvent("User", "Felgo")
+//      flurry.logEvent("User.Felgo")
       nativeUtils.openUrl("https://felgo.com/onu-game-in-app/")// this is added by the wp redirect: /?utm_medium=game&utm_source=onu&utm_campaign=onu - do not add this here, because then we cant link e.g. to an anchor like showcases/#onu
       website.visible = false
     }

@@ -102,8 +102,8 @@ Item {
     }
 
     onClicked: {
-      ga.logEvent("User", "Request Friend")
-      flurry.logEvent("User.RequestFriend")
+//      ga.logEvent("User", "Request Friend")
+//      flurry.logEvent("User.RequestFriend")
       var message = "You have got a friendship request from Player " + gameNetwork.user.name
       gameNetwork.sendFriendRequest(refTag.player.userId, message, function(success) { })
       refTag.friendRequested = true

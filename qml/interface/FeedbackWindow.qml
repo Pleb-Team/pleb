@@ -234,8 +234,8 @@ Item {
 
       // check if there has been feedback and send it to Felgo
       else if (feedbackInput.text){
-        ga.logEvent("User", "Send Feedback")
-        flurry.logEvent("User.SendFeedback")
+//        ga.logEvent("User", "Send Feedback")
+//        flurry.logEvent("User.SendFeedback")
 
         // send the enteredText and the optional email to Felgo
         //nativeUtils.sendEmail("support@felgo.com", gameTitle + " Feedback", "What do you think about" + gameTitle + "? What do you like, what are you missing?\nPlease add your feedback here:\n\n")

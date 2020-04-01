@@ -173,16 +173,16 @@ Item {
     // track when ad is displayed
     onAdReceived: {
       if(adMobBanner.visible) {
-        ga.logEvent("System", "Display AdMob Banner")
-        flurry.logEvent("AdMobBanner.Display")
+//        ga.logEvent("System", "Display AdMob Banner")
+//        flurry.logEvent("AdMobBanner.Display")
       }
     }
 
     // track when ad is clicked
     onAdOpened: {
       if(adMobBanner.visible) {
-        ga.logEvent("User", "AdMob Banner Clicked")
-        flurry.logEvent("AdMobBanner.Clicked")
+//        ga.logEvent("User", "AdMob Banner Clicked")
+//        flurry.logEvent("AdMobBanner.Clicked")
       }
     }
 
@@ -246,7 +246,7 @@ Item {
         lockScreenArea.visible = true // lock screen until interstitial is actually opened
         watchVideoDialog.visible = true // show dialog before starting video
 
-        flurry.logEvent("AdMobInterstitial.Show", {"fromWhereShown": fromWhereShown})
+//        flurry.logEvent("AdMobInterstitial.Show", {"fromWhereShown": fromWhereShown})
       }
       else if(openMenu) {
         // jump to menu if no ads
@@ -256,9 +256,9 @@ Item {
 
     // track interstitial behavior
     onInterstitialOpened: {
-      ga.logEvent("System", "Display AdMob Interstitial")
-      flurry.logEvent("AdMobInterstitial.Display")
-      flurry.logTimedEvent("Interstitial.Running")
+//      ga.logEvent("System", "Display AdMob Interstitial")
+//      flurry.logEvent("AdMobInterstitial.Display")
+//      flurry.logTimedEvent("Interstitial.Running")
       startTime = new Date().getTime()
       elapsedTime = 0
       displayWhenLoaded = false      // deactivate auto display (to allow caching)
@@ -269,15 +269,15 @@ Item {
       if(elapsedTime == 0) {
         elapsedTime = new Date().getTime() - startTime
         startTime = 0
-        flurry.endTimedEvent("Interstitial.Running")
+//        flurry.endTimedEvent("Interstitial.Running")
         if(elapsedTime > 10000) {
           storeScene.giveTokens(gameTokenEarnedPerVideoWatch) // reward player with 1 token for watching
           earnedTokenDialog.visible = true
         }
       }
 
-      ga.logEvent("User", "AdMob Interstitial Closed", "watched (ms)", elapsedTime)
-      flurry.logEvent("AdMobInterstitial.Closed", "watched (ms)", elapsedTime)
+//      ga.logEvent("User", "AdMob Interstitial Closed", "watched (ms)", elapsedTime)
+//      flurry.logEvent("AdMobInterstitial.Closed", "watched (ms)", elapsedTime)
 
       // request new interstitial
       adMobInterstitial.hasInterstitial = false
@@ -288,15 +288,15 @@ Item {
       if(elapsedTime == 0) {
         elapsedTime = new Date().getTime() - startTime
         startTime = 0
-        flurry.endTimedEvent("Interstitial.Running")
+//        flurry.endTimedEvent("Interstitial.Running")
         if(elapsedTime > 10000) {
           storeScene.giveTokens(gameTokenEarnedPerVideoWatch) // reward player with 1 token for watching
           earnedTokenDialog.visible = true
         }
       }
 
-      ga.logEvent("User", "AdMob Interstitial Clicked", "watched (ms)", elapsedTime)
-      flurry.logEvent("AdMobInterstitial.Clicked", "watched (ms)", elapsedTime)
+//      ga.logEvent("User", "AdMob Interstitial Clicked", "watched (ms)", elapsedTime)
+//      flurry.logEvent("AdMobInterstitial.Clicked", "watched (ms)", elapsedTime)
     }
 
     testDeviceIds: Constants.adMobTestDeviceIds

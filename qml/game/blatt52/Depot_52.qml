@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Felgo 3.0
 
 Item {
-  id: depot
+  id: depot52
   width: 82
   height: 134
 
@@ -24,14 +24,14 @@ Item {
   SoundEffect {
     volume: 0.5
     id: skipSound
-    source: "../../assets/snd/skip.wav"
+    source: "../../../assets/snd/skip.wav"
   }
 
   // sound effect plays when a player gets skipped
   SoundEffect {
     volume: 0.5
     id: reverseSound
-    source: "../../assets/snd/reverse.wav"
+    source: "../../../assets/snd/reverse.wav"
   }
 
   // blocks the player for a short period of time and trigger a new turn when he gets skipped
@@ -51,8 +51,7 @@ Item {
 
   // create the depot by placing a single stack card
   function createDepot(){
-    depositCard(deck.getTopCardId())
-    deck.cardsInStack --
+      // first player creates depot by playing first card
   }
 
   // return a random number between two values
@@ -111,13 +110,7 @@ Item {
 
   // check if the card has an effect for the next player
   function hasEffect(){
-    if (current.variationType === "skip" ||
-        current.variationType === "draw2" ||
-        current.variationType === "wild4"){
-      return true
-    }else{
-      return false
-    }
+    return false
   }
 
   // check if the selected card matches with the current reference card
@@ -130,15 +123,15 @@ Item {
     }
     var card = entityManager.getEntityById(cardId)
 
-    // draw2 and wild4 cards can only be matched by other cards of the same type
-    if (effect && current.variationType === "draw2" && card.variationType !== "draw2") return false
-    if (effect && current.variationType === "wild4" && card.variationType !== "wild4") return false
-    // the card is valid if it is the same color or type as the current reference card
-    if (card.cardColor === current.cardColor) return true
-    if (card.variationType === current.variationType) return true
-    // the card matches if either the selected or current reference cards are black
-    if (card.cardColor === "black") return true
-    if (current.cardColor === "black") return true
+    //
+//    console.debug("current: " + current)
+//    console.debug("card: " + card)
+    if (current === undefined || current === null) return true
+    if (card.points === current.points) return true
+    if (card.points === current.points+1) return true
+    if ((card.points === 2) && (current.points === 14)) return true
+
+    return false
   }
 
   // play a card effect depending on the card type

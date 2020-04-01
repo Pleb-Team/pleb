@@ -84,7 +84,7 @@ GameWindow {
     gameId: Constants.gameId
     secret: Constants.gameSecret
     user.deviceId: generateDeviceId()
-    facebookItem: facebook
+//    facebookItem: facebook
 
     property int counterAppInstances: 0
 
@@ -142,22 +142,22 @@ GameWindow {
     }
   }
 
-  Facebook {
-    id: facebook
-    // appId: Constants.fbAppId
-    readPermissions: [ "email", "user_friends" ]
-    publishPermissions: ["publish_actions"]
-  }
+//  Facebook {
+//    id: facebook
+//    // appId: Constants.fbAppId
+//    readPermissions: [ "email", "user_friends" ]
+//    publishPermissions: ["publish_actions"]
+//  }
 
-  GoogleAnalytics {
-    id: ga
-    // propertyId: Constants.gaPropertyId
-  }
+//  GoogleAnalytics {
+//    id: ga
+//    // propertyId: Constants.gaPropertyId
+//  }
 
-  Flurry {
-    id: flurry
-    // apiKey: Constants.flurryApiKey
-  }
+//  Flurry {
+//    id: flurry
+//    // apiKey: Constants.flurryApiKey
+//  }
 
   // loadingScene is our first scene, so set the state to menu initially
   state: "loading"
@@ -177,7 +177,7 @@ GameWindow {
     Timer {
       id: loadingTimer
       interval: 500
-      onTriggered: sceneLoader.source = Qt.resolvedUrl("PlebMainItem.qml")
+      onTriggered: sceneLoader.source = Qt.resolvedUrl("MainItem.qml")
     }
   }
 

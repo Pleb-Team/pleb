@@ -58,7 +58,7 @@ SceneBase {
   }
 
   Component.onCompleted: {
-    ga.logScreen("LoadingScene") // log loading scene at startup
-    flurry.logEvent("Screen.LoadingScene")
+//    ga.logScreen("LoadingScene") // log loading scene at startup
+//    flurry.logEvent("Screen.LoadingScene")
   }
 }

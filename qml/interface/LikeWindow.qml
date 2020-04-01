@@ -74,8 +74,8 @@ Item {
     buttonImage.fillMode: Image.PreserveAspectFit
 
     onClicked: {
-      ga.logEvent("User", "Dislike ONU")
-      flurry.logEvent("User.DislikeONU")
+//      ga.logEvent("User", "Dislike ONU")
+//      flurry.logEvent("User.DislikeONU")
 
       // open the feedback window instead
       like.visible = false
@@ -103,8 +103,8 @@ Item {
 
     onClicked: {
       // open the rating window instead
-      ga.logEvent("User", "Like ONU")
-      flurry.logEvent("User.LikeONU")
+//      ga.logEvent("User", "Like ONU")
+//      flurry.logEvent("User.LikeONU")
 
       like.visible = false
       rating.visible = true
