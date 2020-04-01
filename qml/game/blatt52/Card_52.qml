@@ -1,10 +1,10 @@
 import QtQuick 2.0
 import Felgo 3.0
 import QtGraphicalEffects 1.0
-import "../scenes"
+import "../../scenes"
 
 EntityBase {
-  id: cardDummy
+  id: card52
   entityType: "card"
   width: 82
   height: 134
@@ -43,7 +43,7 @@ EntityBase {
     anchors.centerIn: parent
     width: parent.width * 1.3
     height: parent.height * 1.2
-    source: "../../assets/img/cards/blatt52/glow.png"
+    source: "../../../assets/img/cards/blatt52/glow.png"
     visible: false
     smooth: true
   }
@@ -52,7 +52,7 @@ EntityBase {
   Image {
     id: cardImage
     anchors.fill: parent
-    source: "../../assets/img/cards/blatt52/back.png"
+    source: "../../../assets/img/cards/blatt52/back.png"
     smooth: true
   }
 
@@ -103,15 +103,15 @@ EntityBase {
   states: [
     State {
       name: "depot"
-      ParentChange { target: card; parent: newParent; x: 0; y: 0; rotation: 0}
+      ParentChange { target: card52; parent: newParent; x: 0; y: 0; rotation: 0}
     },
     State {
       name: "player"
-      ParentChange { target: card; parent: newParent; x: 0; y: 0; rotation: 0}
+      ParentChange { target: card52; parent: newParent; x: 0; y: 0; rotation: 0}
     },
     State {
       name: "stack"
-      ParentChange { target: card; parent: newParent; x: 0; y: 0; rotation: 0}
+      ParentChange { target: card52; parent: newParent; x: 0; y: 0; rotation: 0}
     }
   ]
 
@@ -136,13 +136,13 @@ EntityBase {
   function updateCardImage(){
     // hidden cards show the back side without effect
     if (hidden){
-      cardImage.source = "../../assets/img/cards/blatt52/back.png"
+      cardImage.source = "../../../assets/img/cards/blatt52/back.png"
     } else if (variationType == "ten") {
-        cardImage.source = "../../assets/img/cards/blatt52/" + "X" + cardColor.charAt(0).toLowerCase() + ".png"
+        cardImage.source = "../../../assets/img/cards/blatt52/" + "X" + cardColor.charAt(0).toLowerCase() + ".png"
     } else if (variationType == "jack" || variationType == "queen" || variationType == "king" || variationType == "ace"){
-      cardImage.source = "../../assets/img/cards/blatt52/" + variationType.charAt(0).toUpperCase() + cardColor.charAt(0).toLowerCase() + ".png"
+      cardImage.source = "../../../assets/img/cards/blatt52/" + variationType.charAt(0).toUpperCase() + cardColor.charAt(0).toLowerCase() + ".png"
     } else {
-        cardImage.source = "../../assets/img/cards/blatt52/" + points + cardColor.charAt(0).toLowerCase() + ".png"
+        cardImage.source = "../../../assets/img/cards/blatt52/" + points + cardColor.charAt(0).toLowerCase() + ".png"
     }
   }
 }

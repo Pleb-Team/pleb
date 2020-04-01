@@ -3,7 +3,7 @@ import Felgo 3.0
 
 // includes all cards in the game and the stack functionality
 Item {
-  id: deckDummy
+  id: deck52
   width: 82
   height: 134
 
@@ -65,7 +65,7 @@ Item {
     var id
     for (var i = 0; i < cardInfo.length; i ++){
       id = entityManager.createEntityFromUrlWithProperties(
-            Qt.resolvedUrl("Card_Dummy.qml"), {
+            Qt.resolvedUrl("Card_52.qml"), {
               "variationType": cardInfo[i].variationType,
               "cardColor": cardInfo[i].cardColor,
               "points": cardInfo[i].points,
@@ -182,9 +182,6 @@ Item {
       for (var j = 0; j < cardIds.length; j++) {
         for (var k = 0; k < cardDeck.length; k ++){
           if (cardDeck[k].entityId == cardIds[j]){
-            if(cardDeck[k].variationType == "wild" || cardDeck[k].variationType == "wild4"){
-              cardDeck[k].cardColor = "black"
-            }
             cardDeck[k].hidden = true
             cardDeck[k].newParent = deck
             cardDeck[k].state = "stack"
