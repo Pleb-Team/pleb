@@ -55,7 +55,7 @@ ios {
     OTHER_FILES += $$QMAKE_INFO_PLIST
 
     # Uncomment for using iOS plugin libraries
-    # FELGO_PLUGINS += facebook onesignal flurry admob chartboost soomla
+    # FELGO_PLUGINS += onesignal
 }
 
 DISTFILES += \

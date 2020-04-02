@@ -29,8 +29,6 @@ Item {
     onClicked: {
       // do not react to clicks if ONUButton is set invisible (= removed from the game / not available for users)
       if(onuButton.visible) {
-//        ga.logEvent("User", "ONU", "singlePlayer", multiplayer.singlePlayer)
-//        flurry.logEvent("User.ONU", "singlePlayer", multiplayer.singlePlayer)
         button.enabled = false
         onu(multiplayer.localPlayer.userId)
       }

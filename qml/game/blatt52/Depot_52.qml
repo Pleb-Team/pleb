@@ -19,6 +19,8 @@ Item {
   // the amount of cards to draw, can be increased by draw2 and wild4 cards
   property int drawAmount: 1
 
+  property int depotGridCounter: 0
+
 
   // sound effect plays when a player gets skipped
   SoundEffect {
@@ -72,10 +74,14 @@ Item {
       card.hidden = false
     }
 
+    // center grid of 2x2 depending on their count
+    var grid_x = ((depotGridCounter % 2) - 0.5) * depot52.width;
+    var grid_y = (Math.floor(depotGridCounter / 2) - 0.5) * depot52.height;
+
     // move the card to the depot and vary the position and rotation
-    var rotation = randomIntFromInterval(-5, 5)
-    var xOffset = randomIntFromInterval(-5, 5)
-    var yOffset = randomIntFromInterval(-5, 5)
+    var rotation = randomIntFromInterval(-2, 2)
+    var xOffset = grid_x + randomIntFromInterval(-2, 2)
+    var yOffset = grid_y + randomIntFromInterval(-2, 2)
     card.rotation = rotation
     card.x = xOffset
     card.y = yOffset
@@ -86,6 +92,7 @@ Item {
     }else{
       card.z = current.z + 1
     }
+    depotGridCounter = (depotGridCounter + 1) % 4;
 
     // the deposited card is the current reference card
     current = card

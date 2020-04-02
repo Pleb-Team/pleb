@@ -48,8 +48,6 @@ SceneBase {
         gameLogic.sendGameStateToPlayer(player.userId)
 
         // log event when a player joined the game
-//        ga.logEvent("System", "Player Joined", "singlePlayer", multiplayer.singlePlayer)
-//        flurry.logEvent("System.PlayerJoined", "singlePlayer", multiplayer.singlePlayer)
       }
     }
 
@@ -69,8 +67,7 @@ SceneBase {
       // log event when a player left the game
       if(multiplayer.amLeader && activeScene === gameScene) {
         // not relevant for google analytics, causes to exceed the free limit
-        //ga.logEvent("System", "Player Left", "singlePlayer", multiplayer.singlePlayer)
-//        flurry.logEvent("System.PlayerLeft", "singlePlayer", multiplayer.singlePlayer)
+        // flurry.logEvent("System.PlayerLeft", "singlePlayer", multiplayer.singlePlayer)
       }
     }
 
@@ -169,7 +166,6 @@ SceneBase {
     visible: system.debugBuild
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.top: parent.top
-    anchors.topMargin: adMobBanner.visible && adMobBanner.height > 0 ? (adMobBanner.height / gameScene.yScaleForScene) + 10 : 10
     z: 1
     onClicked: {
       switchName.visible = true
@@ -384,8 +380,6 @@ SceneBase {
   // init the game after switching to the gameScene
   onVisibleChanged: {
     if(visible){
-//      ga.logScreen("GameScene")
-//      flurry.logEvent("Screen.GameScene")
       gameLogic.initGame()
     }
   }

@@ -16,7 +16,7 @@ GameWindow {
 
   // generate your own license key which includes the OneSignal Push Notification plugin & the Facebook plugin at https://felgo.com/licenseKey
   // licenseKey: Constants.licenseKey
-  title: gameNetwork.user.deviceId + " - " + gameNetwork.user.name
+  title: "Pleb - a very special card game"
 
   // this is used in the sharing dialog, rating dialog
   readonly property string gameTitle: "Pleb"
@@ -33,15 +33,8 @@ GameWindow {
   property alias loadingScene: loadingScene
 
   // enable / disable store or advertisements
-  readonly property bool enableStoreAndAds: Constants.enableStoreAndAds
-  readonly property bool showAdvertisements: gameTokens < gameTokenNoAdsLimit && enableStoreAndAds
   readonly property int gamesPlayed: menuScene ? menuScene.localStorage.gamesPlayed : 0
   readonly property int appStarts: menuScene ? menuScene.localStorage.appStarts : 0
-  readonly property int gameTokens : storeScene ? storeScene.tokens : 0  // tokens are our game currency from in-app purchase store
-
-  readonly property int gameTokenEarnedPerVideoWatch: 1
-  readonly property int gameTokensEarnedPerDay: 1
-  readonly property int gameTokenNoAdsLimit: 10
 
   // create and remove entities at runtime
   EntityManager {
@@ -57,7 +50,7 @@ GameWindow {
 
   Settings {
     id: multiSettings
-    property alias counterAppInstances: gameNetwork.counterAppInstances
+    property int counterAppInstances: 0
 
     Component.onCompleted: {
 
@@ -65,7 +58,7 @@ GameWindow {
       // you might need this, if the app is destroyed forcefully (e.g. from QtCreator with the red quit application button), because then no Component.onDestruction is called and the counter does not get decreased
       // multiSettings.counterAppInstances = 0
 
-      console.log("multiSettings loaded with counterAppInstances value:" + counterAppInstances+ ", userName: " + gameNetwork.user.name)
+      console.log("multiSettings loaded with counterAppInstances value:" + counterAppInstances)
       multiSettings.counterAppInstances++
     }
   }
@@ -114,7 +107,7 @@ GameWindow {
 
     playerCount: 4
     startGameWhenReady: true
-    gameNetworkItem: gameNetwork
+    //gameNetworkItem: gameNetwork
     multiplayerView: matchmakingScene && matchmakingScene.mpView
     maxJoinTries: 5
     fewRoomsThreshold: 3
@@ -135,30 +128,12 @@ GameWindow {
         menuScene.localStorage.setGamesPlayed(gamesPlayed + 1)
 
         // only reduce token if game is not restarted (once players are in a game they don't need more tokens)
-        if(!gameRestarted && enableStoreAndAds)
-          storeScene.takeTokens(1) // take 1 token from user
+        //if(!gameRestarted && enableStoreAndAds)
+        //  storeScene.takeTokens(1) // take 1 token from user
       }
       window.state = "game"
     }
   }
-
-//  Facebook {
-//    id: facebook
-//    // appId: Constants.fbAppId
-//    readPermissions: [ "email", "user_friends" ]
-//    publishPermissions: ["publish_actions"]
-//  }
-
-//  GoogleAnalytics {
-//    id: ga
-//    // propertyId: Constants.gaPropertyId
-//  }
-
-//  Flurry {
-//    id: flurry
-//    // apiKey: Constants.flurryApiKey
-//  }
-
   // loadingScene is our first scene, so set the state to menu initially
   state: "loading"
   activeScene: loadingScene
@@ -212,24 +187,6 @@ GameWindow {
       name: "game"
       PropertyChanges {target: gameScene; opacity: 1}
       PropertyChanges {target: window; activeScene: gameScene}
-    },
-    State {
-      name: "multiplayer"
-      PropertyChanges {target: matchmakingScene; opacity: 1}
-      PropertyChanges {target: window; activeScene: matchmakingScene}
-    },
-    State {
-      name: "gn"
-      PropertyChanges {target: gameNetworkScene; opacity: 1}
-      PropertyChanges {target: window; activeScene: gameNetworkScene}
-    },
-    State {
-      name: "store"
-      PropertyChanges {target: storeScene; opacity: 1 }
-      PropertyChanges {target: window; activeScene: storeScene}
-      StateChangeScript {
-        script: { storeScene.enterScene() }
-      }
     }
   ]
 }

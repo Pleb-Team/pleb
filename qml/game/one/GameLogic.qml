@@ -363,9 +363,6 @@ Item {
           closeToWin()
         }
 
-        // not relevant for google analytics, causes to exceed the free limit
-        //ga.logEvent("User", "Stack Selected", "singlePlayer", multiplayer.singlePlayer)
-//        flurry.logEvent("User.StackSelected", "singlePlayer", multiplayer.singlePlayer)
       }
     }
 
@@ -379,8 +376,6 @@ Item {
       } else if (entityManager.getEntityById(cardId).state === "player"){
         if (multiplayer.myTurn && !depot.skipped && !acted) {
           // not relevant for google analytics, causes to exceed the free limit
-          //ga.logEvent("User", "Card Selected", "singlePlayer", multiplayer.singlePlayer)
-//          flurry.logEvent("User.CardSelected", "singlePlayer", multiplayer.singlePlayer)
 
           if (depot.validCard(cardId)){
             // the user can act only once unless the selected card was a wild card
@@ -413,8 +408,6 @@ Item {
         multiplayer.sendMessage(messagePickColor, {color: pickedColor, userId: multiplayer.localPlayer.userId})
         endTurn()
         // not relevant for google analytics, causes to exceed the free limit
-        //ga.logEvent("User", "Color Picked", "singlePlayer", multiplayer.singlePlayer)
-//        flurry.logEvent("User.ColorPicked", "singlePlayer", multiplayer.singlePlayer)
       }
     }
   }
@@ -611,10 +604,6 @@ Item {
     scaleHand(1.0)
     initialized = false
     receivedMessageBeforeGameStateInSync = false
-
-//    ga.logEvent("User", "Exit Game", "singlePlayer", multiplayer.singlePlayer)
-//    flurry.logEvent("User.ExitGame", "singlePlayer", multiplayer.singlePlayer)
-//    flurry.endTimedEvent("Game.TimeInGameTotal", {"singlePlayer": multiplayer.singlePlayer})
   }
 
   function joinGame(room){
@@ -624,16 +613,12 @@ Item {
   // initialize the game
   // is called from GameOverWindow when the leader restarts the game, and from GameScene when it got visible from GameScene.onVisibleChanged
   function initGame(calledFromGameOverScreen){
-//    ga.logEvent("System", "Start Game", "singlePlayer", multiplayer.singlePlayer)
-//    flurry.logEvent("System.StartGame", "singlePlayer", multiplayer.singlePlayer)
 
     // add own event whether the game was started new from the main menu or re-started - this is only sent from the leader and not from the clients!
     // for the client events, see System.GameRestarted and System.GameStarted in the onGameStarted handler
     if(calledFromGameOverScreen) {
-//      ga.logEvent("User", "Restart Game", "singlePlayer", multiplayer.singlePlayer)
 //      flurry.logEvent("User.RestartGame", "singlePlayer", multiplayer.singlePlayer)
     } else {
-//      ga.logEvent("User", "Start New Game", "singlePlayer", multiplayer.singlePlayer)
 //      flurry.logEvent("User.StartNewGame", "singlePlayer", multiplayer.singlePlayer)
     }
 
@@ -696,10 +681,6 @@ Item {
     scaleHand()
     // check if the player has two or less cards left
     closeToWin()
-
-//    ga.logEvent("User", "Restart Game", "singlePlayer", multiplayer.singlePlayer)
-//    flurry.logEvent("User.RestartGame", "singlePlayer", multiplayer.singlePlayer)
-
     console.debug("InitGame finished!")
   }
 
@@ -1110,10 +1091,6 @@ Item {
     multiplayer.leaderCode(function () {
       restartGameTimer.start()
     })
-
-//    ga.logEvent("System", "End Game", "singlePlayer", multiplayer.singlePlayer)
-//    flurry.logEvent("System.EndGame", "singlePlayer", multiplayer.singlePlayer)
-//    flurry.endTimedEvent("Game.TimeInGameSingleMatch", {"singlePlayer": multiplayer.singlePlayer})
   }
 
   function startNewGame(){

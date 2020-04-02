@@ -39,10 +39,7 @@ Item {
     }
   }
 
-  function printLn(string) {    
-//    ga.logEvent("User", "Chat Message")
-//    flurry.logEvent("User.ChatMessage")
-
+  function printLn(string) {
     // unless this is the first line, add a newline
     if (text.text.length > 0) {
       text.text += "\n"

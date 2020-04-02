@@ -210,8 +210,7 @@ SceneBase {
 
   onVisibleChanged: {
     if(visible) {
-//      ga.logScreen("CardScene")
-//      flurry.logEvent("Screen.CardScene")
+       // cleaned up
     }
   }
 }

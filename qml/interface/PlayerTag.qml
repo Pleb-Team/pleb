@@ -70,7 +70,7 @@ EntityBase {
       var ctx = getContext("2d")
       ctx.reset()
 
-      if (multiplayer.activePlayer === player){
+      if (true) { //multiplayer.activePlayer === player){
         var centreX = canvas.width / 2
         var centreY = canvas.height / 2
         var step = 360 / gameLogic.userInterval - 1
@@ -159,8 +159,6 @@ EntityBase {
     anchors.fill: parent
     enabled: player && player.connected ? true: false
     onClicked: {
-//      ga.logEvent("User", "Show PlayerInfo")
-//      flurry.logEvent("User.ShowPlayerInfo")
       gameScene.playerInfoPopup.visible = true
       gameScene.playerInfoPopup.refTag = playerTag
     }
@@ -209,8 +207,8 @@ EntityBase {
     highscore = gameNetwork.userHighscoreForCurrentActiveLeaderboard
     rank = gameNetwork.userPositionForCurrentActiveLeaderboard
 
-    if (sendToOthers){
-      multiplayer.sendMessage(gameLogic.messageSetPlayerInfo, {userId: multiplayer.localPlayer.userId, level: level, highscore: highscore, rank: rank})
-    }
+//    if (sendToOthers){
+//      multiplayer.sendMessage(gameLogic.messageSetPlayerInfo, {userId: multiplayer.localPlayer.userId, level: level, highscore: highscore, rank: rank})
+//    }
   }
 }

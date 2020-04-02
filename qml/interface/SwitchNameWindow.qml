@@ -77,7 +77,7 @@ Item {
       horizontalAlignment: Text.AlignHCenter
       font.pixelSize: 30
       maximumLength: 16
-      placeholderText: focus ? "" : gameNetwork.user.name
+      placeholderText: focus ? "" : "gameNetwork.user.name"
       inputMethodHints: Qt.ImhNoPredictiveText
       validator: RegExpValidator{regExp: /^[a-zA-Z0-9äöüßÄÖÜß_ -]{3,}$/}
 
