@@ -39,7 +39,7 @@ SceneBase {
   // token remaining time info
   Text {
     id: tokenTimerText
-    text: gameTokensEarnedPerDay + " free token\nin "+remainingTime
+    text: "<gameTokensEarnedPerDay>" + " free token\nin "+remainingTime
     color: "white"
     font.family: standardFont.name
     font.pixelSize: 10
@@ -129,7 +129,7 @@ SceneBase {
 
     ButtonBase {
       id: watchButton
-      text: "Watch Video (+" + gameTokenEarnedPerVideoWatch + " Token)"
+      text: "Watch Video (+" + "<gameTokenEarnedPerVideoWatch>" + " Token)"
       anchors.horizontalCenter: parent.horizontalCenter
       onClicked: {
          // show interstitial without opening menu and force ad even if enough tokens
@@ -139,7 +139,7 @@ SceneBase {
 
     // ad description
     Text {
-      text: "No advertisements are shown if you have "+gameTokenNoAdsLimit+" tokens or more."
+      text: "No advertisements are shown if you have " + "<gameTokenNoAdsLimit>" + " tokens or more."
       font.family: standardFont.name
       font.pixelSize: 10
       color: "white"
