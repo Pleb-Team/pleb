@@ -204,7 +204,7 @@ SceneBase {
       for(var i = 0; i < conv.length; i++){
         count += conv[i].unread_count
       }
-      inboxButton.notification = count
+//      inboxButton.notification = count
     }
   }
 
