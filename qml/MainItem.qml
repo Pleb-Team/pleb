@@ -14,7 +14,6 @@ Item {
   property alias gameScene: gameScene
   property alias instructionScene: instructionScene
   property alias cardScene: cardScene
-  property alias storeScene: storeScene
 
 
   // menu scene
@@ -35,10 +34,6 @@ Item {
       case "matchmaking":
           multiplayer.showMatchmaking()
           window.state = "multiplayer"
-        break
-      case "store":
-        storeScene.previousState = window.state
-        window.state = "store"
         break
       default:
         window.state = button
@@ -106,13 +101,6 @@ Item {
         break
       }
     }
-  }
-
-  // scene for in-game store
-  StoreScene {
-    id: storeScene
-    property string previousState: "" // memorize previously visible screen
-    onBackButtonPressed: window.state = previousState
   }
 
   // dummy mousearea to lock whole game while interstitial is showing

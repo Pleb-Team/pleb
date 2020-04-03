@@ -4,11 +4,6 @@ import "scenes"
 import "common"
 import Qt.labs.settings 1.0
 
-// NOTE: to enable push notifications & Facebook connection on iOS & Android, you need a paid license
-// this demo also works without push notifications so you can test its functionality
-// contact us via support@felgo.com if you want to enable push notifications & Facebook in your multiplayer games or in this demo
-
-
 GameWindow {
   id: window
   height: 640
@@ -26,9 +21,6 @@ GameWindow {
   property InstructionScene instructionScene: sceneLoader.item && sceneLoader.item.instructionScene
   property CardScene cardScene: sceneLoader.item && sceneLoader.item.cardScene
   property GameScene gameScene: sceneLoader.item && sceneLoader.item.gameScene
-  property MultiplayerScene matchmakingScene: sceneLoader.item && sceneLoader.item.matchmakingScene
-  property GameNetworkScene gameNetworkScene: sceneLoader.item && sceneLoader.item.gameNetworkScene
-  property StoreScene storeScene: sceneLoader.item && sceneLoader.item.storeScene
 
   property alias loadingScene: loadingScene
 
@@ -77,7 +69,6 @@ GameWindow {
     gameId: Constants.gameId
     secret: Constants.gameSecret
     user.deviceId: generateDeviceId()
-//    facebookItem: facebook
 
     property int counterAppInstances: 0
 
@@ -99,7 +90,7 @@ GameWindow {
         return system.UDID
       }
     }
-    gameNetworkView: gameNetworkScene && gameNetworkScene.gnView
+    //gameNetworkView: gameNetworkScene && gameNetworkScene.gnView
   }
 
   FelgoMultiplayer {
@@ -107,8 +98,8 @@ GameWindow {
 
     playerCount: 4
     startGameWhenReady: true
-    //gameNetworkItem: gameNetwork
-    multiplayerView: matchmakingScene && matchmakingScene.mpView
+    // gameNetworkItem: gameNetwork
+    // multiplayerView: matchmakingScene && matchmakingScene.mpView
     maxJoinTries: 5
     fewRoomsThreshold: 3
     joinRankingIncrease: 200
