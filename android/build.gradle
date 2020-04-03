@@ -22,7 +22,6 @@ apply plugin: 'com.android.application'
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     // Felgo Plugins
-    implementation 'net.vplay.plugins:plugin-onesignal:3.+'
 }
 
 android {
