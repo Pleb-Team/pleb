@@ -21,9 +21,27 @@ GameWindow {
     screenWidth: 960
     screenHeight: 640
 
+    // sync deck with leader and set up the game
+    function showCards(){
+
+        // Show cards and highlight current player
+        var s = ""
+        for (var i = 0; i < backend.getNumberPlayersMax(); i++)
+        {
+            if (i === backend.getActualPlayerID())
+                s = s + "-->\tPlayer " + i + ": " + backend.getPlayerCardsText(i) + "\n";
+            else
+                s = s + "\tPlayer " + i + ": " + backend.getPlayerCardsText(i) + "\n";
+        }
+        textPlayerCards.text = s;
+    }
+
 
     BackEnd {
         id: backend
+        onPlayerCardsTextChanged: showCards()
+        onPlayerCardsChanged: showCards()
+        onActualPlayerIDChanged: showCards()
     }
 	
 	
@@ -32,24 +50,22 @@ GameWindow {
 
         // the "logical size" - the scene content is auto-scaled to match the GameWindow size
         width: 480
-        height: 320
+        height: 400
 
         Rectangle {
             anchors.fill: scene.gameWindowAnchorItem
             color: "blue"
         }
 
-
+        Text {
+            id: textPlayerCards
+            text: "Card distribution" // backend.playerCardsText
+        }
 
         GridLayout {
             id: gridPlayer
-
+            anchors.top: textPlayerCards.bottom
             columns: 2
-
-            Text { text: "Cards in hand"  }
-            Text {
-                text: backend.playerCardsText
-            }
 
             Text { text: "Number" }
             TextField {
@@ -62,10 +78,6 @@ GameWindow {
                 placeholderText: qsTr("2")
                 onTextChanged: backend.moveSimpleValue = text
             }
-
-
-
-
 
             Text { text: "Resulting Description"  }
             Text {
