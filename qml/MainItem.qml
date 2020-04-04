@@ -14,7 +14,9 @@ Item {
   property alias gameScene: gameScene
   property alias instructionScene: instructionScene
   property alias cardScene: cardScene
-
+  property alias matchmakingScene: matchmakingScene
+  property alias gameNetworkScene: gameNetworkScene
+  property alias storeScene: storeScene
 
   // menu scene
   MenuScene {
@@ -102,6 +104,24 @@ Item {
       }
     }
   }
+
+ // matchmaking scene
+ MultiplayerScene {
+   id: matchmakingScene
+   onBackButtonPressed: window.state = "menu"
+ }
+
+ GameNetworkScene{
+   id: gameNetworkScene
+   onBackButtonPressed: window.state = "menu"
+ }
+
+ // scene for in-game store
+ StoreScene {
+   id: storeScene
+   property string previousState: "" // memorize previously visible screen
+   onBackButtonPressed: window.state = previousState
+ }
 
   // dummy mousearea to lock whole game while interstitial is showing
   // otherwise user may click something in short time until it opens up
