@@ -1,5 +1,6 @@
 # allows to add DEPLOYMENTFOLDERS and links to the Felgo library and QtCreator auto-completion
 CONFIG += felgo
+CONFIG += felgo-live
 
 # Joachim: Enabling is needed if we want to use our own C++ sources and Felgo live server. IT generates a bunch
 # of heave error messages like 'private headers', 'no winrtrunner.exe found' etc...

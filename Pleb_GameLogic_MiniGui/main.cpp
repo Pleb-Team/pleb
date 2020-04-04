@@ -1,6 +1,7 @@
 #include <QApplication>
 //#include <QApplication>
 #include <FelgoApplication>
+#include <FelgoLiveClient>
 #include <QQmlApplicationEngine>
 
 #include "../Pleb_GameLogic_QtWrapper/BackEnd.h"
@@ -28,7 +29,7 @@ int main(int argc, char *argv[])
 
     // use this during development
     // for PUBLISHING, use the entry point below
-    felgo.setMainQmlFileName(QStringLiteral("qml/Main.qml"));
+    // felgo.setMainQmlFileName(QStringLiteral("qml/Main.qml"));
 
     // use this instead of the above call to avoid deployment of the qml files and compile them into the binary with qt's resource system qrc
     // this is the preferred deployment option for publishing games to the app stores, because then your qml files and js files are protected
@@ -37,7 +38,9 @@ int main(int argc, char *argv[])
     // felgo.setMainQmlFileName(QStringLiteral("qrc:/qml/Main.qml"));
 
     qmlRegisterType<BackEnd>("io.qt.examples.backend", 1, 0, "BackEnd");
-    engine.load(QUrl(felgo.mainQmlFileName()));
+  //  engine.load(QUrl(felgo.mainQmlFileName()));
 
+    FelgoLiveClient liveClient(&engine);
     return app.exec();
+
 }
