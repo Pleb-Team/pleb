@@ -3,14 +3,14 @@ import Felgo 3.0
 
 // includes all cards in the game and the stack functionality
 Item {
-  id: deck52
+  id: deckPleb
   width: 82
   height: 134
 
   // amount of cards in the game
-  property int cardsInDeck: 52
+  property int cardsInDeck: 32
   // amount of cards in the stack left to draw
-  property int cardsInStack: 52
+  property int cardsInStack: 32
   // array with the information of all cards in the game
   property var cardInfo: []
   // array with all card entities in the game
@@ -20,12 +20,14 @@ Item {
     "seven", "eight", "nine", "ten", "jack", "queen", "king", "ace"]
   property var cardColor: ["clubs", "diamonds", "hearts", "spades"]
 
+  property bool allowRestack: false
+
 
   // shuffle sound in the beginning of the game
   SoundEffect {
     volume: 0.5
     id: shuffleSound
-    source: "../../assets/snd/shuffle.wav"
+    source: "../../../assets/snd/shuffle.wav"
   }
 
   // the leader creates the deck in the beginning of the game
@@ -50,7 +52,7 @@ Item {
     var card
     var order = 0
     // create one clubs, diamonds, hearts and spades card for each type
-    for (var i = 0; i < types.length; i++) {
+    for (var i = 5; i < types.length; i++) {
         for (var j = 0; j < cardColor.length; j++) {
             card = {variationType: types[i], cardColor: cardColor[j], points: i+2, hidden: true, order: order}
             cardInfo.push(card)
@@ -65,7 +67,7 @@ Item {
     var id
     for (var i = 0; i < cardInfo.length; i ++){
       id = entityManager.createEntityFromUrlWithProperties(
-            Qt.resolvedUrl("Card_52.qml"), {
+            Qt.resolvedUrl("Card_pleb.qml"), {
               "variationType": cardInfo[i].variationType,
               "cardColor": cardInfo[i].cardColor,
               "points": cardInfo[i].points,
@@ -76,6 +78,7 @@ Item {
               "parent": deck,
               "newParent": deck})
       cardDeck.push(entityManager.getEntityById(id))
+//        console.debug("id: " + id + " card: " + entityManager.getEntityById(id))
     }
     offsetStack()
   }
@@ -95,6 +98,15 @@ Item {
     depot.effect = false
     var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
     multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
+
+    if (cardsInStack < playerHands.children.length) {
+        for (; cardsInStack > 0; cardsInStack--) {
+            cardDeck[0].newParent = null
+            cardDeck[0].state = "void"
+            console.debug("voided " + cardDeck[0])
+        }
+    }
+
     return handOut
   }
 
@@ -148,6 +160,7 @@ Item {
   // reposition the remaining cards to create a stack
   function offsetStack(){
     for (var i = 0; i < cardDeck.length; i++){
+//        console.debug("i: " + i + " = " + cardDeck[i])
       if (cardDeck[i].state == "stack"){
         cardDeck[i].y = i * (-0.1)
       }
@@ -166,15 +179,17 @@ Item {
     if (cardDeck.length <= 0) return
     var card = entityManager.getEntityById(getTopCardId())
     card.glowImage.visible = false
+    card.glowGroupImage.visible = false
   }
 
   // move the old depot cards to the stack if there are no cards left to draw
   function reStack(){
+      if (allowRestack) {
     var cardIds = []
     if (cardsInStack <= 1){
       // find all old depot cards
       for (var i = 0; i < cardDeck.length; i ++){
-        if (cardDeck[i].state === "depot" && cardDeck[i].entityId !== depot.current.entityId){
+        if (cardDeck[i].state === "depot" && !depot.currentTable.includes(cardDeck[i].entityId)){
           cardIds.push(cardDeck[i].entityId)
         }
       }
@@ -194,6 +209,7 @@ Item {
     }
     // reposition the new cards to create a stack
     offsetStack()
+      }
   }
 
   // move the stack cards to the beginning of the cardDeck array
