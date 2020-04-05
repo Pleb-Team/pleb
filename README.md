@@ -1,5 +1,5 @@
 # Pleb
-A cooperative project to write a cross platform card game.
+A cooperative project to write a fancy cross platform card game with various AI styles.
 
 # Table of Contents
 0. [Development](#development)
