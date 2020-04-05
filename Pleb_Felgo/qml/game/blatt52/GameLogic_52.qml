@@ -40,6 +40,12 @@ Item {
   // gets set to true when a message is received before the game state got synced. in that case, request a new game state
   property bool receivedMessageBeforeGameStateInSync: false
 
+  // Every player has its own Backend (for the time being)
+  BackEnd {
+      id: arschlochGameLogic
+  }
+
+
   // bling sound effect when selecting a color for wild or wild4 cards
   SoundEffect {
     volume: 0.5
@@ -534,6 +540,13 @@ Item {
       markValid()
     }
   }
+
+
+  function showArschlochAIComputation() {
+      arschlochGameLogic.resetGameState();
+
+  }
+
 
   // start the turn for the active player
   function turnStarted(playerId) {

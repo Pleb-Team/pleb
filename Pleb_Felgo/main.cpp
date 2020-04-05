@@ -4,6 +4,8 @@
 #include <QQmlApplicationEngine>
 #include <QtQml>
 
+#include "../Pleb_GameLogic_QtWrapper/BackEnd.h"
+
 int main(int argc, char *argv[])
 {
 
@@ -31,6 +33,7 @@ int main(int argc, char *argv[])
     // also see the .pro file for more details
     //  felgo.setMainQmlFileName(QStringLiteral("qrc:/qml/Main.qml"));
 
+    qmlRegisterType<BackEnd>("io.qt.examples.backend", 1, 0, "BackEnd");
     engine.load(QUrl(felgo.mainQmlFileName()));
 
     return app.exec();
