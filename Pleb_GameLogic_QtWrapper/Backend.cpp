@@ -8,19 +8,32 @@ BackEnd::BackEnd(QObject *parent) :
     QObject(parent)
 {
     int n;
+    int nActualPlayer = 0;
+    CMove Move;
 
     m_GameState.m_nActualPlayer = 0;
     m_GameState.m_nLastPlayer = 0;
     m_GameState.m_nZustand = Jojo_SpielZustandSpielen;
 
+
     // Initial card distribution
-    for (n = CARD_7; n < NUMBER_VALUE; n++)
+    m_Game.ShuffleCards();
+    while (m_Game.GetNumberCards())
     {
-        m_GameState.PlayerBekommtKarten(TMoveSimple(2, n), 0);
-        m_GameState.PlayerBekommtKarten(TMoveSimple(2, n), 1);
-        m_GameState.PlayerBekommtKarten(TMoveSimple(2, n), 2);
-        m_GameState.PlayerBekommtKarten(TMoveSimple(2, n), 3);
+        Move = m_Game.TakeOneCard(nActualPlayer);
+        m_GameState.PlayerBekommtKarten(Move.GetMoveSimple(), nActualPlayer);
+        nActualPlayer = (nActualPlayer + 1) % NUMBER_PLAYER;
     }
+
+//    for ()
+
+//    for (n = CARD_7; n < NUMBER_VALUE; n++)
+//    {
+//        m_GameState.PlayerBekommtKarten(TMoveSimple(2, n), 0);
+//        m_GameState.PlayerBekommtKarten(TMoveSimple(2, n), 1);
+//        m_GameState.PlayerBekommtKarten(TMoveSimple(2, n), 2);
+//        m_GameState.PlayerBekommtKarten(TMoveSimple(2, n), 3);
+//    }
 
     // Notify observers
     emit playerCardsTextChanged();

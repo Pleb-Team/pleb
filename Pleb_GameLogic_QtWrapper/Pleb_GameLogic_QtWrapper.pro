@@ -18,11 +18,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     BackEnd.cpp \
+    Game/Game/Game.cpp \
     Game/Game/GameStatistics.cpp \
     Game/Konfiguration.cpp
 
 HEADERS += \
     BackEnd.h \
+    Game/Game/Game.h \
     Game/Game/GameResult.h \
     Game/Game/GameState.h \
     Game/Game/GameStatistics.h \

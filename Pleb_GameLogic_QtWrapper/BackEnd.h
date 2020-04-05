@@ -11,6 +11,7 @@
 #include "Game/Game/GameResult.h"
 #include "Game/Game/GameStatistics.h"
 #include "Game/Game/GameState.h"
+#include "Game/Game/Game.h"
 
 
 class BackEnd : public QObject
@@ -28,6 +29,15 @@ class BackEnd : public QObject
     Q_PROPERTY(QString lastMoveSimpleText READ getLastMoveSimpleText NOTIFY lastMoveSimpleTextChanged)
 
 
+private:
+    QString m_userName;
+
+    TMoveSimple m_MoveSimple = TMoveSimple(3, CARD_BUBE);
+    CMoveResults m_MoveSimpleResults();
+    CMove m_Move = CMove(CARD_DAME, COLOR_PIK);
+    CGameState m_GameState;
+    CGameStatistics m_GameStatistics;
+    CGame m_Game;
 
 
 public:
@@ -67,15 +77,6 @@ signals:
 
     void actualPlayerIDChanged();
     void lastPlayerIDChanged();
-
-private:
-    QString m_userName;
-
-    TMoveSimple m_MoveSimple = TMoveSimple(3, CARD_BUBE);
-    CMoveResults m_MoveSimpleResults();
-    CMove m_Move = CMove(CARD_DAME, COLOR_PIK);
-    CGameState m_GameState;
-    CGameStatistics m_GameStatistics;
 };
 
 #endif // BACKEND_H
