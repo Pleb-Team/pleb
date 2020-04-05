@@ -72,13 +72,19 @@ void BackEnd::setMoveSimpleNumber(const int MoveSimpleNumber)
 QString BackEnd::getPlayerCardsText(int nPlayerID)
 {
     std::string s;
+    CPlayerSimpleAI2 PlayerSimpleAI2;
+    TMoveSimple MoveSimpleAI;
 
     // Player 0 receives a lot of cards
     for (int v = 0; v < NUMBER_VALUE; v++)
         if (m_GameState.m_CardDistribution[nPlayerID][v] > 0)
             s = s + TMoveSimple(m_GameState.m_CardDistribution[nPlayerID][v], v).GetText();
 
-    return QString::fromStdString(s);
+    // Let the AI think
+    MoveSimpleAI = PlayerSimpleAI2.ThinkInGameState(&m_GameState);
+    MoveSimpleAI.GetText();
+
+    return QString::fromStdString(s + " SimpleAI2: " + MoveSimpleAI.GetText());
 }
 
 

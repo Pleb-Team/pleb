@@ -12,13 +12,23 @@
 #include "Game/Game/GameStatistics.h"
 #include "Game/Game/GameState.h"
 #include "Game/Game/Game.h"
+#include "Game/AI/PlayerAI.h"
+#include "Game/AI/PlayerSimpleAI2.h"
 
 
 class BackEnd : public QObject
 {
     Q_OBJECT
+
+    // Declare everything as property that might be accessed Don't know why, but otherwise the function getPlayerCardsText()
+    // cannot be accesses from QML / JS
     Q_PROPERTY(int moveSimpleValue READ getMoveSimpleValue WRITE setMoveSimpleValue NOTIFY moveSimpleValueChanged)
     Q_PROPERTY(int moveSimpleNumber READ getMoveSimpleNumber WRITE setMoveSimpleNumber NOTIFY moveSimpleNumberChanged)
+
+    // Move computed by the AI
+//    Q_PROPERTY(int moveSimpleAIValue READ getMoveSimpleValue WRITE setMoveSimpleValue NOTIFY moveSimpleValueChanged)
+//    Q_PROPERTY(int moveSimpleAINumber READ getMoveSimpleNumber WRITE setMoveSimpleNumber NOTIFY moveSimpleNumberChanged)
+
     Q_PROPERTY(int actualPlayerID READ getActualPlayerID NOTIFY actualPlayerIDChanged)
     Q_PROPERTY(int lastPlayerID READ getLastPlayerID NOTIFY lastPlayerIDChanged)
     Q_PROPERTY(int numberPlayersMax READ getNumberPlayersMax)

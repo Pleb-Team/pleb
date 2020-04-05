@@ -4,7 +4,7 @@
 #include "../Global.h"
 
 #include "Move.h"
-// #include "CardOwner.h"
+
 
 //--------------------------------------------------------------------------------------------------
 /// Klasse CGame speichert einen Kartenstapel zum Mischen und Aufteilen von Karten.

@@ -18,12 +18,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     BackEnd.cpp \
+    Game/AI/PlayerAI.cpp \
+    Game/AI/PlayerSimpleAI2.cpp \
     Game/Game/Game.cpp \
     Game/Game/GameStatistics.cpp \
     Game/Konfiguration.cpp
 
 HEADERS += \
     BackEnd.h \
+    Game/AI/PlayerAI.h \
+    Game/AI/PlayerSimpleAI2.h \
     Game/Game/Game.h \
     Game/Game/GameResult.h \
     Game/Game/GameState.h \

@@ -47,6 +47,15 @@ GameWindow {
         Component.onCompleted: showCards();
     }
 	
+	// According to Felgo, this might help with the Messages "NOTE:​ you are running a development build in Release Mode.​ However,​ 
+	// the Release mode is recommended only for publish builds that are released to the app stores and for final testing.​ 
+	// You can enable a publish build in the config.​json file in your qml folder by setting the "​stage"​ property to 
+	// "​publish"​.​ For more information see:​ https:​/​/​felgo.​net/​doc/​felgo-​publishing/​
+	// ... but unfortunately, it didnt help
+    EntityManager {
+      id: entityManager
+      entityContainer: scene
+    }
 	
     Scene {
         id: scene
