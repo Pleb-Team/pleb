@@ -39,9 +39,12 @@ GameWindow {
 
     BackEnd {
         id: backend
+		
+		// Update the card display whenever needed
         onPlayerCardsTextChanged: showCards()
         onPlayerCardsChanged: showCards()
         onActualPlayerIDChanged: showCards()
+        Component.onCompleted: showCards();
     }
 	
 	
