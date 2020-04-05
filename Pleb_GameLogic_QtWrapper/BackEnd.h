@@ -20,6 +20,8 @@ class BackEnd : public QObject
     Q_PROPERTY(int moveSimpleNumber READ getMoveSimpleNumber WRITE setMoveSimpleNumber NOTIFY moveSimpleNumberChanged)
     Q_PROPERTY(int actualPlayerID READ getActualPlayerID NOTIFY actualPlayerIDChanged)
     Q_PROPERTY(int lastPlayerID READ getLastPlayerID NOTIFY lastPlayerIDChanged)
+    Q_PROPERTY(int numberPlayersMax READ getNumberPlayersMax)
+    Q_PROPERTY(int numberPlayersInGame READ getNumberPlayersInGame)
 
     Q_PROPERTY(QString moveSimpleText READ getMoveSimpleText NOTIFY moveSimpleTextChanged)
     Q_PROPERTY(QString playerCardsText READ getPlayerCardsText NOTIFY playerCardsTextChanged)
@@ -31,20 +33,26 @@ class BackEnd : public QObject
 public:
     explicit BackEnd(QObject *parent = nullptr);
 
-    int getMoveSimpleValue() { return m_MoveSimple.ValueCards; }
-    void setMoveSimpleValue(const int MoveSimpleValue);
+    Q_INVOKABLE int getMoveSimpleValue() { return m_MoveSimple.ValueCards; }
+    Q_INVOKABLE void setMoveSimpleValue(const int MoveSimpleValue);
 
-    int getMoveSimpleNumber() { return m_MoveSimple.NumberCards; }
-    void setMoveSimpleNumber(const int MoveSimpleNumber);
+    Q_INVOKABLE int getMoveSimpleNumber() { return m_MoveSimple.NumberCards; }
+    Q_INVOKABLE void setMoveSimpleNumber(const int MoveSimpleNumber);
 
-    int getActualPlayerID() { return m_GameState.m_nActualPlayer; }
-    int getLastPlayerID() { return m_GameState.m_nLastPlayer; }
+    Q_INVOKABLE int getActualPlayerID() { return m_GameState.m_nActualPlayer; }
+    Q_INVOKABLE int getLastPlayerID() { return m_GameState.m_nLastPlayer; }
 
+    // How many players still have > 0 cards
+    Q_INVOKABLE int getNumberPlayersInGame() { return m_GameState.GetNumberPlayers(); }
 
-    QString getMoveSimpleText() { return QString::fromStdString(m_MoveSimple.GetText() );  }
-    QString getLastMoveSimpleText() { return QString::fromStdString(m_GameState.m_LastMoveSimple.GetText() );  }
+    // Maximum number of players possible, e.g. at beginning of game
+    Q_INVOKABLE int getNumberPlayersMax() { return NUMBER_PLAYER; }
 
-    QString getPlayerCardsText();
+    Q_INVOKABLE QString getMoveSimpleText() { return QString::fromStdString(m_MoveSimple.GetText() );  }
+    Q_INVOKABLE QString getLastMoveSimpleText() { return QString::fromStdString(m_GameState.m_LastMoveSimple.GetText() );  }
+
+    Q_INVOKABLE QString getPlayerCardsText() { return getPlayerCardsText(m_GameState.m_nActualPlayer); }
+    Q_INVOKABLE QString getPlayerCardsText(int nPlayerID);
 
     Q_INVOKABLE void playCards();
 
@@ -53,7 +61,10 @@ signals:
     void moveSimpleNumberChanged();
     void moveSimpleTextChanged();
     void lastMoveSimpleTextChanged();
+
     void playerCardsTextChanged();
+    void playerCardsChanged(int nPlayerID);
+
     void actualPlayerIDChanged();
     void lastPlayerIDChanged();
 
