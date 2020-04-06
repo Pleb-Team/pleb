@@ -1,6 +1,5 @@
 import QtQuick 2.0
 import Felgo 3.0
-import io.qt.examples.backend 1.0
 
 // the cards in the hand of the player
 Item {
@@ -204,8 +203,6 @@ Item {
 
   // highlight all valid cards by setting the glowImage visible
   function markValid(){
-    console.debug("markValid()")
-
     if (!depot.skipped && !gameLogic.gameOver && !colorPicker.chosingColor){
       for (var i = 0; i < hand.length; i ++){
         if (depot.validCard(hand[i].entityId)){
