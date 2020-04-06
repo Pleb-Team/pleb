@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Felgo 3.0
+import io.qt.examples.backend 1.0
 
 Item {
   id: gameLogic52
@@ -40,7 +41,6 @@ Item {
   // gets set to true when a message is received before the game state got synced. in that case, request a new game state
   property bool receivedMessageBeforeGameStateInSync: false
 
-  // Every player has its own Backend (for the time being)
   BackEnd {
       id: arschlochGameLogic
   }
@@ -542,10 +542,10 @@ Item {
   }
 
 
-  function showArschlochAIComputation() {
-      arschlochGameLogic.resetGameState();
+ // function showArschlochAIComputation() {
+ //     arschlochGameLogic.resetGameState();
 
-  }
+ // }
 
 
   // start the turn for the active player
