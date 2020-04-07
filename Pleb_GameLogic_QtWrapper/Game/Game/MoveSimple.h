@@ -39,7 +39,7 @@ public:
             {
 //                s = s + " " + inttostr(ValueCards);
                 if ((0 <= ValueCards) && (ValueCards <= MAX_VALUE))
-                    s = s + " " + c_sTextOnCards[ValueCards];
+                    s = s + c_sTextOnCards[ValueCards] + " ";
                 else
                     s = s + " ?";
             }

@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Felgo 3.0
+import io.qt.examples.backend 1.0
 
 Item {
   id: gameLogic52
@@ -39,6 +40,11 @@ Item {
 
   // gets set to true when a message is received before the game state got synced. in that case, request a new game state
   property bool receivedMessageBeforeGameStateInSync: false
+
+  BackEnd {
+      id: arschlochGameLogic
+  }
+
 
   // bling sound effect when selecting a color for wild or wild4 cards
   SoundEffect {
@@ -534,6 +540,13 @@ Item {
       markValid()
     }
   }
+
+
+ // function showArschlochAIComputation() {
+ //     arschlochGameLogic.resetGameState();
+
+ // }
+
 
   // start the turn for the active player
   function turnStarted(playerId) {

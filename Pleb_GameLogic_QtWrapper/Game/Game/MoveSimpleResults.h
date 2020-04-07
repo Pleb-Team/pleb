@@ -1,10 +1,10 @@
 #ifndef MOVESIMPLERESULTS_H
 #define MOVESIMPLERESULTS_H
 
-
 #include "MoveSimple.h"
 
 
+// \todo rename class
 
 //-------------------------------------------------------------------------------------------------
 /// Klasse CMoveResult
