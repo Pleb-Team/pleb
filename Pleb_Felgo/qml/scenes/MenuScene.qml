@@ -387,15 +387,15 @@ SceneBase {
       visible: false
     }
 
-    // button to send feedback to Felgo
-    ButtonBase {
-      color: "transparent"
-      width: communityButton.width
-      height: communityButton.height
-      anchors.margins: communityButton.anchors.margins
-      buttonImage.source: "../../assets/img/Invites.png"
-      onClicked: showFeedback()
-    }
+//    // button to send feedback to Felgo
+//    ButtonBase {
+//      color: "transparent"
+//      width: communityButton.width
+//      height: communityButton.height
+//      anchors.margins: communityButton.anchors.margins
+//      buttonImage.source: "../../assets/img/Invites.png"
+//      onClicked: showFeedback()
+//    }
   }
 
   // message and leaderboard buttons
@@ -445,12 +445,12 @@ SceneBase {
     }
   }
 
-  LikeWindow {
-    id: like
-    visible: false
-    scale: 0.5
-    anchors.centerIn: gameWindowAnchorItem
-  }
+//  LikeWindow {
+//    id: like
+//    visible: false
+//    scale: 0.5
+//    anchors.centerIn: gameWindowAnchorItem
+//  }
 
   RatingWindow {
     id: rating
@@ -459,12 +459,12 @@ SceneBase {
     anchors.centerIn: gameWindowAnchorItem
   }
 
-  FeedbackWindow {
-    id: feedback
-    visible: false
-    scale: 0.5
-    anchors.centerIn: gameWindowAnchorItem
-  }
+//  FeedbackWindow {
+//    id: feedback
+//    visible: false
+//    scale: 0.5
+//    anchors.centerIn: gameWindowAnchorItem
+//  }
 
   WebsiteWindow {
     id: website
@@ -487,16 +487,16 @@ SceneBase {
     }
   }
 
-  Connections {
-    target: window.loadingScene
-    onOpacityChanged: {
-      if (window.loadingScene.opacity == 0){
-        if (localStorage.getValue("appstarts") > 5 && !localStorage.getValue("feedbackSent")){
-          showFeedback()
-        }
-      }
-    }
-  }
+//  Connections {
+//    target: window.loadingScene
+//    onOpacityChanged: {
+//      if (window.loadingScene.opacity == 0){
+//        if (localStorage.getValue("appstarts") > 5 && !localStorage.getValue("feedbackSent")){
+//          showFeedback()
+//        }
+//      }
+//    }
+//  }
 
   // define Storage item for loading/storing key-value data
   // ask the user for feedback after opening the app 5 times
@@ -554,11 +554,11 @@ SceneBase {
     }
   }
 
-  function showFeedback(){
-//    ga.logEvent("User", "Show Feedback Dialog")
-//    flurry.logEvent("User.ShowFeedbackDialog")
-    like.visible = true
-  }
+//  function showFeedback(){
+////    ga.logEvent("User", "Show Feedback Dialog")
+////    flurry.logEvent("User.ShowFeedbackDialog")
+//    like.visible = true
+//  }
 
   // enter scene will be called whenever menuScene is shown
   function enterScene() {
