@@ -653,7 +653,18 @@ Item {
       }
   }
 
+  LegacyPlebCodeBridge {
+      id: legacyBridge
+  }
 
+  function playPlebCustom() {
+      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+      var cardIds = legacyBridge.getMove(userId)
+      if (cardIds.length > 0) {
+          multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
+          depositCards(cardIds, userId)
+      }
+  }
 
   // check whether a user with a specific id has valid cards or not
   function hasValidCards(user){
