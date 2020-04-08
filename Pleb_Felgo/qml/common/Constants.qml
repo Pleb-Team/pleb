@@ -33,8 +33,8 @@ Item {
   ]
 
   // for sending feedback via a php script, use a password
-  readonly property string feedbackSecret: "<secret-for-feedback-dialog>"
-  readonly property string ratingUrl: "<your-rating-url>" // url to open on device for rating the app
+//  readonly property string feedbackSecret: "<secret-for-feedback-dialog>"
+//  readonly property string ratingUrl: "<your-rating-url>" // url to open on device for rating the app
 
   // Soomla In-App Purchases - add your configuration here
   readonly property string soomlaSecret: "<your-soomla-secret>"
