@@ -60,7 +60,8 @@ ios {
 
 DISTFILES += \
     qml/game/blatt52/Card_52.qml \
-    qml/game/blatt52/Deck_52.qml
+    qml/game/blatt52/Deck_52.qml \
+    qml/game/blatt52/GameLogicInterface.qml
 
 
 # from here added to integrate C++ game logic and AI component
