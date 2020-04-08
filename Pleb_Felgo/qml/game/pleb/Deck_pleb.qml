@@ -101,9 +101,9 @@ Item {
 
     if (cardsInStack < playerHands.children.length) {
         for (; cardsInStack > 0; cardsInStack--) {
-            cardDeck[0].newParent = null
-            cardDeck[0].state = "void"
-            console.debug("voided " + cardDeck[0])
+            cardDeck[cardsInStack - 1].newParent = null
+            cardDeck[cardsInStack - 1].state = "void"
+            console.debug("voided " + cardDeck[cardsInStack - 1])
         }
     }
 
@@ -176,10 +176,14 @@ Item {
 
   // unmark the stack
   function unmark(){
-    if (cardDeck.length <= 0) return
+    if (cardDeck.length > 0) {
+//        console.debug("Unmarking stack...")
     var card = entityManager.getEntityById(getTopCardId())
     card.glowImage.visible = false
     card.glowGroupImage.visible = false
+    } else {
+//        console.debug("No stack to unmark")
+    }
   }
 
   // move the old depot cards to the stack if there are no cards left to draw
@@ -189,7 +193,7 @@ Item {
     if (cardsInStack <= 1){
       // find all old depot cards
       for (var i = 0; i < cardDeck.length; i ++){
-        if (cardDeck[i].state === "depot" && !depot.currentTable.includes(cardDeck[i].entityId)){
+        if (cardDeck[i].state === "depot" && !depot.lastDeposit.includes(cardDeck[i].entityId)){
           cardIds.push(cardDeck[i].entityId)
         }
       }

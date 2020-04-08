@@ -13,9 +13,9 @@ SceneBase {
 
   // game signals
   signal cardSelected(var cardId)
-  signal cardGroupToggle(var cardId)
   signal stackSelected()
   signal colorPicked(var pickedColor)
+  signal depotSelected()
 
   // access the elements from outside
   property alias deck: deck
@@ -120,6 +120,16 @@ SceneBase {
 
     NumberAnimation { id: mirrorAnimation; target: depotImage; properties: "rotation";
       from: 0; to: 180; duration: 400; easing.type: Easing.InOutQuad }
+
+    // clickable depot area
+    MouseArea {
+      id: depotButton
+      anchors.fill: parent
+      acceptedButtons: Qt.LeftButton | Qt.RightButton
+      onClicked: {
+          gameScene.depotSelected()
+      }
+    }
   }
 
   // contains all game logic functions

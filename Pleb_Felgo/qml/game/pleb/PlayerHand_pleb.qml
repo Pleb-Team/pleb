@@ -198,6 +198,14 @@ Item {
       return result
   }
 
+  function canBeatDepot() {
+      var beat = false
+      for (var i = 0; !beat && i < hand.length; i++) {
+          beat = hand[i].points > depot.lastDeposit[0].points && countCards(hand[i].points) >= depot.lastDeposit.length
+      }
+      return beat
+  }
+
   // remove card with a specific id from hand
   function removeFromHand(cardId){
     for (var i = 0; i < hand.length; i ++){
@@ -212,15 +220,54 @@ Item {
     }
   }
 
+  function getSelectedGroup() {
+      var result = []
+      for (var i = 0; i < hand.length; i++) {
+          if (hand[i].glowGroupImage.visible === true) {
+              result.push(hand[i])
+          }
+      }
+      return result
+  }
+
+  function getAllAvailableGroups(gPoints) {
+      var result = []
+      var pointGroup = {}
+      var group
+      for (var i = 0; i < hand.length; i++) {
+          group = pointGroup[hand[i].points]
+          if (!group) {
+              group = []
+              pointGroup[hand[i].points] = group
+          }
+          group.push(hand[i])
+      }
+      for (var j = ((gPoints) ? gPoints : 0); j < 15; j++) {
+          group = pointGroup[j]
+          if (group) {
+              for (var k = group.length; k > 1; k--) {
+                  result.push(group.slice(0, k))
+              }
+          }
+      }
+      return result
+  }
+
   // highlight all valid cards by setting the glowImage visible
   function markValid(){
     if (!depot.skipped && !gameLogic.gameOver && !colorPicker.chosingColor){
+        var selectedGroup = getSelectedGroup()
       for (var i = 0; i < hand.length; i ++){
         if (depot.validCard(hand[i].entityId)){
-          hand[i].glowImage.visible = true
+            if (selectedGroup.length === 0 || (selectedGroup[0].points === hand[i].points && (depot.lastDeposit.length === 0 || selectedGroup.length < depot.lastDeposit.length || player.userId === depot.lastPlayer))) { // TODO LASTCARD || depot.finishedPlayers.includes(depot.lastPlayer)))) {
+                hand[i].glowImage.visible = !hand[i].glowGroupImage.visible
+            } else {
+                hand[i].glowImage.visible = false
+            }
           hand[i].updateCardImage()
         }else{
           hand[i].glowImage.visible = false
+            hand[i].glowGroupImage.visible = false
         }
       }
       // mark the stack if there are no valid cards in hand
@@ -274,7 +321,7 @@ Item {
         valids.push(entityManager.getEntityById(hand[i].entityId))
       }
     }
-    console.debug("could play: " + valids)
+//    console.debug("could play: " + valids)
     return valids
   }
 
@@ -315,7 +362,7 @@ Item {
     }
   }
 
-  // check if the player has won with zero cards left
+  // check if the player has finished with zero cards left
   function checkWin(){
     if (hand.length == 0){
       winSound.play()

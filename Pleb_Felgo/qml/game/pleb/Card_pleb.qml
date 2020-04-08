@@ -20,8 +20,6 @@ EntityBase {
   property string cardColor: "spades"
   property int order
 
-  property bool grouped: false
-
   // hidden cards show the back side  
   // you could also offer an in-app purchase to show the cards of a player for example!
   property bool hidden: !forceShowAllCards
@@ -76,8 +74,7 @@ EntityBase {
     anchors.fill: parent
     acceptedButtons: Qt.LeftButton | Qt.RightButton
     onClicked: {
-        if (mouse.button == Qt.RightButton) {
-            grouped = !grouped
+        if (mouse.button === Qt.RightButton) {
             gameScene.cardGroupToggle(entityId)
         } else {
             gameScene.cardSelected(entityId)

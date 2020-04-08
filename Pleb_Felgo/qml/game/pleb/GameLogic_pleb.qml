@@ -155,7 +155,7 @@ Item {
           syncPlayers()
           initTags()
           syncDeck(message.deck)
-          depot.syncDepot(message.depot, message.currentTableIDs, message.currentTableCardColors, message.skipped, message.clockwise, message.effect, message.drawAmount)
+          depot.syncDepot(message.depot, message.lastDepositIDs, message.lastDepositCardColors, message.skipped, message.clockwise, message.effect, message.drawAmount, message.lastPlayer, message.finishedPlayers)
           syncHands(message.playerHands)
 
           // join a game which is already over
@@ -337,36 +337,37 @@ Item {
 
     // the player selected the stack
     onStackSelected: {
+        console.debug("SIGNAL 'onStackSelected' was triggered")
       // draw cards if it is the player's turn
-      if (multiplayer.myTurn && !depot.skipped && !acted && !cardsDrawn) {
-        if (hasValidCards(multiplayer.localPlayer)){
-          acted = true
-        }
+//      if (multiplayer.myTurn && !depot.skipped && !acted && !cardsDrawn) {
+//        if (hasValidCards(multiplayer.localPlayer)){
+//          acted = true
+//        }
 
-        var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-        getCards(depot.drawAmount, userId)
-        multiplayer.sendMessage(messageMoveCardsHand, {cards: depot.drawAmount, userId: userId})
+//        var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+//        getCards(depot.drawAmount, userId)
+//        multiplayer.sendMessage(messageMoveCardsHand, {cards: depot.drawAmount, userId: userId})
 
-        if (acted || !hasValidCards(multiplayer.localPlayer)){
-          acted = true
-          endTurn()
-        } else {
-          // reset the drawAmount during the player's turn
-          depot.drawAmount = 1
-          depot.effect = false
-          multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: 1, userId: userId})
+//        if (acted || !hasValidCards(multiplayer.localPlayer)){
+//          acted = true
+//          endTurn()
+//        } else {
+//          // reset the drawAmount during the player's turn
+//          depot.drawAmount = 1
+//          depot.effect = false
+//          multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: 1, userId: userId})
 
-          // scale and mark the newly aquired cards according to the playerHand
-          scaleHand(1.6)
-          markValid()
-          // check if the player has two or less cards left
-          closeToWin()
-        }
+//          // scale and mark the newly aquired cards according to the playerHand
+//          scaleHand(1.6)
+//          markValid()
+//          // check if the player has two or less cards left
+//          closeToWin()
+//        }
 
-        // not relevant for google analytics, causes to exceed the free limit
-        //ga.logEvent("User", "Stack Selected", "singlePlayer", multiplayer.singlePlayer)
-//        flurry.logEvent("User.StackSelected", "singlePlayer", multiplayer.singlePlayer)
-      }
+//        // not relevant for google analytics, causes to exceed the free limit
+//        //ga.logEvent("User", "Stack Selected", "singlePlayer", multiplayer.singlePlayer)
+////        flurry.logEvent("User.StackSelected", "singlePlayer", multiplayer.singlePlayer)
+//      }
     }
 
     // the player selected a card
@@ -389,11 +390,50 @@ Item {
 //            if (currentType === "ace") {
 //                acted = false
 //            } else {
-                acted = true
+//                acted = true
 //            }
+//
+//            var cardIds = depositCards([cardId], multiplayer.localPlayer.userId)
+//            multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: multiplayer.localPlayer.userId})
 
-            var cardIds = depositCards([cardId], multiplayer.localPlayer.userId)
-            multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: multiplayer.localPlayer.userId})
+              var selectedCard = entityManager.getEntityById(cardId)
+              if (selectedCard.glowImage.visible || selectedCard.glowGroupImage.visible) {
+                  selectedCard.glowGroupImage.visible = !selectedCard.glowGroupImage.visible
+                  selectedCard.glowImage.visible = !selectedCard.glowGroupImage.visible
+
+                  // convenience for the player to auto-select groups
+                  if (depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayer) { // TODO LASTCARD  && !depot.finishedPlayers.includes(depot.lastPlayer)) {
+                      var activeHand = getHand(multiplayer.localPlayer.userId).hand
+                      if (selectedCard.glowGroupImage.visible) {
+                          var groupSize = 1
+                          for (var i = 0; i < activeHand.length; i++) {
+                              if (activeHand[i].entityId !== selectedCard.entityId) {
+                                  if (activeHand[i].points === selectedCard.points) {
+                                      if (groupSize < depot.lastDeposit.length) {
+                                          activeHand[i].glowGroupImage.visible = true
+                                          activeHand[i].glowImage.visible = false
+                                          groupSize++
+                                      } else {
+                                          activeHand[i].glowGroupImage.visible = false
+                                          activeHand[i].glowImage.visible = false
+                                      }
+                                  }
+                              }
+                          }
+                      } else {
+                          for (var j = 0; j < activeHand.length; j++) {
+                              if (activeHand[j].entityId !== selectedCard.entityId) {
+                                  if (activeHand[j].points === selectedCard.points) {
+                                      activeHand[j].glowGroupImage.visible = false
+                                  }
+                              }
+                          }
+                      }
+                  }
+
+                  // refresh hand display
+                  markValid()
+              }
 
             // the active player increases the drawAmount after playing a draw2 or wild4 card
 //            if (depot.current.variationType === "draw2") depot.draw(2)
@@ -403,22 +443,20 @@ Item {
 //            if (depot.current.cardColor !== "black" && multiplayer.myTurn){
 //              endTurn()
 //            }
-            if (multiplayer.myTurn){
-                endTurn()
-            }
+//            if (multiplayer.myTurn){
+//                endTurn()
+//            }
           }
         }
+      } else if (entityManager.getEntityById(cardId).state === "depot") {
+          console.debug("DEPOT CARD SELECTED")
+          skipOrPlay()
       }
     }
 
-    onCardGroupToggle: {
-        var card = entityManager.getEntityById(cardId)
-        if (card.grouped) {
-            card.glowImage.visible = false
-            card.glowGroupImage.visible = true
-        } else {
-            card.glowGroupImage.visible = false
-        }
+    onDepotSelected: {
+        console.debug("DEPOT ITSELF SELECTED")
+        skipOrPlay()
     }
 
     // the player selected a color
@@ -434,6 +472,29 @@ Item {
 //        flurry.logEvent("User.ColorPicked", "singlePlayer", multiplayer.singlePlayer)
       }
     }
+  }
+
+  function skipOrPlay() {
+      if (multiplayer.myTurn && !depot.skipped && !acted) {
+          var cardIds = []
+          var activeHand = getHand(multiplayer.localPlayer.userId).hand
+          for (var i = 0; i < activeHand.length; i++) {
+              if (activeHand[i].glowGroupImage.visible) {
+                  cardIds.push(activeHand[i].entityId)
+              }
+          }
+          acted = true
+          if (cardIds.length > 0) {
+              console.debug("Player " + multiplayer.localPlayer.userId + " is playing: " + cardIds)
+              depositCards(cardIds, multiplayer.localPlayer.userId)
+              multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: multiplayer.localPlayer.userId})
+          } else {
+              console.debug("Player " + multiplayer.localPlayer.userId + "skipped its turn")
+          }
+          if (multiplayer.myTurn){
+              endTurn()
+          }
+      }
   }
 
   // sync deck with leader and set up the game
@@ -468,28 +529,15 @@ Item {
       // find the playerHand for the active player
       // if the selected card is in the playerHand of the active player
       if (activeHand.inHand(cardIds[0])){
-          var mastercard = entityManager.getEntityById(cardIds[0])
-          for (var j = 0; j < activeHand.hand.length; j++) {
-              if (activeHand.hand[j].grouped && !cardIds.includes(activeHand.hand[j].entityId)) {
-                  cardIds.push(activeHand.hand[j].entityId)
-              }
-          }
-          if (depot.currentTable.length > 0 && depot.currentTable[0].variationType !== "ace" && depot.skippedPlayers.length < 3) {
-          for (var k = 0; cardIds.length < depot.currentTable.length && k < activeHand.hand.length; k++) {
-              if (activeHand.hand[k].points === mastercard.points && !cardIds.includes(activeHand.hand[k].entityId)) {
-                  cardIds.push(activeHand.hand[k].entityId)
-              }
-          }
-          }
           for (var l = 0; l < cardIds.length; l++) {
               activeHand.removeFromHand(cardIds[l])
           }
 
         // deposit the cards
         depot.depositCards(cardIds)
-          console.debug("player " + userId + " played " + cardIds)
+//          console.debug("player " + userId + " played " + cardIds)
 
-        if (depot.currentTable.length > 0 && depot.currentTable[0].variationType === "reverse"){
+        if (depot.lastDeposit.length > 0 && depot.lastDeposit[0].variationType === "reverse"){
           multiplayer.leaderCode(function() {
             depot.reverse()
           })
@@ -516,8 +564,8 @@ Item {
 //        }
         // uncover the card for disconnected players after chosing the color
         if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected){
-            for (var m = 0; m < depot.currentTable.length; m++) {
-                depot.currentTable[m].hidden = false
+            for (var m = 0; m < depot.lastDeposit.length; m++) {
+                depot.lastDeposit[m].hidden = false
             }
         }
       }
@@ -528,7 +576,8 @@ Item {
   // let AI take over if the player is not skipped
   function executeAIMove() {
     if(!depot.skipped){
-      playRandomValid()
+//      playRandomValid()
+        playPlebRandom()
     }
   }
 
@@ -548,13 +597,63 @@ Item {
 //          if (depot.current.variationType === "wild4") depot.draw(4)
           // let the ai only draw cards if the user hasn't already done it
         } else {
-            depot.pass(true)
+            depot.skipTurn(true)
 //          getCards(depot.drawAmount, userId)
-          multiplayer.sendMessage(messageMoveCardsHand, {cards: depot.drawAmount, userId: userId})
+//          multiplayer.sendMessage(messageMoveCardsHand, {cards: depot.drawAmount, userId: userId})
         }
       }
     }
   }
+
+  function playPlebRandom() {
+      // find the playerHand of the active player
+      for (var i = 0; i < playerHands.children.length; i++) {
+          if (playerHands.children[i].player === multiplayer.activePlayer){
+              if (depot.finishedPlayers.length < playerHands.children.length - 1) {
+                  var validCardId = playerHands.children[i].randomValidId()
+                  if (validCardId){
+                      var randomSize = Math.floor(Math.random() * 100)
+                      if (randomSize > 94) {
+                          console.debug("Player " + multiplayer.activePlayer.userId + " RANDOMLY skipped its turn with " + randomSize + "%")
+                      } else {
+                          var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+                          var cardIds = []
+                          var validCard = entityManager.getEntityById(validCardId)
+                          cardIds.push(validCardId)
+                          if (depot.lastDeposit.length === 0 || multiplayer.activePlayer.userId === depot.lastPlayer) { // TODO LASTCARD || depot.finishedPlayers.includes(depot.lastPlayer)) {
+                              var pointCards = playerHands.children[i].countCards(validCard.points)
+                              randomSize = pointCards - Math.floor(Math.random() * pointCards)
+                              console.debug("Player " + multiplayer.activePlayer.userId + " opted for " + randomSize + " cards (of " + pointCards + ")")
+                              for (var j = 0; cardIds.length < randomSize && j < playerHands.children[i].hand.length; j++) {
+                                  if (playerHands.children[i].hand[j].entityId !== validCard.entityId) {
+                                      if (playerHands.children[i].hand[j].points === validCard.points) {
+                                          cardIds.push(playerHands.children[i].hand[j].entityId)
+                                      }
+                                  }
+                              }
+                          } else {
+                              for (var k = 0; cardIds.length < depot.lastDeposit.length && k < playerHands.children[i].hand.length; k++) {
+                                  if (playerHands.children[i].hand[k].entityId !== validCard.entityId) {
+                                      if (playerHands.children[i].hand[k].points === validCard.points) {
+                                          cardIds.push(playerHands.children[i].hand[k].entityId)
+                                      }
+                                  }
+                              }
+                          }
+                          multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
+                          depositCards(cardIds, userId)
+                      }
+                  } else {
+                      depot.skipTurn(true)
+                  }
+              } else {
+                  plebFinish(playerHands.children[i])
+              }
+          }
+      }
+  }
+
+
 
   // check whether a user with a specific id has valid cards or not
   function hasValidCards(user){
@@ -587,8 +686,7 @@ Item {
     console.debug("#######################################################################################################################################")
     console.debug("playerId: " + playerId + " and multiplayer.activePlayer.userId: " + multiplayer.activePlayer.userId)
     console.debug("Turn started")
-    console.debug("passed: " + depot.skippedPlayers)
-            console.debug(" and board " + depot.currentTable)
+    console.debug("Last deposit: " + depot.lastDeposit + " by player " + depot.lastPlayer)
     console.debug("players hand: " + (getHand(multiplayer.activePlayer.userId).hand))
     // start the timer
     gameLogic.startTurnTimer()
@@ -602,8 +700,25 @@ Item {
     colorPicker.chosingColor = false
     // check if the current card has an effect for the active player
     depot.cardEffect()
-    // pass if the player has no valid cards
-    depot.pass(!hasValidCards(multiplayer.activePlayer) || (depot.acePlayer !== null && multiplayer.activePlayer.userId !== depot.acePlayer))
+    if (depot.finishedPlayers.length === playerHands.children.length - 1) {
+        plebFinish(getHand(multiplayer.activePlayer.userId))
+        endTurn()
+    }
+    if (depot.finishedPlayers.includes(multiplayer.activePlayer.userId)) {
+        endTurn()
+    } else {
+        var canPlay = hasValidCards(multiplayer.activePlayer)
+        if (canPlay) {
+            depot.skipTurn(false)
+        } else {
+            // skip if the player has no valid cards
+            depot.skipTurn(true)
+            // TODO LASTCARD first player to skip after another player's last card becomes the lastPlayer; in some variants, the Pleb is supposed to become the lastPlayer after another player's last card
+            if (depot.finishedPlayers.includes(depot.lastPlayer)) {
+                depot.lastPlayer = multiplayer.activePlayer.userId
+            }
+        }
+    }
     // zoom in on the hand of the active local player
     if (!depot.skipped && multiplayer.myTurn) scaleHand(1.6)
     // check if the player has two or less cards left
@@ -620,6 +735,16 @@ Item {
         aiTimeOut.start()
       }
     })
+  }
+
+  function plebFinish(plebHand) {
+      // let the new Pleb finish its game by playing all its remaining cards
+      var lastcards = []
+      for (var l = 0; l < plebHand.hand.length; l++) {
+          lastcards.push(plebHand.hand[l].entityId)
+      }
+      multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: lastcards, userId: plebHand.player.userId})
+      depositCards(lastcards, plebHand.player.userId)
   }
 
   // schedule AI to take over after 10 seconds if the connected player is inactive
@@ -699,6 +824,7 @@ Item {
     }
     console.debug("multiplayer.myTurn " + multiplayer.myTurn)
 
+    var lastGameOutcome = depot.finishedPlayers
     // reset all values at the start of the game
     gameOver = false
     timer.start()
@@ -738,8 +864,12 @@ Item {
       }
 
       // only the leader needs to call this
-      // lets always the leader take the first turn, otherwise the same player that ended the game before would be the first to make a turn
-      gameLogic.triggerNewTurn(multiplayer.leaderPlayer.userId)
+      // lets always the leader take the first turn on the first game
+      if (lastGameOutcome.length < 1) {
+          gameLogic.triggerNewTurn(multiplayer.leaderPlayer.userId)
+      } else {
+          gameLogic.triggerNewTurn(lastGameOutcome[lastGameOutcome.length - 1])
+      }
     })
 
     // start by scaling the playerHand of the active localPlayer
@@ -784,11 +914,11 @@ Item {
     // save the deck information to create an identical one
     message.deck = deck.cardInfo
     // sync the depot variables
-    message.currentTableIDs = []
-    message.currentCardColors = []
-    for (var l = 0; l < depot.currentTable.length; l++) {
-        message.currentTableIDs.push(depot.currentTable[l].entityId)
-        message.currentCardColors.push(depot.currentTable[l].cardColor)
+    message.lastDepositIDs = []
+    message.lastDepositCardColors = []
+    for (var l = 0; l < depot.lastDeposit.length; l++) {
+        message.lastDepositIDs.push(depot.lastDeposit[l].entityId)
+        message.lastDepositCardColors.push(depot.lastDeposit[l].cardColor)
     }
 
     message.skipped = depot.skipped
@@ -800,7 +930,7 @@ Item {
     // save all card ids of the current depot
     var depotIDs = []
     for (var k = 0; k < deck.cardDeck.length; k++){
-      if (deck.cardDeck[k].state === "depot" && !depot.currentTable.includes(deck.cardDeck[k].entityId)){
+      if (deck.cardDeck[k].state === "depot" && !depot.lastDeposit.includes(deck.cardDeck[k].entityId)){
         depotIDs.push(deck.cardDeck[k].entityId)
       }
     }
@@ -808,6 +938,9 @@ Item {
 
     // send the message to the newly joined player
     message.receiverPlayerId = playerId
+
+    message.lastPlayer = depot.lastPlayer
+    message.finishedPlayers = depot.finishedPlayers
 
     console.debug("Send Message: " + JSON.stringify(message))
     multiplayer.sendMessage(messageSyncGameState, message)
@@ -951,10 +1084,10 @@ Item {
 
   // change the current depot wild or wild4 card to the selected color and update the image
   function pickColor(pickedColor){
-    if (depot.currentTable.length > 0 && ((depot.currentTable[0].variationType === "wild4" || depot.currentTable[0].variationType === "wild")
-        && depot.currentTable[0].cardColor === "black")){
-      depot.currentTable[0].cardColor = pickedColor
-      depot.currentTable[0].updateCardImage()
+    if (depot.lastDeposit.length > 0 && ((depot.lastDeposit[0].variationType === "wild4" || depot.lastDeposit[0].variationType === "wild")
+        && depot.lastDeposit[0].cardColor === "black")){
+      depot.lastDeposit[0].cardColor = pickedColor
+      depot.lastDeposit[0].updateCardImage()
     }
   }
 
@@ -1001,6 +1134,7 @@ Item {
 
   // end the turn of the active player
   function endTurn(){
+      console.debug("ENDING TURN <===")
     // unmark all highlighted valid card options
     unmark()
     // scale down the hand of the active local player
@@ -1011,9 +1145,11 @@ Item {
     for (var i = 0; i < playerHands.children.length; i++) {
       if (playerHands.children[i].player === multiplayer.activePlayer){
         if (playerHands.children[i].checkWin()){
-            console.debug("=================================================================================> " + multiplayer.activePlayer + " HAS WON!!!")
-          endGame()
-          multiplayer.sendMessage(messageEndGame, {userId: userId})
+            console.debug("=================================================================================> " + multiplayer.activePlayer + " HAS FINISHED!!!")
+            if (!depot.finishedPlayers.includes(userId)) {
+                depot.finishedPlayers.push(userId)
+            }
+
           // make the player pick up two cards if he forgot to press the active onu button
         }
 //        else if (playerHands.children[i].missedOnu()){
@@ -1023,6 +1159,17 @@ Item {
 //        }
       }
     }
+    if (depot.finishedPlayers.length >= playerHands.children.length) { // TODO FINISH how to finish game; opting for letting all players drop their cards, even the Pleb // - 1) {
+//        for (var j = 0; depot.finishedPlayers.length < playerHands.children.length && j < playerHands.children.length; j++) {
+//            if (!depot.finishedPlayers.includes(playerHands.children[j].player.userId)) {
+//                depot.finishedPlayers.push(playerHands.children[j].player.userId)
+//            }
+//        }
+        console.debug("ENDING GAME <=======================================================================================")
+        endGame()
+        multiplayer.sendMessage(messageEndGame, {userId: userId})
+    }
+
     // continue if the game is still going
     if (!gameOver){
       console.debug("trigger new turn in endTurn, clockwise: " + depot.clockwise)
