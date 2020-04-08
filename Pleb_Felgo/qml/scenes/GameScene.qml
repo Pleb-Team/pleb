@@ -2,7 +2,6 @@ import Felgo 3.0
 import QtQuick 2.12
 import "../common"
 import "../game/one"
-//import "../game/blatt52"
 import "../game/pleb"
 import "../interface"
 
