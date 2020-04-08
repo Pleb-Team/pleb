@@ -2,7 +2,8 @@
 #define GAMESTATE_H
 
 #include <assert.h>
-#include <cstring>
+#include <string>
+#include <cstring> // for memset
 
 #include "../Global.h"
 #include "../Konfiguration.h"
@@ -59,8 +60,9 @@ public:
 	/// Konstruktor
     CGameState() { Reset(); }
 
-	/// Resets Lastmove, LastPlayer, NumberPlayer and cards of all players to initial state
-	inline void Reset() ;	
+    /// Resets Lastmove, LastPlayer, NumberPlayer, ActualPLayer all to initial invalid (-1)
+    /// and clears all cards, i.e. all players have empty hands
+    inline void Reset();
 
 	/// Adds the cards to m_CardDistribution, m_CardNumberDistribution and m_CardDistributionTotal
 	inline void PlayerBekommtKarten( const TMoveSimple & Move, int nPlayerID );
@@ -88,10 +90,40 @@ public:
 
 	/// \return Total number of players who are still holding cards
     inline int GetNumberPlayers() const { return m_nNumberPlayers; }
+
+    /// Returns a textual description of the game state for debugging
+    inline std::string GetDescription();
 };
 
 
 
+//---------------------------------------------------------------------------------------------------
+/// Returns a textual description of the game state for debugging
+//---------------------------------------------------------------------------------------------------
+inline std::string CGameState::GetDescription()
+{
+    std::string s;
+
+    for (int nPlayerID = 0; nPlayerID < NUMBER_PLAYER; nPlayerID++)
+    {
+        if (nPlayerID == m_nActualPlayer)
+            s = s + "--> Player " + inttostr(nPlayerID) + ": ";
+        else
+            s = s + "    Player " + inttostr(nPlayerID) + ": ";
+
+        for (int v = 0; v < NUMBER_VALUE; v++)
+            if (m_CardDistribution[nPlayerID][v] > 0)
+                s = s + TMoveSimple(m_CardDistribution[nPlayerID][v], v).GetText();
+
+        s = s + "\n";
+    }
+
+    s = s + "\n";
+    s = s + "Actual player: " + inttostr(m_nActualPlayer) + "\n";
+    s = s + "Last player: " + inttostr(m_nLastPlayer) + ", LastMove: " + m_LastMoveSimple.GetText() + "\n";
+
+    return s;
+}
 
 
 
@@ -156,7 +188,7 @@ inline int CGameState::PlayCards( const TMoveSimple & MoveSimple, bool bSofortNe
 	{
 		if (!IsMoveLegal(MoveSimple))
 		{
-            g_pKonfig->Log("[CGameState::PlayCards]: IsMoveLegal returned false");
+            g_pKonfig->Log("[CGameState::PlayCards] IsMoveLegal() returned false for move: " + MoveSimple.GetText());
 			return JOJO_ERROR;
 		}
 	}

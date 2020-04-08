@@ -24,16 +24,17 @@ GameWindow {
     // sync deck with leader and set up the game
     function showCards(){
 
-        // Show cards and highlight current player
-        var s = ""
-        for (var i = 0; i < backend.getNumberPlayersMax(); i++)
-        {
-            if (i === backend.getActualPlayerID())
-                s = s + "-->\tPlayer " + i + ": " + backend.getPlayerCardsText(i) + "\n";
-            else
-                s = s + "\tPlayer " + i + ": " + backend.getPlayerCardsText(i) + "\n";
-        }
-        textPlayerCards.text = s;
+//        // Show cards and highlight current player
+//        var s = ""
+//        for (var i = 0; i < backend.getNumberPlayersMax(); i++)
+//        {
+//            if (i === backend.getActualPlayerID())
+//                s = s + "-->\tPlayer " + i + ": " + backend.getPlayerCardsText(i) + "\n";
+//            else
+//                s = s + "\tPlayer " + i + ": " + backend.getPlayerCardsText(i) + "\n";
+//        }
+//        textPlayerCards.text = s;
+
     }
 
 
@@ -71,7 +72,8 @@ GameWindow {
 
         Text {
             id: textPlayerCards
-            text: "Card distribution" // backend.playerCardsText
+            font.family: "Courier New"
+            text: backend.playerCardsText
         }
 
         GridLayout {
@@ -99,36 +101,6 @@ GameWindow {
             Button {
                 text: "Play it!"
                 onClicked: backend.playCards();
-            }
-        }
-
-
-
-
-        GridLayout {
-            id: gridGame
-
-            columns: 2
-            anchors.top: gridPlayer.bottom
-
-            Text { text: "Actual Player"  }
-            Text {
-                text: backend.actualPlayerID
-            }
-
-            Text { text: "Last Move"  }
-            Text {
-                text: backend.lastMoveSimpleText
-            }
-
-            Text { text: "Last Player"  }
-            Text {
-                text: backend.lastPlayerID
-            }
-
-            Text { text: "Stack"  }
-            Text {
-                text: "Stack"
             }
         }
     }

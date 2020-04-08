@@ -1,4 +1,5 @@
 #include <QMessageBox>
+#include <iostream>
 
 #include "BackEnd.h"
 
@@ -24,16 +25,6 @@ BackEnd::BackEnd(QObject *parent) :
         m_GameState.PlayerBekommtKarten(Move.GetMoveSimple(), nActualPlayer);
         nActualPlayer = (nActualPlayer + 1) % NUMBER_PLAYER;
     }
-
-//    for ()
-
-//    for (n = CARD_7; n < NUMBER_VALUE; n++)
-//    {
-//        m_GameState.PlayerBekommtKarten(TMoveSimple(2, n), 0);
-//        m_GameState.PlayerBekommtKarten(TMoveSimple(2, n), 1);
-//        m_GameState.PlayerBekommtKarten(TMoveSimple(2, n), 2);
-//        m_GameState.PlayerBekommtKarten(TMoveSimple(2, n), 3);
-//    }
 
     // Notify observers
     emit playerCardsTextChanged();
@@ -75,16 +66,11 @@ QString BackEnd::getPlayerCardsText(int nPlayerID)
     CPlayerSimpleAI2 PlayerSimpleAI2;
     TMoveSimple MoveSimpleAI;
 
-    // Player 0 receives a lot of cards
     for (int v = 0; v < NUMBER_VALUE; v++)
         if (m_GameState.m_CardDistribution[nPlayerID][v] > 0)
             s = s + TMoveSimple(m_GameState.m_CardDistribution[nPlayerID][v], v).GetText();
 
-    // Let the AI think
-    MoveSimpleAI = PlayerSimpleAI2.ThinkInGameState(&m_GameState);
-    MoveSimpleAI.GetText();
-
-    return QString::fromStdString(s + " SimpleAI2: " + MoveSimpleAI.GetText());
+    return QString::fromStdString(s);
 }
 
 
@@ -93,8 +79,11 @@ Q_INVOKABLE void BackEnd::playCards()
 {
     if (m_GameState.PlayCards(m_MoveSimple, true, true) == JOJO_ERROR)
     {
-        g_pKonfig->Log("Error: You cannot play this move " + m_MoveSimple.GetText());
+        g_pKonfig->Log("[BackEnd::playCards] Error: You cannot play this move " + m_MoveSimple.GetText());
     }
+
+    std::string s = m_GameState.GetDescription();
+    std::cout << m_GameState.GetDescription() << std::endl;
 
     emit lastMoveSimpleTextChanged();
     emit playerCardsTextChanged();
