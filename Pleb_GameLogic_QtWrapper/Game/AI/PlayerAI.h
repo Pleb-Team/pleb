@@ -114,6 +114,14 @@ public:
 			assert( MYCARDS[ CARD_7 ] && L"Spieler muß mit Karo7 beginnen, hat aber gar keine 7!");
 			return TMoveSimple( MYCARDS[ CARD_7 ], CARD_7 );
 		}
+
+        // If game control is outside, it might happen that a player may restart, but htere
+        // is still a lst move.
+        if (m_GameState.m_nActualPlayer == m_GameState.m_nLastPlayer)
+        {
+            assert(m_GameState.m_LastMoveSimple.IsEmpty() && L"Whoops, game contronl not correctly implemented: If ActualPlayer is the one who played last, he is allowed to restart and thus LastMove should have been cleared!");
+        }
+
 		return Think();	
     }
 
