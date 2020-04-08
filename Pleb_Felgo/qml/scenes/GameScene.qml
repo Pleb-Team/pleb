@@ -2,7 +2,7 @@ import Felgo 3.0
 import QtQuick 2.12
 import "../common"
 import "../game/one"
-import "../game/blatt52"
+import "../game/pleb"
 import "../interface"
 
 SceneBase {
@@ -14,6 +14,7 @@ SceneBase {
   signal cardSelected(var cardId)
   signal stackSelected()
   signal colorPicked(var pickedColor)
+  signal depotSelected()
 
   // access the elements from outside
   property alias deck: deck
@@ -118,10 +119,20 @@ SceneBase {
 
     NumberAnimation { id: mirrorAnimation; target: depotImage; properties: "rotation";
       from: 0; to: 180; duration: 400; easing.type: Easing.InOutQuad }
+
+    // clickable depot area
+    MouseArea {
+      id: depotButton
+      anchors.fill: parent
+      acceptedButtons: Qt.LeftButton | Qt.RightButton
+      onClicked: {
+          gameScene.depotSelected()
+      }
+    }
   }
 
   // contains all game logic functions
-  GameLogic_52 {
+  GameLogic_pleb {
     id: gameLogic
   }
 
@@ -186,7 +197,7 @@ SceneBase {
   }
 
   // the deck on the right of the depot
-  Deck_52 {
+  Deck_pleb {
     id: deck
     anchors.verticalCenter: depot.verticalCenter
     anchors.left: depot.right
@@ -256,14 +267,14 @@ SceneBase {
     id: playerHands
     anchors.fill: gameWindowAnchorItem
 
-    PlayerHand_52 {
+    PlayerHand_pleb {
       id: bottomHand
       anchors.bottom: parent.bottom
       anchors.horizontalCenter: parent.horizontalCenter
       z: 100
     }
 
-    PlayerHand_52 {
+    PlayerHand_pleb {
       id: leftHand
       anchors.left: parent.left
       anchors.leftMargin: -width/2 + height/2
@@ -271,14 +282,14 @@ SceneBase {
       rotation: 90
     }
 
-    PlayerHand_52 {
+    PlayerHand_pleb {
       id: topHand
       anchors.top: parent.top
       anchors.horizontalCenter: parent.horizontalCenter
       rotation: 180
     }
 
-    PlayerHand_52 {
+    PlayerHand_pleb {
       id: rightHand
       anchors.right: parent.right
       anchors.rightMargin: -width/2 + height/2
@@ -288,7 +299,7 @@ SceneBase {
   }
 
   // the depot in the middle of the game field
-  Depot_52 {
+  Depot_pleb {
     id: depot
     //anchors.centerIn: gameWindowAnchorItem
     anchors.horizontalCenter: gameWindowAnchorItem.horizontalCenter

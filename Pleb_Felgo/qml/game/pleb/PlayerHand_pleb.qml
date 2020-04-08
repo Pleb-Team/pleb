@@ -3,7 +3,7 @@ import Felgo 3.0
 
 // the cards in the hand of the player
 Item {
-  id: playerHand
+  id: playerHandPleb
   width: 400
   height: 134
 
@@ -12,7 +12,7 @@ Item {
   property int originalHeight: 134
 
   // amount of cards in hand in the beginning of the game
-  property int start: 7
+  property int start: 8
   // array with all cards in hand
   property var hand: []
   // the owner of the cards
@@ -115,7 +115,7 @@ Item {
     // make sure they stay within the playerHand
     offset = originalWidth * zoom / 10
     if (hand.length > 7){
-      offset = playerHand.originalWidth * zoom / hand.length / 1.5
+      offset = playerHandPleb.originalWidth * zoom / hand.length / 1.5
     }
 
     // calculate the card position and rotation in the hand and change the z order
@@ -128,7 +128,7 @@ Item {
       //offset of all cards + one card width
       var handWidth = offset * (hand.length - 1) + card.originalWidth * zoom
       // x value depending on the array position
-      var cardX = (playerHand.originalWidth * zoom - handWidth) / 2 + (i * offset)
+      var cardX = (playerHandPleb.originalWidth * zoom - handWidth) / 2 + (i * offset)
 
       card.rotation = cardAngle
       card.y = Math.abs(cardAngle) * 1.5
@@ -173,7 +173,7 @@ Item {
 
   // change the parent of the card to playerHand
   function changeParent(card){
-    card.newParent = playerHand
+    card.newParent = playerHandPleb
     card.state = "player"
   }
 
@@ -185,6 +185,25 @@ Item {
       }
     }
     return false
+  }
+
+  // counts how many cards with the supplied points are in hand
+  function countCards(points) {
+      var result = 0
+      for (var i = 0; i < hand.length; i ++){
+        if(hand[i].points === points){
+          result++
+        }
+      }
+      return result
+  }
+
+  function canBeatDepot() {
+      var beat = false
+      for (var i = 0; !beat && i < hand.length; i++) {
+          beat = hand[i].points > depot.lastDeposit[0].points && countCards(hand[i].points) >= depot.lastDeposit.length
+      }
+      return beat
   }
 
   // remove card with a specific id from hand
@@ -201,24 +220,62 @@ Item {
     }
   }
 
+  function getSelectedGroup() {
+      var result = []
+      for (var i = 0; i < hand.length; i++) {
+          if (hand[i].glowGroupImage.visible === true) {
+              result.push(hand[i])
+          }
+      }
+      return result
+  }
+
+  function getAllAvailableGroups(gPoints) {
+      var result = []
+      var pointGroup = {}
+      var group
+      for (var i = 0; i < hand.length; i++) {
+          group = pointGroup[hand[i].points]
+          if (!group) {
+              group = []
+              pointGroup[hand[i].points] = group
+          }
+          group.push(hand[i])
+      }
+      for (var j = ((gPoints) ? gPoints : 0); j < 15; j++) {
+          group = pointGroup[j]
+          if (group) {
+              for (var k = group.length; k > 1; k--) {
+                  result.push(group.slice(0, k))
+              }
+          }
+      }
+      return result
+  }
+
   // highlight all valid cards by setting the glowImage visible
   function markValid(){
     if (!depot.skipped && !gameLogic.gameOver && !colorPicker.chosingColor){
+        var selectedGroup = getSelectedGroup()
       for (var i = 0; i < hand.length; i ++){
         if (depot.validCard(hand[i].entityId)){
-          hand[i].glowImage.visible = true
+            if (selectedGroup.length === 0 || (selectedGroup[0].points === hand[i].points && (depot.lastDeposit.length === 0 || selectedGroup.length < depot.lastDeposit.length || player.userId === depot.lastPlayer))) { // TODO LASTCARD || depot.finishedPlayers.includes(depot.lastPlayer)))) {
+                hand[i].glowImage.visible = !hand[i].glowGroupImage.visible
+            } else {
+                hand[i].glowImage.visible = false
+            }
           hand[i].updateCardImage()
         }else{
           hand[i].glowImage.visible = false
-          hand[i].saturation = -0.5
-          hand[i].lightness = 0.5
+            hand[i].glowGroupImage.visible = false
         }
       }
       // mark the stack if there are no valid cards in hand
-      var validId = randomValidId()
-      if(validId == null){
-        deck.markStack()
-      }
+//      var validId = randomValidId()
+//      if(validId == null){
+//          console.debug("marking STACK AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+//        deck.markStack()
+//      }
     }
   }
 
@@ -226,6 +283,7 @@ Item {
   function unmark(){
     for (var i = 0; i < hand.length; i ++){
       hand[i].glowImage.visible = false
+        hand[i].glowGroupImage.visible = false
       hand[i].updateCardImage()
     }
   }
@@ -233,8 +291,8 @@ Item {
   // scale the whole playerHand of the active localPlayer with a zoom factor
   function scaleHand(scale){
     zoom = scale
-    playerHand.height = playerHand.originalHeight * zoom
-    playerHand.width = playerHand.originalWidth * zoom
+    playerHandPleb.height = playerHandPleb.originalHeight * zoom
+    playerHandPleb.width = playerHandPleb.originalWidth * zoom
     for (var i = 0; i < hand.length; i ++){
       hand[i].width = hand[i].originalWidth * zoom
       hand[i].height = hand[i].originalHeight * zoom
@@ -263,6 +321,7 @@ Item {
         valids.push(entityManager.getEntityById(hand[i].entityId))
       }
     }
+//    console.debug("could play: " + valids)
     return valids
   }
 
@@ -303,9 +362,9 @@ Item {
     }
   }
 
-  // check if the player has won with zero cards left
+  // check if the player has finished with zero cards left
   function checkWin(){
-    if (hand.length == 0 && onu){
+    if (hand.length == 0){
       winSound.play()
       return true
     }else{
