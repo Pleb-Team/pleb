@@ -577,7 +577,8 @@ Item {
   function executeAIMove() {
     if(!depot.skipped){
 //      playRandomValid()
-        playPlebRandom()
+//      playPlebRandom()
+        playPlebCustom()
     }
   }
 
@@ -687,7 +688,11 @@ Item {
 
   // start the turn for the active player
   function turnStarted(playerId) {
+
     console.debug("turnStarted() called")
+
+    // let the AI compute a move recommendation (it is not being played here)
+    legacyBridge.getMove(multiplayer.activePlayer.userId);
 
     if(!multiplayer.activePlayer) {
       console.debug("ERROR: activePlayer not valid in turnStarted!")
@@ -740,6 +745,7 @@ Item {
     for (var i = 0; i < playerTags.children.length; i++){
       playerTags.children[i].canvas.requestPaint()
     }
+
     // schedule AI to take over in 3 seconds in case the player is gone
     multiplayer.leaderCode(function() {
       if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected) {
