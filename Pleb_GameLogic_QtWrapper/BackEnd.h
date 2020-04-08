@@ -25,14 +25,11 @@ class BackEnd : public QObject
     Q_PROPERTY(int moveSimpleValue READ getMoveSimpleValue WRITE setMoveSimpleValue NOTIFY moveSimpleValueChanged)
     Q_PROPERTY(int moveSimpleNumber READ getMoveSimpleNumber WRITE setMoveSimpleNumber NOTIFY moveSimpleNumberChanged)
     Q_PROPERTY(QString moveSimpleText READ getMoveSimpleText NOTIFY moveSimpleTextChanged)
-
-    // Move computed by the AI
-//    Q_PROPERTY(int moveSimpleAIValue READ getMoveSimpleValue WRITE setMoveSimpleValue NOTIFY moveSimpleValueChanged)
-//    Q_PROPERTY(int moveSimpleAINumber READ getMoveSimpleNumber WRITE setMoveSimpleNumber NOTIFY moveSimpleNumberChanged)
+    Q_PROPERTY(QString moveSimpleAI READ getMoveSimpleAIText)
 
     Q_PROPERTY(int actualPlayerID READ getActualPlayerID WRITE setActualPlayerID NOTIFY actualPlayerIDChanged)
     Q_PROPERTY(int lastPlayerID READ getLastPlayerID WRITE setLastPlayerID NOTIFY lastPlayerIDChanged)
-    Q_PROPERTY(int numberPlayersMax READ getNumberPlayersMax)
+//    Q_PROPERTY(int numberPlayersMax READ getNumberPlayersMax)
     Q_PROPERTY(int numberPlayersInGame READ getNumberPlayersInGame)
 
     Q_PROPERTY(QString playerCardsText READ getPlayerCardsText NOTIFY playerCardsTextChanged)
@@ -40,31 +37,22 @@ class BackEnd : public QObject
 
 
 private:
-    QString m_userName;
-
-    TMoveSimple m_MoveSimple = TMoveSimple(3, CARD_BUBE);
-    CMoveResults m_MoveSimpleResults();
-    CMove m_Move = CMove(CARD_DAME, COLOR_PIK);
+    TMoveSimple m_MoveSimple = c_MoveSimpleSchieben;
+    TMoveSimple m_MoveSimpleAI = c_MoveSimpleSchieben;
     CGameState m_GameState;
-    CGameStatistics m_GameStatistics;
     CGame m_Game;
 
 
 public:
     explicit BackEnd(QObject *parent = nullptr);
 
+
+    // Manipulate internal MoveSimple just as GUI helper
     Q_INVOKABLE QString getMoveSimpleText() { return QString::fromStdString(m_MoveSimple.GetText() );  }
     Q_INVOKABLE int getMoveSimpleValue() { return m_MoveSimple.ValueCards; }
     Q_INVOKABLE void setMoveSimpleValue(const int MoveSimpleValue);
-
     Q_INVOKABLE int getMoveSimpleNumber() { return m_MoveSimple.NumberCards; }
     Q_INVOKABLE void setMoveSimpleNumber(const int MoveSimpleNumber);
-
-    Q_INVOKABLE int getActualPlayerID() { return m_GameState.m_nActualPlayer; }
-    Q_INVOKABLE void setActualPlayerID(int n) { m_GameState.m_nActualPlayer = n; }
-
-    Q_INVOKABLE int getLastPlayerID() { return m_GameState.m_nLastPlayer; }
-    Q_INVOKABLE void setLastPlayerID(int n) { m_GameState.m_nLastPlayer = n; }
 
     // How many players still have > 0 cards
     Q_INVOKABLE int getNumberPlayersInGame() { return m_GameState.GetNumberPlayers(); }
@@ -72,17 +60,55 @@ public:
     // Maximum number of players possible, e.g. at beginning of game
     Q_INVOKABLE int getNumberPlayersMax() { return NUMBER_PLAYER; }
 
-    Q_INVOKABLE QString getLastMoveSimpleText() { return QString::fromStdString(m_GameState.m_LastMoveSimple.GetText() );  }
-
-    Q_INVOKABLE QString getPlayerCardsText() { return getPlayerCardsText(m_GameState.m_nActualPlayer); }
+    Q_INVOKABLE QString getPlayerCardsText() { return QString::fromStdString(m_GameState.GetDescription()); }
     Q_INVOKABLE QString getPlayerCardsText(int nPlayerID);
 
-    Q_INVOKABLE void resetGameState() { m_GameState.Reset(); }
-    Q_INVOKABLE void addPlayerCards(int nPlayerID, int nNumberCards, int nValueCards) {
-        m_GameState.PlayerBekommtKarten(TMoveSimple(nNumberCards, nValueCards), nPlayerID);  }
+    // Access to LastPlayerID, i.e. thte player who played the last move which is currently
+    // visible in the center of the table (deck)
+    Q_INVOKABLE int getLastPlayerID() { return m_GameState.m_nLastPlayer; }
+    Q_INVOKABLE void setLastPlayerID(int n) { m_GameState.m_nLastPlayer = n; }
 
 
     Q_INVOKABLE void playCards();
+
+    // --------------------------------------------------------------------------------------------
+
+
+    // Resets Lastmove, LastPlayer, NumberPlayer, ActualPLayer all to initial invalid (-1)
+    // and clears all cards, i.e. all players have empty hands
+    Q_INVOKABLE void resetGameState() {
+        m_MoveSimpleAI = c_MoveSimpleSchieben;
+        m_GameState.Reset(); }
+
+    // Adds the given card number and value to the mentioned players cards in his hand
+    Q_INVOKABLE void addPlayerCards(int nPlayerID, int nNumberCards, int nValueCards)    {
+        m_GameState.PlayerBekommtKarten(TMoveSimple(nNumberCards, nValueCards), nPlayerID);  }
+
+    // Set the last move, i.e. what cards are currently visible in the centre of the table.
+    // For the game rules, it is also important who played these cards thus nLastPlayerID must be given
+    Q_INVOKABLE QString getLastMoveSimpleText() { return QString::fromStdString(m_GameState.m_LastMoveSimple.GetText() );  }
+    Q_INVOKABLE void setLastMoveSimple(int nLastPlayerID, int nNumberCards, int nValueCards) {
+        m_GameState.m_nLastPlayer = nLastPlayerID;
+        m_GameState.m_LastMoveSimple = TMoveSimple(nNumberCards, nValueCards); }
+
+    // Access to the current Player, i.e. the one who is next to play
+    // \todo Integrate as a parameter into the rountine think()
+    Q_INVOKABLE int getActualPlayerID() { return m_GameState.m_nActualPlayer; }
+    Q_INVOKABLE void setActualPlayerID(int n) { m_GameState.m_nActualPlayer = n; }
+
+    // Start the AI think routine and let the AI compute a smart move for the current player, which
+    // will be stored in m_MoveSimpleAI. It can be read through getMoveSimpleAI(Value|Number)
+    Q_INVOKABLE void think() {
+        CPlayerSimpleAI2 PlayerSimpleAI2;
+        m_MoveSimpleAI = PlayerSimpleAI2.ThinkInGameState(&m_GameState);   }
+
+    // Read the AI move as computed before via think()
+    // \todo would be nicer to return this tuple directly as function result of think(), but how to return 2 integers?
+    Q_INVOKABLE int getMoveSimpleAIValue() { return m_MoveSimpleAI.ValueCards; }
+    Q_INVOKABLE int getMoveSimpleAINumber() { return m_MoveSimpleAI.NumberCards; }
+    Q_INVOKABLE QString getMoveSimpleAIText() { return QString::fromStdString(m_MoveSimpleAI.GetText()); }
+
+
 
 signals:
     void moveSimpleValueChanged();
