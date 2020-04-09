@@ -81,7 +81,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 INCLUDEPATH += ../Pleb_GameLogic_QtWrapper
-LIBS += -L../build-Pleb_GameLogic_QtWrapper-Desktop_Qt_5_13_2_MinGW_32_bit-Debug/debug -llibPleb_GameLogic_QtWrapper
+# LIBS += -L../build-Pleb_GameLogic_QtWrapper-Desktop_Qt_5_13_2_MinGW_32_bit-Debug/debug -llibPleb_GameLogic_QtWrapper
+# LIBS += -L ../build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug -llibPleb_GameLogic_QtWrapper
+#LIBS += -L/Users/joachim/Programmieren/Pleb/build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug -llibPleb_GameLogic_QtWrapper
+
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -95,3 +98,16 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS +=
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug/release/ -lPleb_GameLogic_QtWrapper
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug/debug/ -lPleb_GameLogic_QtWrapper
+else:unix: LIBS += -L$$PWD/../build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug/ -lPleb_GameLogic_QtWrapper
+
+INCLUDEPATH += $$PWD/../build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug
+DEPENDPATH += $$PWD/../build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug/release/libPleb_GameLogic_QtWrapper.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug/debug/libPleb_GameLogic_QtWrapper.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug/release/Pleb_GameLogic_QtWrapper.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug/debug/Pleb_GameLogic_QtWrapper.lib
+else:unix: PRE_TARGETDEPS += $$PWD/../build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug/libPleb_GameLogic_QtWrapper.a
