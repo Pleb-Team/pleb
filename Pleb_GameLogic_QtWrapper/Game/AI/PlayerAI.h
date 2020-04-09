@@ -119,7 +119,12 @@ public:
         // is still a lst move.
         if (m_GameState.m_nActualPlayer == m_GameState.m_nLastPlayer)
         {
-            assert(m_GameState.m_LastMoveSimple.IsEmpty() && L"Whoops, game contronl not correctly implemented: If ActualPlayer is the one who played last, he is allowed to restart and thus LastMove should have been cleared!");
+            if (!m_GameState.m_LastMoveSimple.IsEmpty())
+            {
+                m_GameState.m_LastMoveSimple = c_MoveSimpleSchieben;
+                g_pKonfig->Log("[CPlayerAI::ThinkInGameState] Whoops, game contronl not correctly implemented: If ActualPlayer is the one who played last, he is allowed to restart and thus LastMove should have been cleared! Applyging correction now ...");
+                //assert(m_GameState.m_LastMoveSimple.IsEmpty() && L"Whoops, game contronl not correctly implemented: If ActualPlayer is the one who played last, he is allowed to restart and thus LastMove should have been cleared!");
+            }
         }
 
 		return Think();	

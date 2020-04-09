@@ -4,7 +4,7 @@ import QtGraphicalEffects 1.0
 import "../../scenes"
 
 EntityBase {
-  id: card
+  id: cardPleb
   entityType: "card"
   width: 82
   height: 134
@@ -15,9 +15,9 @@ EntityBase {
   property int originalHeight: 134
 
   // these properties are different for every card type
-  variationType: "wild4"
-  property int points: 50
-  property string cardColor: "black"
+  variationType: "ace"
+  property int points: 14
+  property string cardColor: "spades"
   property int order
 
   // hidden cards show the back side  
@@ -31,12 +31,8 @@ EntityBase {
   // access the image and text from outside
   property alias cardImage: cardImage
   property alias glowImage: glowImage
+  property alias glowGroupImage: glowGroupImage
   property alias cardButton: cardButton
-
-  // for coloring the card
-  property real hue: 60/360 // red
-  property real lightness: 0
-  property real saturation: 0
 
   // used to reparent the cards at runtime
   property var newParent
@@ -48,7 +44,18 @@ EntityBase {
     anchors.centerIn: parent
     width: parent.width * 1.3
     height: parent.height * 1.2
-    source: "../../../assets/img/cards/one/glow.png"
+    source: "../../../assets/img/cards/blatt52/glow.png"
+    visible: false
+    smooth: true
+  }
+
+  // glow image highlights a group card
+  Image {
+    id: glowGroupImage
+    anchors.centerIn: parent
+    width: parent.width * 1.3
+    height: parent.height * 1.2
+    source: "../../../assets/img/cards/blatt52/glowGroup.png"
     visible: false
     smooth: true
   }
@@ -57,32 +64,21 @@ EntityBase {
   Image {
     id: cardImage
     anchors.fill: parent
-    source: "../../../assets/img/cards/one/back.png"
+    source: "../../../assets/img/cards/blatt52/back.png"
     smooth: true
-
-    // changes the cards hue according to the cardColor
-    layer.enabled: true
-    layer.effect: HueSaturation {
-      hue: parent.hue
-      lightness: parent.lightness
-      saturation: parent.saturation
-
-      Behavior on lightness {
-        NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
-      }
-
-      Behavior on saturation {
-        NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
-      }
-    }
   }
 
   // clickable card area
   MouseArea {
     id: cardButton
     anchors.fill: parent
+    acceptedButtons: Qt.LeftButton | Qt.RightButton
     onClicked: {
-      gameScene.cardSelected(entityId)
+        if (mouse.button === Qt.RightButton) {
+            gameScene.cardGroupToggle(entityId)
+        } else {
+            gameScene.cardSelected(entityId)
+        }
     }
   }
 
@@ -124,15 +120,15 @@ EntityBase {
   states: [
     State {
       name: "depot"
-      ParentChange { target: card; parent: newParent; x: 0; y: 0; rotation: 0}
+      ParentChange { target: cardPleb; parent: newParent; x: 0; y: 0; rotation: 0}
     },
     State {
       name: "player"
-      ParentChange { target: card; parent: newParent; x: 0; y: 0; rotation: 0}
+      ParentChange { target: cardPleb; parent: newParent; x: 0; y: 0; rotation: 0}
     },
     State {
       name: "stack"
-      ParentChange { target: card; parent: newParent; x: 0; y: 0; rotation: 0}
+      ParentChange { target: cardPleb; parent: newParent; x: 0; y: 0; rotation: 0}
     }
   ]
 
@@ -154,39 +150,16 @@ EntityBase {
   }
 
   // update the card image of turning cards
-  // update wild and wild4 cards after selecting a color
-  // use normal multicolor images for wild and wild4 cards
-  // color the other cards with the help of HueSaturation
   function updateCardImage(){
     // hidden cards show the back side without effect
     if (hidden){
-      cardImage.layer.enabled = false // deactivate coloring of card
-      cardImage.source = "../../../assets/img/cards/one/back.png"
-      // wild and wild4 cards use normal multicolor images without effect
-    } else if (variationType == "wild" || variationType == "wild4"){
-      card.hue = 0
-      card.saturation = 0
-      card.lightness = 0.0
-      cardImage.layer.enabled = true // enable coloring of card
-      cardImage.source = "../../../assets/img/cards/one/" + variationType + "_" + cardColor + ".png"
-      // the numbered cards, skip and draw2 are colored with the help of HueSaturation
+      cardImage.source = "../../../assets/img/cards/blatt52/back.png"
+    } else if (variationType == "ten") {
+        cardImage.source = "../../../assets/img/cards/blatt52/" + "X" + cardColor.charAt(0).toLowerCase() + ".png"
+    } else if (variationType == "jack" || variationType == "queen" || variationType == "king" || variationType == "ace"){
+      cardImage.source = "../../../assets/img/cards/blatt52/" + variationType.charAt(0).toUpperCase() + cardColor.charAt(0).toLowerCase() + ".png"
     } else {
-      cardImage.layer.enabled = true // enable coloring of card
-      card.lightness = 0.0
-      if (cardColor == "yellow") {
-        card.hue = 55/360
-        card.saturation = 0
-      } else if (cardColor == "red") {
-        card.hue = 0/360
-        card.saturation = 0
-      } else if (cardColor == "green") {
-        card.hue = 110/360
-        card.saturation = -0.1
-      } else if (cardColor == "blue") {
-        card.hue = 220/360
-        card.saturation = -0.1
-      }
-      cardImage.source = "../../../assets/img/cards/one/" + variationType + "_red.png"
+        cardImage.source = "../../../assets/img/cards/blatt52/" + points + cardColor.charAt(0).toLowerCase() + ".png"
     }
   }
 }

@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Felgo 3.0
 import "../common"
 
-// window leads to the Felgo website
+// window leads to the Pleb repo
 Item {
   id: website
   width: 400
@@ -47,12 +47,12 @@ Item {
     anchors.margins: 40
     spacing: 20
 
-    // website header
+    // repo header
     Text {
       id: websiteText
       horizontalAlignment: Text.AlignHCenter
       anchors.horizontalCenter: parent.horizontalCenter
-      text: "Felgo"
+      text: "Pleb"
       font.family: standardFont.name
       color: "black"
       font.pixelSize: 36
@@ -60,12 +60,12 @@ Item {
       wrapMode: Text.Wrap
     }
 
-    // website note
+    // repo note
     Text {
       id: websiteNote
       horizontalAlignment: Text.AlignHCenter
       anchors.horizontalCenter: parent.horizontalCenter
-      text: "This game is built with Felgo. The source code is available in the free Felgo SDK - so you can build your own card game in minutes! Visit Felgo.net now?"
+      text: "Visit the Pleb repository on GitHub now?"
       font.family: standardFont.name
       color: "black"
       font.pixelSize: 20
@@ -93,7 +93,7 @@ Item {
     }
   }
 
-  // button to the website
+  // button to the repo
   ButtonBase {
     anchors.right: parent.right
     anchors.top: parent.bottom
@@ -107,11 +107,12 @@ Item {
     textSize: 28
     text: "Yes"
     onClicked: {
-      // open the website instead
+      // open the repo website instead
 //      ga.logEvent("User", "Felgo")
 //      flurry.logEvent("User.Felgo")
-      nativeUtils.openUrl("https://felgo.com/onu-game-in-app/")// this is added by the wp redirect: /?utm_medium=game&utm_source=onu&utm_campaign=onu - do not add this here, because then we cant link e.g. to an anchor like showcases/#onu
+      nativeUtils.openUrl("https://github.com/Pleb-Team/pleb")
       website.visible = false
     }
   }
+
 }
