@@ -52,3 +52,10 @@ compile_commands.json
 *creator.user*
 
 *_qmlcache.qrc
+
+# MacOS Stuff
+.DS_Store
+
+
+
+
