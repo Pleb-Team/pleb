@@ -1,5 +1,5 @@
 # allows to add DEPLOYMENTFOLDERS and links to the Felgo library and QtCreator auto-completion
-CONFIG += felgo
+#CONFIG += felgo
 #CONFIG += felgo-live
 
 # Joachim: Enabling is needed if we want to use our own C++ sources and Felgo live server. IT generates a bunch
@@ -11,7 +11,7 @@ CONFIG += felgo
 
 # Project identifier and version
 # More information: https://felgo.com/doc/felgo-publishing/#project-configuration
-PRODUCT_IDENTIFIER = com.yourcompany.wizardEVP.FelgoEmptyProject
+PRODUCT_IDENTIFIER = de.stuggi.hackaton.pleb_minigui
 PRODUCT_VERSION_NAME = 1.0.0
 PRODUCT_VERSION_CODE = 1
 
@@ -29,7 +29,8 @@ DEPLOYMENTFOLDERS += assetsFolder
 
 # Add more folders to ship with the application here
 
-RESOURCES += #    resources.qrc # uncomment for publishing
+RESOURCES += \ #    resources.qrc # uncomment for publishing
+    resources.qrc
 
 # NOTE: for PUBLISHING, perform the following steps:
 # 1. comment the DEPLOYMENTFOLDERS += qmlFolder line above, to avoid shipping your qml files with the application (instead they get compiled to the app binary)
@@ -42,7 +43,13 @@ RESOURCES += #    resources.qrc # uncomment for publishing
 
 
 # The .cpp file which was generated for your project. Feel free to hack it.
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    ../Pleb_GameLogic_QtWrapper/Backend.cpp \
+    ../Pleb_GameLogic_QtWrapper/Game/AI/PlayerAI.cpp \
+    ../Pleb_GameLogic_QtWrapper/Game/AI/PlayerSimpleAI2.cpp \
+    ../Pleb_GameLogic_QtWrapper/Game/Game/Game.cpp \
+    ../Pleb_GameLogic_QtWrapper/Game/Game/GameStatistics.cpp \
+    ../Pleb_GameLogic_QtWrapper/Game/Konfiguration.cpp
 
 
 android {
@@ -80,8 +87,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-INCLUDEPATH += ../Pleb_GameLogic_QtWrapper
-LIBS += -L../build-Pleb_GameLogic_QtWrapper-Desktop_Qt_5_13_2_MinGW_32_bit-Debug/debug -llibPleb_GameLogic_QtWrapper
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -94,6 +99,17 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-HEADERS +=
-
-DISTFILES +=
+HEADERS += \
+    ../Pleb_GameLogic_QtWrapper/BackEnd.h \
+    ../Pleb_GameLogic_QtWrapper/Game/AI/PlayerAI.h \
+    ../Pleb_GameLogic_QtWrapper/Game/AI/PlayerSimpleAI2.h \
+    ../Pleb_GameLogic_QtWrapper/Game/Game/Game.h \
+    ../Pleb_GameLogic_QtWrapper/Game/Game/GameResult.h \
+    ../Pleb_GameLogic_QtWrapper/Game/Game/GameState.h \
+    ../Pleb_GameLogic_QtWrapper/Game/Game/GameStatistics.h \
+    ../Pleb_GameLogic_QtWrapper/Game/Game/Move.h \
+    ../Pleb_GameLogic_QtWrapper/Game/Game/MoveSimple.h \
+    ../Pleb_GameLogic_QtWrapper/Game/Game/MoveSimpleResults.h \
+    ../Pleb_GameLogic_QtWrapper/Game/Global.h \
+    ../Pleb_GameLogic_QtWrapper/Game/GlobalConstants.h \
+    ../Pleb_GameLogic_QtWrapper/Game/Konfiguration.h
