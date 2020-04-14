@@ -309,21 +309,21 @@ SceneBase {
       opacity: communityButton.hidden ? 0 : 1
     }
 
-    // button to connect with facebook
-    ButtonBase {
-      color: "transparent"
-      width: communityButton.width
-      height: communityButton.height
-      anchors.margins: communityButton.anchors.margins
-      buttonImage.source: "../../assets/img/Facebook.png"
-      visible: !system.desktopPlatform && !gameNetwork.facebookConnectionSuccessful
+//    // button to connect with facebook
+//    ButtonBase {
+//      color: "transparent"
+//      width: communityButton.width
+//      height: communityButton.height
+//      anchors.margins: communityButton.anchors.margins
+//      buttonImage.source: "../../assets/img/Facebook.png"
+//      visible: !system.desktopPlatform && !gameNetwork.facebookConnectionSuccessful
 
-      onClicked: {
-//        ga.logEvent("User", "Show Facebook")
-//        flurry.logEvent("User.ShowFacebook")
-        connectFacebook.visible ^= true
-      }
-    }
+//      onClicked: {
+////        ga.logEvent("User", "Show Facebook")
+////        flurry.logEvent("User.ShowFacebook")
+//        connectFacebook.visible ^= true
+//      }
+//    }
 
     // button to share the game
     ButtonBase {
@@ -434,16 +434,16 @@ SceneBase {
     }
   }
 
-  ConnectFacebookWindow {
-    id: connectFacebook
-    visible: false
-    scale: 0.5
-    anchors.centerIn: gameWindowAnchorItem
-    onConnectFacebookClicked: {
-      // close community submenu after showing facebook dialog
-      communityButton.clicked()
-    }
-  }
+//  ConnectFacebookWindow {
+//    id: connectFacebook
+//    visible: false
+//    scale: 0.5
+//    anchors.centerIn: gameWindowAnchorItem
+//    onConnectFacebookClicked: {
+//      // close community submenu after showing facebook dialog
+//      communityButton.clicked()
+//    }
+//  }
 
 //  LikeWindow {
 //    id: like
