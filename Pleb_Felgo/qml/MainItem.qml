@@ -380,15 +380,15 @@ Item {
   }
 
   // use loader to check for available app updates
-  Loader {
-    property string updateCheckUrl: system.publishBuild ? "https://felgo.com/qml-sources/OnuVersionCheck.qml" : "https://felgo.com/qml-sources/OnuVersionCheck-test.qml"
+//  Loader {
+//    property string updateCheckUrl: system.publishBuild ? "https://felgo.com/qml-sources/OnuVersionCheck.qml" : "https://felgo.com/qml-sources/OnuVersionCheck-test.qml"
 
-    visible: false
-    source: !system.desktopPlatform ? updateCheckUrl : ""
-    property var menuScene: mainItem.menuScene // required to access menuScene scaleFactor in loaded QML
-    property Component dialogComponent: Qt.createComponent(Qt.resolvedUrl("interface/OnuDialog.qml")) // make dialog component available for loaded QML
-    onLoaded: item.parent = mainItem
-  }
+//    visible: false
+//    source: !system.desktopPlatform ? updateCheckUrl : ""
+//    property var menuScene: mainItem.menuScene // required to access menuScene scaleFactor in loaded QML
+//    property Component dialogComponent: Qt.createComponent(Qt.resolvedUrl("interface/OnuDialog.qml")) // make dialog component available for loaded QML
+//    onLoaded: item.parent = mainItem
+//  }
 
   // checks if user has enough tokens before starting game
   function checkTokens(allowedHandler, customOption, optionHandler) {
