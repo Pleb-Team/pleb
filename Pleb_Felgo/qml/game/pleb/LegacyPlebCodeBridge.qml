@@ -55,8 +55,7 @@ Item {
 
 		// Now let the AI think
         arschlochGameLogic.think()
-        console.debug("[thinkAIWrapper] AI computed move for Player " + arschlochGameLogic.getActualPlayerID() + ": ")
-        console.debug(arschlochGameLogic.getMoveSimpleAIText())
+        console.debug("[thinkAIWrapper] AI computed move for Player " + arschlochGameLogic.getActualPlayerID() + ": " + arschlochGameLogic.getMoveSimpleAIText())
 
         // Decode legace card meanings (Number, Value) to Pleb coding
         var movePoints = arschlochGameLogic.getMoveSimpleAIValue() + 7
