@@ -67,7 +67,7 @@ GameWindow {
 
         Rectangle {
             anchors.fill: scene.gameWindowAnchorItem
-            color: "blue"
+            color: "lightblue"
         }
 
         Text {
