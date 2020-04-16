@@ -1,3 +1,7 @@
+#include <algorithm>    // std::shuffle
+#include <random>       // std::default_random_engine
+#include <chrono>       // std::chrono::system_clock
+
 #include "Game.h"
 
 
@@ -19,19 +23,12 @@ void CGame::ShuffleCards()
 		}
 	}
 
-	// Karten mischen
-	for (n = 0; n < NUMBER_CARD - 1; n++) 
-	{
-		// m ist gleichverteilt mit m <= n <= 31
-		m = n + (rand() % (NUMBER_CARD - n) );
+    // obtain a time-based seed:
+    unsigned seed = static_cast<unsigned int>(std::chrono::system_clock::now().time_since_epoch().count());
+    std::default_random_engine e(seed);
 
-		// Karten n und m tauschen
-		Karte = m_vecKarten[n]; m_vecKarten[n] = m_vecKarten[m]; m_vecKarten[m] = Karte;
-	}
-
-	//// Observer benachrichtigen, damit zB CKarte3D-Objekte angelegt werden können
-	//if (m_pGuiObserver)
-	//	m_pGuiObserver->Update( Jojo_EventKartenGemischt, this );
+    // Shuffle the cards
+    std::shuffle(m_vecKarten.begin(), m_vecKarten.end(), e);
 }
 
 

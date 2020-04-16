@@ -7,15 +7,20 @@ Item {
   property bool singlePlayer: false
   property bool initialized: false
   onInitializedChanged: console.debug("GameLogic.initialized changed to:", initialized)
+
   // the remaining turn time for the active player
   property double remainingTime
+
   // turn time for the active player, in seconds
   // do not set this too low, otherwise players with higher latency could run into problems as they get skipped by the leader
-  property int userInterval: multiplayer.myTurn && !multiplayer.amLeader ? 7 : 10
+  property int userInterval: multiplayer.myTurn && !multiplayer.amLeader ? 30 : 30
+
   // turn time for AI players, in milliseconds
   property int aiTurnTime: 600
+
   // restart the game at the end after a few seconds
   property int restartTime: 8000
+
   // whether the user has already drawn cards this turn or not
   property bool cardsDrawn: false
   property bool acted: false
@@ -56,15 +61,18 @@ Item {
 
     onTriggered: {
       remainingTime -= 1
+
       // let the AI play for the connected player after 10 seconds
       if (remainingTime === 0) {
         gameLogic.turnTimedOut()
       }
+
       // mark the valid card options for the active player
       if (multiplayer.myTurn){
         markValid()
         scaleHand()
       }
+
       // repaint the timer circle on the playerTag every second
       for (var i = 0; i < playerTags.children.length; i++){
         playerTags.children[i].canvas.requestPaint()
@@ -74,7 +82,7 @@ Item {
 
   // AI takes over after a few seconds if the player is not connected
   Timer {
-    id: aiTimeOut
+    id: aiTimeOutTimer
     interval: aiTurnTime
     onTriggered: {
       gameLogic.executeAIMove()
@@ -677,6 +685,7 @@ Item {
   // give the connected player 10 seconds until the AI takes over
   function startTurnTimer() {
     timer.stop()
+
     // 7 seconds
     remainingTime = userInterval
     if (!gameOver) {
@@ -749,7 +758,7 @@ Item {
     // schedule AI to take over in 3 seconds in case the player is gone
     multiplayer.leaderCode(function() {
       if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected) {
-        aiTimeOut.start()
+        aiTimeOutTimer.start()
       }
     })
   }
@@ -766,6 +775,9 @@ Item {
 
   // schedule AI to take over after 10 seconds if the connected player is inactive
   function turnTimedOut(){
+      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+      console.debug("[turnTimedOut] called. Active player UserID: " + userId)
+
     if (multiplayer.myTurn && !acted){
       acted = true
       scaleHand(1.0)
@@ -789,7 +801,7 @@ Item {
 
   // stop the timers and reset the deck at the end of the game
   function leaveGame(){
-    aiTimeOut.stop()
+    aiTimeOutTimer.stop()
     restartGameTimer.stop()
     timer.running = false
     depot.effectTimer.stop()
@@ -1324,7 +1336,7 @@ Item {
     scaleHand(1.0)
     gameOver = true
     onuButton.blinkAnimation.stop()
-    aiTimeOut.stop()
+    aiTimeOutTimer.stop()
     timer.running = false
     depot.effectTimer.stop()
 
