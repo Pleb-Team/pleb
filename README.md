@@ -2,48 +2,62 @@
 A cooperative project to write a fancy cross platform card game with various AI styles.
 
 # Table of Contents
-0. [Development](#development)
+
+1. [About](#about)
+1. [Screenshots](#screenshots)
 1. [Documentation](#documentation)
-2. [Changes](#changes)
-3. [ToDo](#todo)
-4. [Architecture](#architecture)
-5. [CI Continuous Integration](#CI)
-6. [Goals](#goals)
-7. [Dependencies](#dependencies)
-8. [Issues](#issues)
-9. [Yet in plan](#yet-in-plan)
+1. [Development](#development)
+1. [Licenses](#licenses)
 
-### Development
+### About
+Pleb is an implementation of the popular German card game **Arschloch** and English card game **President**. See at the [documentation](#documentation) for common rules.
 
-#### git
-* help with github changes on private email,  [remote: error: GH007: Your push would publish a private email address](https://www.masterdevops.eu/2019/04/14/git-error-gh007-your-push-would-publish-a-private-email-address/)
-* for [architecture graph](#development) look for [diagrams github support](https://www.diagrams.net/blog/github-support)
-* setup ssh github key :grin: in github user settings
+It is based on the former Windows version [arschloch3d](https://sourceforge.net/projects/arschloch3d/) which uses [Direct3D](https://en.wikipedia.org/wiki/Direct3D).
 
-#### qml / qt
-* qt-C++ to qml: [Integrating QML and C++](https://doc.qt.io/qt-5/qtqml-cppintegration-topic.html)
-* qml: [Felgo](https://felgo.com/apps/avoid-cpp-models-qt) howto
+### Screenshots
+* Android:
+<img src="docs/imgs/screenshot_android-1920x1080.png" width="30%">
+
+* IOS:
 
 ### Documentation
+* [Arschloch Rules](https://de.wikipedia.org/wiki/Arschloch_(Kartenspiel)) auf Deutsch
+* [President Rules](https://en.wikipedia.org/wiki/President_(card_game)) in English
 
-### Changes
 
-### ToDo
+### Development
+1. [Changes](#changes)
+1. [ToDo](#todo)
+1. [Architecture](#architecture)
+1. [CI Continuous Integration](#CI)
+1. [Dependencies](#dependencies)
 
-### Architecture
-![Diagram](PlebArchitecture.svg)
+
+#### Changes
+
+#### ToDo
+* use from Felgo independent multi-player cross platform system. Proposals:
+    - [Google Play Game Services](https://developers.google.com/games/services/) - unfortunately deprecated
+
+#### Architecture
+![Diagram](docs/PlebArchitecture.svg)
 
 (still early version of drawing, and [editable](https://app.diagrams.net/?mode=github)
 
-### CI
+#### CI
 * with Felgo comes [Felgo Cloud](https://felgo.com/pricing) for individual developers that supports [android deployment](https://felgo.com/doc/felgo-deployment-android/)
-* [travis](https://travis-ci.org/) as release builder one day :grin: or never
 * f-droid as deployment: [Publishing Nightly Builds](https://f-droid.org/de/docs/Publishing_Nightly_Builds/)
 
-### Goals
+#### Dependencies
+* [Felgo](https://felgo.com/): Multiplayer
 
-### Dependencies
+### Licenses
+* Software:
+   * Felgo license: https://felgo.com/pricing
+* Graphics:
+   * Background image: "Secessione della plebe sul Monte Sacro" Gravur von B. Barloccini, 1849, from Wikipedia as [public domain](https://commons.wikimedia.org/wiki/File:Secessio_plebis.JPG).
+* Sound/Music:
+   * Music: Bensound.com
+   * Sound: freesound.org
 
-### Issues
 
-### Yet in plan
