@@ -125,10 +125,6 @@ SceneBase {
     anchors.right: info.left
     anchors.rightMargin: 5
     visible: info.visible
-    onClicked: {
-//      ga.logEvent("User", "Profile")
-//      flurry.logEvent("User.Profile")
-    }
   }
 
   GameButton {
@@ -185,24 +181,10 @@ SceneBase {
     anchors.right: gameWindowAnchorItem.right
     anchors.rightMargin: 10
 
-    infoButton.enabled: player.name != ""
+    infoButton.enabled: player.name !== ""
     infoButton.onClicked: {
-//      ga.logEvent("User", "Own Player Details")
-//      flurry.logEvent("User.OwnPlayerDetails")
       info.visible ^= true
     }
-  }
-
-  // credits
-  Text {
-    anchors.bottom: gameWindowAnchorItem.bottom
-    anchors.bottomMargin: 10
-    anchors.right: gameWindowAnchorItem.right
-    anchors.rightMargin: 10
-    font.pixelSize: 6
-    color: "white"
-    text: "UNO © 2016 Matell, Inc."
-    visible: false
   }
 
   // main menu
@@ -217,30 +199,17 @@ SceneBase {
       anchors.horizontalCenter: parent.horizontalCenter
       text: "Quick Game"
       action: "quick"
-      onClicked: {
-//        ga.logEvent("User", "Quick Game")
-//        flurry.logEvent("User.Quick Game")
-      }
     }
 
     MenuButton {
       anchors.horizontalCenter: parent.horizontalCenter
       text: "Matchmaking"
-      onClicked: {
-//        ga.logEvent("User", "Matchmaking")
-//        flurry.logEvent("User.Matchmaking")
-      }
     }
 
     MenuButton {
       anchors.horizontalCenter: parent.horizontalCenter
       text: "Single Player"
       action: "single"
-      //visible: false
-      onClicked: {
-//        ga.logEvent("User", "Single Game")
-//        flurry.logEvent("User.Single Game")
-      }
     }
   }
 
@@ -278,8 +247,6 @@ SceneBase {
       onClicked: {
         hidden = !hidden
         slideMenu()
-//        ga.logEvent("User", "Community Menu")
-//        flurry.logEvent("User.Community Menu")
       }
 
       // slides the community menu in or out depending on the hidden
@@ -302,28 +269,17 @@ SceneBase {
       height: communityButton.height
       anchors.margins: communityButton.anchors.margins
       buttonImage.source: "../../assets/img/Friends.png"
-      onClicked: {
-//        ga.logEvent("User", "Friends")
-//        flurry.logEvent("User.Friends")
-      }
       opacity: communityButton.hidden ? 0 : 1
     }
 
-//    // button to connect with facebook
-//    ButtonBase {
-//      color: "transparent"
-//      width: communityButton.width
-//      height: communityButton.height
-//      anchors.margins: communityButton.anchors.margins
-//      buttonImage.source: "../../assets/img/Facebook.png"
-//      visible: !system.desktopPlatform && !gameNetwork.facebookConnectionSuccessful
-
-//      onClicked: {
-////        ga.logEvent("User", "Show Facebook")
-////        flurry.logEvent("User.ShowFacebook")
-//        connectFacebook.visible ^= true
-//      }
-//    }
+    MenuButton {
+      action: "leaderboard"
+      color: "transparent"
+      width: communityButton.width
+      height: communityButton.height
+      anchors.margins: communityButton.anchors.margins
+      buttonImage.source: "../../assets/img/Network.png"
+    }
 
     // button to share the game
     ButtonBase {
@@ -335,45 +291,21 @@ SceneBase {
       visible: !system.desktopPlatform
 
       onClicked: {
-//        ga.logEvent("User", "Share")
-//        flurry.logEvent("User.Share")
-        nativeUtils.share("Come and play " + gameTitle + " with me, the best multiplayer card game! My player name is " + gameNetwork.displayName, "https://felgo.com/one-download/")
+        nativeUtils.share("Come and play "
+                        + gameTitle
+                        + " with me, the best multiplayer card game! My player name is "
+                        + gameNetwork.displayName, "https://github.com/Pleb-team/pleb/")
       }
     }
 
-    // music and sound effect toggle buttons
-    Row {
-      spacing: 4
-
-      // button to toggle the music
-      ButtonBase {
-        color: "transparent"
-        width: communityButton.width
-        height: communityButton.height
-        anchors.margins: communityButton.anchors.margins
-        buttonImage.source: "../../assets/img/Music.png"
-        opacity: settings.musicEnabled ? 1.0 :  0.6
-        onClicked: {
-//          ga.logEvent("User", "Music")
-//          flurry.logEvent("User.Music")
-          settings.musicEnabled ^= true
-        }
-      }
-
-      // button to toggle the sound effects
-      ButtonBase {
-        color: "transparent"
-        width: communityButton.width
-        height: communityButton.height
-        anchors.margins: communityButton.anchors.margins
-        buttonImage.source: "../../assets/img/Sound.png"
-        opacity: settings.soundEnabled ? 1.0 :  0.6
-        onClicked: {
-//          ga.logEvent("User", "Sound")
-//          flurry.logEvent("User.Sound")
-          settings.soundEnabled ^= true
-        }
-      }
+    MenuButton {
+      id: inboxButton
+      action: "inbox"
+      color: "transparent"
+      width: communityButton.width
+      height: communityButton.height
+      anchors.margins: communityButton.anchors.margins
+      buttonImage.source: "../../assets/img/Messages.png"
     }
 
     // button to send feedback to Felgo
@@ -384,21 +316,11 @@ SceneBase {
       anchors.margins: communityButton.anchors.margins
       buttonImage.source: "../../assets/img/Instructions.png"
       onClicked: window.state = "instructions"
-      visible: false
+      visible: true
     }
-
-//    // button to send feedback to Felgo
-//    ButtonBase {
-//      color: "transparent"
-//      width: communityButton.width
-//      height: communityButton.height
-//      anchors.margins: communityButton.anchors.margins
-//      buttonImage.source: "../../assets/img/Invites.png"
-//      onClicked: showFeedback()
-//    }
   }
 
-  // message and leaderboard buttons
+  // sound and music buttons
   Row {
     anchors.bottom: gameWindowAnchorItem.bottom
     anchors.left: community.right
@@ -406,65 +328,33 @@ SceneBase {
     anchors.leftMargin: community.spacing
     spacing: community.spacing
 
-    MenuButton {
-      id: inboxButton
-      action: "inbox"
+
+    // button to toggle the music
+    ButtonBase {
       color: "transparent"
       width: communityButton.width
       height: communityButton.height
       anchors.margins: communityButton.anchors.margins
-      buttonImage.source: "../../assets/img/Messages.png"
+      buttonImage.source: "../../assets/img/Music.png"
+      opacity: settings.musicEnabled ? 1.0 :  0.6
       onClicked: {
-//        ga.logEvent("User", "Messages")
-//        flurry.logEvent("User.Messages")
+        settings.musicEnabled ^= true
       }
     }
 
-    MenuButton {
-      action: "leaderboard"
+    // button to toggle the sound effects
+    ButtonBase {
       color: "transparent"
       width: communityButton.width
       height: communityButton.height
       anchors.margins: communityButton.anchors.margins
-      buttonImage.source: "../../assets/img/Network.png"
+      buttonImage.source: "../../assets/img/Sound.png"
+      opacity: settings.soundEnabled ? 1.0 :  0.6
       onClicked: {
-//        ga.logEvent("User", "Network")
-//        flurry.logEvent("User.Network")
+        settings.soundEnabled ^= true
       }
     }
   }
-
-//  ConnectFacebookWindow {
-//    id: connectFacebook
-//    visible: false
-//    scale: 0.5
-//    anchors.centerIn: gameWindowAnchorItem
-//    onConnectFacebookClicked: {
-//      // close community submenu after showing facebook dialog
-//      communityButton.clicked()
-//    }
-//  }
-
-//  LikeWindow {
-//    id: like
-//    visible: false
-//    scale: 0.5
-//    anchors.centerIn: gameWindowAnchorItem
-//  }
-
-//  RatingWindow {
-//    id: rating
-//    visible: false
-//    scale: 0.5
-//    anchors.centerIn: gameWindowAnchorItem
-//  }
-
-//  FeedbackWindow {
-//    id: feedback
-//    visible: false
-//    scale: 0.5
-//    anchors.centerIn: gameWindowAnchorItem
-//  }
 
   WebsiteWindow {
     id: website
@@ -486,17 +376,6 @@ SceneBase {
       inboxButton.notification = count
     }
   }
-
-//  Connections {
-//    target: window.loadingScene
-//    onOpacityChanged: {
-//      if (window.loadingScene.opacity == 0){
-//        if (localStorage.getValue("appstarts") > 5 && !localStorage.getValue("feedbackSent")){
-//          showFeedback()
-//        }
-//      }
-//    }
-//  }
 
   // define Storage item for loading/storing key-value data
   // ask the user for feedback after opening the app 5 times
@@ -547,18 +426,10 @@ SceneBase {
   // sync messages on the main menu page
   onVisibleChanged: {
     if(visible){
-//      ga.logScreen("MenuScene")
-//      flurry.logEvent("Screen.MenuScene")
       gameNetwork.api.inbox()
       gameNetwork.sync()
     }
   }
-
-//  function showFeedback(){
-////    ga.logEvent("User", "Show Feedback Dialog")
-////    flurry.logEvent("User.ShowFeedbackDialog")
-//    like.visible = true
-//  }
 
   // enter scene will be called whenever menuScene is shown
   function enterScene() {
