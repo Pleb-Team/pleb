@@ -1,3 +1,6 @@
+Copyright (c) 2020 Pleb-Team
+
+
 # Pleb
 A cooperative project to write a fancy cross platform card game with various AI styles.
 
@@ -52,12 +55,18 @@ It is based on the former Windows version [arschloch3d](https://sourceforge.net/
 * [Felgo](https://felgo.com/): Multiplayer
 
 ### Licenses
-* Software:
-   * Felgo license: https://felgo.com/pricing
+* Pleb
+    <img src="docs/licenses/gplv3-88x31.png">
+    Licensed unter GPLv3: [License](LICENSE)
+    Copyright (c) 2020 Pleb-Team
+* 3rd party software:
+   * Felgo: [license](docs/licenses/FelgoLicense.txt)
+   * Qt: [license](docs/licenses/Qt_LICENSE)
+   * Other libraries and software used: [license](docs/licenses/ThirdPartySoftware_Listing.txt)
 * Graphics:
    * Background image: "Secessione della plebe sul Monte Sacro" Gravur von B. Barloccini, 1849, from Wikipedia as [public domain](https://commons.wikimedia.org/wiki/File:Secessio_plebis.JPG).
 * Sound/Music:
-   * Music: Bensound.com
-   * Sound: freesound.org
+   * Music: [Bensound.com](Bensound.com)
+   * Sound: [freesound.org](freesound.org)
 
 
