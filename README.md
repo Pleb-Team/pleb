@@ -1,3 +1,4 @@
+<img src="docs/licenses/gplv3-88x31.png">
 Copyright (c) 2020 Pleb-Team
 
 
@@ -56,7 +57,6 @@ It is based on the former Windows version [arschloch3d](https://sourceforge.net/
 
 ### Licenses
 * Pleb
-    <img src="docs/licenses/gplv3-88x31.png">
     Licensed unter GPLv3: [License](LICENSE)
     Copyright (c) 2020 Pleb-Team
 * 3rd party software:
