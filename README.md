@@ -57,7 +57,7 @@ It is based on the former Windows version [arschloch3d](https://sourceforge.net/
 
 ### Licenses
 * Pleb
-    Licensed unter GPLv3: [License](LICENSE)
+    Licensed under GPLv3: [License](LICENSE)
     Copyright (c) 2020 Pleb-Team
 * 3rd party software:
    * Felgo: [license](docs/licenses/FelgoLicense.txt)
@@ -66,7 +66,7 @@ It is based on the former Windows version [arschloch3d](https://sourceforge.net/
 * Graphics:
    * Background image: "Secessione della plebe sul Monte Sacro" Gravur von B. Barloccini, 1849, from Wikipedia as [public domain](https://commons.wikimedia.org/wiki/File:Secessio_plebis.JPG).
 * Sound/Music:
-   * Music: [Bensound.com](Bensound.com)
-   * Sound: [freesound.org](freesound.org)
+   * Music: [Bensound.com](https://www.bensound.com)
+   * Sound: [freesound.org](https://www.freesound.org)
 
 
