@@ -25,6 +25,7 @@ GameWindow {
   property MenuScene menuScene: sceneLoader.item && sceneLoader.item.menuScene
   property InstructionScene instructionScene: sceneLoader.item && sceneLoader.item.instructionScene
   property CardScene cardScene: sceneLoader.item && sceneLoader.item.cardScene
+  property LicenseScene licenseScene: sceneLoader.item && sceneLoader.item.licenseScene
   property GameScene gameScene: sceneLoader.item && sceneLoader.item.gameScene
   property MultiplayerScene matchmakingScene: sceneLoader.item && sceneLoader.item.matchmakingScene
   property GameNetworkScene gameNetworkScene: sceneLoader.item && sceneLoader.item.gameNetworkScene
@@ -185,51 +186,64 @@ GameWindow {
 
   // state machine, takes care reversing the PropertyChanges when changing the state, like changing the opacity back to 0
   states: [
-    State {
-      name: "loading"
-      PropertyChanges {target: loadingScene; opacity: 1}
-      PropertyChanges {target: window; activeScene: loadingScene}
-    },
-    State {
-      name: "menu"
-      PropertyChanges {target: menuScene; opacity: 1}
-      PropertyChanges {target: window; activeScene: menuScene}
-      StateChangeScript {
-        script: { menuScene.enterScene() }
+      State {
+          name: "loading"
+          PropertyChanges {target: loadingScene; opacity: 1}
+          PropertyChanges {target: window; activeScene: loadingScene}
+      },
+
+      State {
+          name: "menu"
+          PropertyChanges {target: menuScene; opacity: 1}
+          PropertyChanges {target: window; activeScene: menuScene}
+          StateChangeScript {
+              script: { menuScene.enterScene() }
+          }
+      },
+
+      State {
+          name: "instructions"
+          PropertyChanges {target: instructionScene; opacity: 1}
+          PropertyChanges {target: window; activeScene: instructionScene}
+      },
+
+      State {
+          name: "cards"
+          PropertyChanges {target: cardScene; opacity: 1}
+          PropertyChanges {target: window; activeScene: cardScene}
+      },
+
+      State {
+          name: "license"
+          PropertyChanges {target: licenseScene; opacity: 1}
+          PropertyChanges {target: window; activeScene: licenseScene}
+      },
+
+      State {
+          name: "game"
+          PropertyChanges {target: gameScene; opacity: 1}
+          PropertyChanges {target: window; activeScene: gameScene}
+      },
+
+      State {
+          name: "multiplayer"
+          PropertyChanges {target: matchmakingScene; opacity: 1}
+          PropertyChanges {target: window; activeScene: matchmakingScene}
+      },
+
+      State {
+          name: "gn"
+          PropertyChanges {target: gameNetworkScene; opacity: 1}
+          PropertyChanges {target: window; activeScene: gameNetworkScene}
+      },
+
+      State {
+          name: "store"
+          PropertyChanges {target: storeScene; opacity: 1 }
+          PropertyChanges {target: window; activeScene: storeScene}
+          StateChangeScript {
+              script: { storeScene.enterScene() }
+          }
       }
-    },
-    State {
-      name: "instructions"
-      PropertyChanges {target: instructionScene; opacity: 1}
-      PropertyChanges {target: window; activeScene: instructionScene}
-    },
-    State {
-      name: "cards"
-      PropertyChanges {target: cardScene; opacity: 1}
-      PropertyChanges {target: window; activeScene: cardScene}
-    },
-    State {
-      name: "game"
-      PropertyChanges {target: gameScene; opacity: 1}
-      PropertyChanges {target: window; activeScene: gameScene}
-    },
-    State {
-      name: "multiplayer"
-      PropertyChanges {target: matchmakingScene; opacity: 1}
-      PropertyChanges {target: window; activeScene: matchmakingScene}
-    },
-    State {
-      name: "gn"
-      PropertyChanges {target: gameNetworkScene; opacity: 1}
-      PropertyChanges {target: window; activeScene: gameNetworkScene}
-    },
-    State {
-      name: "store"
-      PropertyChanges {target: storeScene; opacity: 1 }
-      PropertyChanges {target: window; activeScene: storeScene}
-      StateChangeScript {
-        script: { storeScene.enterScene() }
-      }
-    }
   ]
 }

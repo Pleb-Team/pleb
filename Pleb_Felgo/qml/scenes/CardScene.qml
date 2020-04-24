@@ -197,11 +197,11 @@ SceneBase {
   // button to main menu
   MenuButton {
     id: menuButton
-    action: "menu"
-    color: "transparent"
+    action: "license"
+   // color: "transparent"
     width: 25
     height: 25
-    buttonImage.source: "../../assets/img/Exit.png"
+    buttonImage.source: "../../assets/img/ArrowRight.png"
     anchors.right: gameWindowAnchorItem.right
     anchors.rightMargin: 10
     anchors.bottom: gameWindowAnchorItem.bottom
