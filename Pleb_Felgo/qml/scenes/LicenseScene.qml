@@ -44,30 +44,43 @@ SceneBase {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 35
 
-
         color: "white"
         border.color: "darkred"
         border.width: 1
 
         ScrollView {
             id: scrollView
-            anchors.fill: parent
+            anchors.fill: infoRect
             anchors.margins: 10
 
+//            horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+            verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
+
+//            flickableItem.boundsBehavior: Flickable.StopAtBounds
+        //    flickableItem.flickableDirection: Flickable.VerticalFlick
+
+//            clip: true
+
+
             Text {
-                anchors.fill: parent.anchors
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.margins: 10
+                width: infoRect.width - 40
+
                 font.pixelSize: 9
-                text: fileUtils.readFile("../../../../LICENSE")
+                wrapMode: Text.Wrap
+                text: fileUtils.readFile(Qt.resolvedUrl("../../assets/LICENSE_All.txt"))
             }
         }
     }
 
     // switch between the scenes with swipe motions
-    SwipeArea {
-        anchors.fill: parent
-        onSwipeRight: menuButton.clicked()
-        onSwipeLeft: backButtonPressed()
-    }
+//    SwipeArea {
+//        anchors.fill: parent
+//        onSwipeRight: menuButton.clicked()
+//        onSwipeLeft: backButtonPressed()
+//    }
 
     // back button to leave scene
     ButtonBase {

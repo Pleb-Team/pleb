@@ -65,13 +65,6 @@ ios {
 }
 
 DISTFILES += \
-    ../docs/licenses/FelgoLicense.txt \
-    ../docs/licenses/LICENSE.FDL \
-    ../docs/licenses/Qt_LICENSE \
-    ../docs/licenses/ThirdPartySoftware_Listing.txt \
-    ../docs/licenses/gpl-3.0.txt \
-    ../docs/licenses/gplv3-127x51.png \
-    ../docs/licenses/gplv3-88x31.png \
     qml/game/blatt52/Card_52.qml \
     qml/game/blatt52/Deck_52.qml
 
