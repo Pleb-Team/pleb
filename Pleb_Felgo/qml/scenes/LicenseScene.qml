@@ -3,7 +3,7 @@ import QtQuick 2.0
 import QtQuick.Controls 1.4
 import "../common"
 
-// scene describing the game rules
+// scene showing the license
 SceneBase {
     id: licenseScene
 
@@ -19,31 +19,14 @@ SceneBase {
         smooth: true
     }
 
-    Image {
-        id: imageGPL
-        height: 30
-        anchors.top: parent.top
-        anchors.topMargin: 10
-        anchors.left: parent.left
-        anchors.leftMargin: 35
-        source: "../../assets/img/gplv3-127x51.png"
-    }
-
 
     // content window
     Rectangle {
         id: infoRect
         radius: 15
-
-        anchors.top: imageGPL.bottom
-        anchors.topMargin: 10
-        anchors.left: parent.left
-        anchors.leftMargin: 35
-        anchors.right: parent.right
-        anchors.rightMargin: 35
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 35
-
+        anchors.centerIn: gameWindowAnchorItem
+        width: gameWindowAnchorItem.width - 70
+        height: gameWindowAnchorItem.height - 70
         color: "white"
         border.color: "darkred"
         border.width: 1
@@ -52,15 +35,26 @@ SceneBase {
             id: scrollView
             anchors.fill: infoRect
             anchors.margins: 10
+            flickableItem.flickableDirection: Flickable.AutoFlickIfNeeded
 
 //            horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
-            verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
+//            verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
 
 //            flickableItem.boundsBehavior: Flickable.StopAtBounds
         //    flickableItem.flickableDirection: Flickable.VerticalFlick
 
 //            clip: true
 
+
+            Image {
+                anchors.top: parent.top
+                anchors.topMargin: 10
+                anchors.right: parent.right
+                anchors.rightMargin: 10
+                height: 35
+
+                source: "../../assets/img/gplv3-127x51.png"
+            }
 
             Text {
                 anchors.top: parent.top
@@ -70,17 +64,11 @@ SceneBase {
 
                 font.pixelSize: 9
                 wrapMode: Text.Wrap
-                text: fileUtils.readFile(Qt.resolvedUrl("../../assets/LICENSE_All.txt"))
+                text: fileUtils.readFile(Qt.resolvedUrl("../../assets/text/LICENSE_All.txt"))
             }
         }
     }
 
-    // switch between the scenes with swipe motions
-//    SwipeArea {
-//        anchors.fill: parent
-//        onSwipeRight: menuButton.clicked()
-//        onSwipeLeft: backButtonPressed()
-//    }
 
     // back button to leave scene
     ButtonBase {
