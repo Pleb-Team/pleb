@@ -64,7 +64,7 @@ It is based on the former Windows version [arschloch3d](https://sourceforge.net/
    * Qt: [license](docs/licenses/Qt_LICENSE)
    * Other libraries and software used: [license](docs/licenses/ThirdPartySoftware_Listing.txt)
 * Graphics:
-   * Background image: "Secessione della plebe sul Monte Sacro" Gravur von B. Barloccini, 1849, from Wikipedia as [public domain](https://commons.wikimedia.org/wiki/File:Secessio_plebis.JPG).
+   * Background image: "Secessione della plebe sul Monte Sacro" engraved by B. Barloccini, 1849. Downloaded from Wikipedia as [public domain](https://commons.wikimedia.org/wiki/File:Secessio_plebis.JPG).
 * Sound/Music:
    * Music: [Bensound.com](https://www.bensound.com)
    * Sound: [freesound.org](https://www.freesound.org)
