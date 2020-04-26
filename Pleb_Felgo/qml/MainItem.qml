@@ -27,30 +27,30 @@ Item {
         // switch scenes after pressing a MenuButton
         onMenuButtonPressed: {
             // calculate time until bonus
-            var timeUntilBonus = getTimeUntilBonus()
-            var timeUntilBonusStr = (timeUntilBonus.hours !== 0 ? timeUntilBonus.hours+" Hours" : timeUntilBonus.minutes !== 0 ? timeUntilBonus.minutes+ " Minutes" : timeUntilBonus.seconds+ " Seconds")
+//            var timeUntilBonus = getTimeUntilBonus()
+//            var timeUntilBonusStr = (timeUntilBonus.hours !== 0 ? timeUntilBonus.hours+" Hours" : timeUntilBonus.minutes !== 0 ? timeUntilBonus.minutes+ " Minutes" : timeUntilBonus.seconds+ " Seconds")
 
             switch (button){
             case "single":
-                checkTokens(function() {
+//                checkTokens(function() {
                     multiplayer.createSinglePlayerGame()
-                    window.state = "game"
-                }, "Wait "+timeUntilBonusStr, checkDailyBonus)  // adds additional option "Wait"
+//                    window.state = "game"
+//                }, "Wait "+timeUntilBonusStr, checkDailyBonus)  // adds additional option "Wait"
                 break
             case "matchmaking":
-                checkTokens(function() {
+//                checkTokens(function() {
                     // only allowed to play if enough tokens
                     multiplayer.showMatchmaking()
-                    window.state = "multiplayer"
-                }, "Wait "+timeUntilBonusStr, checkDailyBonus) // adds additional option "Wait"
+//                    window.state = "multiplayer"
+//                }, "Wait "+timeUntilBonusStr, checkDailyBonus) // adds additional option "Wait"
                 break
             case "quick":
-                checkTokens(function() {
+//                checkTokens(function() {
                     // only allowed to play if enough tokens
                     multiplayer.joinOrCreateGame()
-                    multiplayer.showMatchmaking()
-                    window.state = "multiplayer"
-                }, "Wait "+timeUntilBonusStr, checkDailyBonus) // adds additional option "Wait"
+//                    multiplayer.showMatchmaking()
+//                    window.state = "multiplayer"
+//                }, "Wait "+timeUntilBonusStr, checkDailyBonus) // adds additional option "Wait"
                 break
             case "invites":
                 multiplayer.showInvitesList()
@@ -393,29 +393,29 @@ Item {
 //    }
 
     // calculates remaining time for daily bonus
-    function getTimeUntilBonus() {
-        var now = new Date().getTime()
-        var next = menuScene.localStorage.lastLogin + (24 * 60 * 60 * 1000)
-        var remaining = next - now
+//    function getTimeUntilBonus() {
+//        var now = new Date().getTime()
+//        var next = menuScene.localStorage.lastLogin + (24 * 60 * 60 * 1000)
+//        var remaining = next - now
 
-        var seconds = Math.ceil((remaining / 1000) % 60)
-        var minutes = Math.floor((remaining / 1000 / 60) % 60)
-        var hours = Math.floor((remaining / 1000 / 60) / 60)
+//        var seconds = Math.ceil((remaining / 1000) % 60)
+//        var minutes = Math.floor((remaining / 1000 / 60) % 60)
+//        var hours = Math.floor((remaining / 1000 / 60) / 60)
 
-        if(seconds === 60) {
-            minutes++
-            seconds = 0
-        }
-        if(minutes === 60) {
-            hours++
-            minutes = 0
-        }
-        if(hours < 0)
-            hours = 0
-        if(minutes < 0)
-            minutes = 0
-        if(seconds < 0)
-            seconds = 0
-        return { hours: hours, minutes: minutes, seconds: seconds }
-    }
+//        if(seconds === 60) {
+//            minutes++
+//            seconds = 0
+//        }
+//        if(minutes === 60) {
+//            hours++
+//            minutes = 0
+//        }
+//        if(hours < 0)
+//            hours = 0
+//        if(minutes < 0)
+//            minutes = 0
+//        if(seconds < 0)
+//            seconds = 0
+//        return { hours: hours, minutes: minutes, seconds: seconds }
+//    }
 }
