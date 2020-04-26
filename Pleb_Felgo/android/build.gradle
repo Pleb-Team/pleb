@@ -21,11 +21,6 @@ apply plugin: 'com.android.application'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-
-    // Felgo Plugins
-//    implementation 'net.vplay.plugins:plugin-admob:3.+'
-//    implementation 'net.vplay.plugins:plugin-chartboost:3.+'
-//    implementation 'net.vplay.plugins:plugin-soomla:3.+'
 }
 
 android {
