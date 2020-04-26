@@ -140,8 +140,6 @@ Item {
     onMessageReceived: {
       console.debug("onMessageReceived with code", code, "initialized:", initialized)
       // not relevant for google analytics, causes to exceed the free limit
-      //ga.logEvent("System", "Receive Message", "singlePlayer", multiplayer.singlePlayer)
-//      flurry.logEvent("System.MessageReceived", "singlePlayer", multiplayer.singlePlayer)
 
       if(!initialized && code !== messageSyncGameState) {
         console.debug("ERROR: received message before gameState was synced and user is not initialized:", code, message)
@@ -371,10 +369,6 @@ Item {
 //          // check if the player has two or less cards left
 //          closeToWin()
 //        }
-
-//        // not relevant for google analytics, causes to exceed the free limit
-//        //ga.logEvent("User", "Stack Selected", "singlePlayer", multiplayer.singlePlayer)
-////        flurry.logEvent("User.StackSelected", "singlePlayer", multiplayer.singlePlayer)
 //      }
     }
 

@@ -54,33 +54,19 @@ SceneBase {
       }
     }
 
-    onPlayerChanged: {
+    onPlayerChanged: {    }
 
-    }
+    onPlayersReady: {    }
 
-    onPlayersReady: {
+    onGameStarted: {   }
 
-    }
-
-    onGameStarted: {
-
-    }
-
-    onPlayerLeft:{
-      // log event when a player left the game
-      if(multiplayer.amLeader && activeScene === gameScene) {
-        // not relevant for google analytics, causes to exceed the free limit
-        //ga.logEvent("System", "Player Left", "singlePlayer", multiplayer.singlePlayer)
-//        flurry.logEvent("System.PlayerLeft", "singlePlayer", multiplayer.singlePlayer)
-      }
-    }
+    onPlayerLeft:{    }
 
     onLeaderPlayerChanged:{
       console.debug("leaderPlayer changed to:", multiplayer.leaderPlayer)
     }
 
-    onActivePlayerChanged:{
-    }
+    onActivePlayerChanged:{   }
 
     onTurnStarted:{
       gameLogic.turnStarted(playerId)
@@ -180,7 +166,8 @@ SceneBase {
     visible: system.debugBuild
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.top: parent.top
-    anchors.topMargin: adMobBanner.visible && adMobBanner.height > 0 ? (adMobBanner.height / gameScene.yScaleForScene) + 10 : 10
+//    anchors.topMargin: adMobBanner.visible && adMobBanner.height > 0 ? (adMobBanner.height / gameScene.yScaleForScene) + 10 : 10
+    anchors.topMargin: 10
     z: 1
     onClicked: {
       switchName.visible = true

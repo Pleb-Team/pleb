@@ -12,8 +12,6 @@ EntityBase {
   property string activeColor: "#f9c336"
   property string inactiveColor: "#28a3c1"
 
-  // set the image if the player is connected to facebook
-  property string facebookImage: ""
   property alias canvas: canvas
   property alias avatar: avatar
   property alias avatarSource: avatar.source
@@ -166,7 +164,7 @@ EntityBase {
     }
   }
 
-  // get the avatar for auto and connected users and search for facebook images
+  // get the avatar for auto and connected users
   function getAvatar(){
     var tmpAvatar = player && player.connected ? "../../assets/img/User.png" : "../../assets/img/Auto.png"
     if (player && player.connected && player.profileImageUrl.length > 0){
@@ -180,7 +178,6 @@ EntityBase {
     canvas.requestPaint()
   }
 
-  // set the facebook avatar and level for the local player and signal the change to the other players
   /*
      Explanation for sendToOthers:
      This function is used in two cases:
