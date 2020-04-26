@@ -4,7 +4,7 @@ import "../common"
 
 // window leads to the Pleb repo
 Item {
-  id: website
+  id: websiteWindow
   width: 400
   height: content.height + content.anchors.topMargin * 2
   z: 110
@@ -89,7 +89,7 @@ Item {
     text: "No"
     onClicked: {
       // close the window
-      website.visible = false
+      websiteWindow.visible = false
     }
   }
 
@@ -107,11 +107,11 @@ Item {
     textSize: 28
     text: "Yes"
     onClicked: {
-      // open the repo website instead
+      // open the repo websiteWindow instead
 //      ga.logEvent("User", "Felgo")
 //      flurry.logEvent("User.Felgo")
       nativeUtils.openUrl("https://github.com/Pleb-Team/pleb")
-      website.visible = false
+      websiteWindow.visible = false
     }
   }
 

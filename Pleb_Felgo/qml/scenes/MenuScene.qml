@@ -1,5 +1,7 @@
 ﻿import QtQuick 2.12
 import QtQuick.Controls 1.4
+import QtQuick.Dialogs 1.1
+
 import Felgo 3.0
 import "../common"
 import "../interface"
@@ -51,7 +53,7 @@ SceneBase {
     width: 380
   }
 
-  // button opens powered by Felgo message and links to the website
+  // button opens powered by Felgo message and links to the websiteWindow
   MouseArea {
     anchors.top: titleImage.top
     anchors.bottom: titleImage.bottom
@@ -63,7 +65,7 @@ SceneBase {
     height: 30
 
     onClicked: {
-      website.visible = true
+      websiteWindow.visible = true
     }
   }
 
@@ -113,19 +115,6 @@ SceneBase {
     }
   }
 
-  // button leading to the profile view
-  MenuButton {
-    action: "profile"
-    color: "transparent"
-    width: 30
-    height: 30
-    buttonImage.source: "../../assets/img/Settings.png"
-    anchors.bottom: gameWindowAnchorItem.bottom
-    anchors.bottomMargin: 10
-    anchors.right: info.left
-    anchors.rightMargin: 5
-    visible: info.visible
-  }
 
   GameButton {
     anchors.right: gameWindowAnchorItem.right
@@ -213,80 +202,39 @@ SceneBase {
     }
   }
 
-  // animation to slide the community menu in and out
-  NumberAnimation {
-    id: slideAnimation
-    running: false
-    target: community
-    property: "anchors.bottomMargin"
-    duration: 200
-    to: 0
-    easing.type: Easing.InOutQuad
-  }
 
-  // community submenu
+  // columnButtons submenu
   Column {
-    id: community
-    width: communityButton.width
+    id: columnButtons
+    width: 35
     spacing: 4
     anchors.left: gameWindowAnchorItem.left
     anchors.leftMargin: 10
     anchors.bottom: gameWindowAnchorItem.bottom
-    anchors.bottomMargin: (community.height - communityButton.height) * (-1) + 10
+    anchors.bottomMargin: 10
 
-    // community button to slide the community submenu in and out
-    ButtonBase {
-      id: communityButton
-      color: "transparent"
-      width: 38
-      height: 38
-      buttonImage.source: "../../assets/img/More.png"
-
-      property bool hidden: true
-
-      onClicked: {
-        hidden = !hidden
-        slideMenu()
-      }
-
-      // slides the community menu in or out depending on the hidden
-      function slideMenu(){
-        if (hidden){
-          slideAnimation.to = (community.height - communityButton.height) * (-1) + 10
-          opacity = 1.0
-        }else{
-          slideAnimation.to = 10
-          opacity = 0.6
-        }
-        slideAnimation.start()
-      }
-    }
 
     MenuButton {
       action: "friends"
       color: "transparent"
-      width: communityButton.width
-      height: communityButton.height
-      anchors.margins: communityButton.anchors.margins
+      width: columnButtons.width
+      height: columnButtons.width
       buttonImage.source: "../../assets/img/Friends.png"
-      opacity: communityButton.hidden ? 0 : 1
     }
 
     MenuButton {
       action: "leaderboard"
       color: "transparent"
-      width: communityButton.width
-      height: communityButton.height
-      anchors.margins: communityButton.anchors.margins
+      width: columnButtons.width
+      height: columnButtons.width
       buttonImage.source: "../../assets/img/Network.png"
     }
 
     // button to share the game
     ButtonBase {
       color: "transparent"
-      width: communityButton.width
-      height: communityButton.height
-      anchors.margins: communityButton.anchors.margins
+      width: columnButtons.width
+      height: columnButtons.width
       buttonImage.source: "../../assets/img/Share.png"
       visible: !system.desktopPlatform
 
@@ -302,39 +250,35 @@ SceneBase {
       id: inboxButton
       action: "inbox"
       color: "transparent"
-      width: communityButton.width
-      height: communityButton.height
-      anchors.margins: communityButton.anchors.margins
+      width: columnButtons.width
+      height: columnButtons.width
       buttonImage.source: "../../assets/img/Messages.png"
     }
 
-    // button to send feedback to Felgo
+    // button leading to the profile view
+    MenuButton {
+      action: "profile"
+      color: "transparent"
+      width: columnButtons.width
+      height: columnButtons.width
+      buttonImage.source: "../../assets/img/Settings.png"
+    }
+
+
     ButtonBase {
       color: "transparent"
-      width: communityButton.width
-      height: communityButton.height
-      anchors.margins: communityButton.anchors.margins
+      width: columnButtons.width
+      height: columnButtons.width
       buttonImage.source: "../../assets/img/Instructions.png"
       onClicked: window.state = "instructions"
-      visible: true
     }
-  }
-
-  // sound and music buttons
-  Row {
-    anchors.bottom: gameWindowAnchorItem.bottom
-    anchors.left: community.right
-    anchors.bottomMargin: 10
-    anchors.leftMargin: community.spacing
-    spacing: community.spacing
 
 
     // button to toggle the music
     ButtonBase {
       color: "transparent"
-      width: communityButton.width
-      height: communityButton.height
-      anchors.margins: communityButton.anchors.margins
+      width: columnButtons.width
+      height: columnButtons.width
       buttonImage.source: "../../assets/img/Music.png"
       opacity: settings.musicEnabled ? 1.0 :  0.6
       onClicked: {
@@ -345,9 +289,8 @@ SceneBase {
     // button to toggle the sound effects
     ButtonBase {
       color: "transparent"
-      width: communityButton.width
-      height: communityButton.height
-      anchors.margins: communityButton.anchors.margins
+      width: columnButtons.width
+      height: columnButtons.width
       buttonImage.source: "../../assets/img/Sound.png"
       opacity: settings.soundEnabled ? 1.0 :  0.6
       onClicked: {
@@ -356,8 +299,10 @@ SceneBase {
     }
   }
 
+
+
   WebsiteWindow {
-    id: website
+    id: websiteWindow
     visible: false
     scale: 0.5
     anchors.centerIn: gameWindowAnchorItem

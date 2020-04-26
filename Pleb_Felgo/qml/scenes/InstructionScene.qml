@@ -170,7 +170,7 @@ SceneBase {
   MenuButton {
     id: cardButton
     action: "cards"
-    color: "transparent"
+//    color: "transparent"
     width: 25
     height: 25
     buttonImage.source: "../../assets/img/ArrowRight.png"
