@@ -13,8 +13,8 @@ SceneBase {
   signal menuButtonPressed(string button)
 
   property alias localStorage: localStorage   // is used by ONUMain to access gamesPlayed counter
-  property alias tokenInfo: tokenInfo         // used by ONUMainItem to trigger tokenInfo animation
-  property bool _initialTokens: false         // is set to true when user gets initial tokens
+//  property alias tokenInfo: tokenInfo         // used by ONUMainItem to trigger tokenInfo animation
+//  property bool _initialTokens: false         // is set to true when user gets initial tokens
 
   // background music
   BackgroundMusic {
@@ -116,41 +116,41 @@ SceneBase {
   }
 
 
-  GameButton {
-    anchors.right: gameWindowAnchorItem.right
-    anchors.bottom: increaseTokenButton.top
-    text: storeScene.tokens === 0 ? "Set to 20" : "Set to 0"
-    onClicked: storeScene.tokens === 0 ? storeScene.giveTokens(20 - storeScene.tokens) : storeScene.takeTokens(storeScene.tokens)
-    visible: system.desktopPlatform && !system.publishBuild && enableStoreAndAds
-  }
+//  GameButton {
+//    anchors.right: gameWindowAnchorItem.right
+//    anchors.bottom: increaseTokenButton.top
+//    text: storeScene.tokens === 0 ? "Set to 20" : "Set to 0"
+//    onClicked: storeScene.tokens === 0 ? storeScene.giveTokens(20 - storeScene.tokens) : storeScene.takeTokens(storeScene.tokens)
+//    visible: system.desktopPlatform && !system.publishBuild && enableStoreAndAds
+//  }
 
-  GameButton {
-    anchors.right: increaseTokenButton.left
-    anchors.bottom: increaseTokenButton.bottom
-    text: "Token--"
-    onClicked: storeScene.takeTokens(1)
-    visible: system.desktopPlatform && !system.publishBuild && enableStoreAndAds
-  }
+//  GameButton {
+//    anchors.right: increaseTokenButton.left
+//    anchors.bottom: increaseTokenButton.bottom
+//    text: "Token--"
+//    onClicked: storeScene.takeTokens(1)
+//    visible: system.desktopPlatform && !system.publishBuild && enableStoreAndAds
+//  }
 
-  GameButton {
-    id: increaseTokenButton
-    anchors.right: gameWindowAnchorItem.right
-    anchors.bottom: tokenInfo.top
-    anchors.bottomMargin: 15
-    text: "Token++"
-    onClicked: storeScene.giveTokens(1)
-    visible: system.desktopPlatform && !system.publishBuild && enableStoreAndAds
-  }
+//  GameButton {
+//    id: increaseTokenButton
+//    anchors.right: gameWindowAnchorItem.right
+//    anchors.bottom: tokenInfo.top
+//    anchors.bottomMargin: 15
+//    text: "Token++"
+//    onClicked: storeScene.giveTokens(1)
+//    visible: system.desktopPlatform && !system.publishBuild && enableStoreAndAds
+//  }
 
-  TokenInfo {
-    id: tokenInfo
-    tokens: storeScene.tokens
-    anchors.right: gameWindowAnchorItem.right
-    anchors.bottom: gameWindowAnchorItem.bottom
-    anchors.bottomMargin: 85
-    onClicked: menuButtonPressed("store")
-    visible: enableStoreAndAds
-  }
+//  TokenInfo {
+//    id: tokenInfo
+//    tokens: storeScene.tokens
+//    anchors.right: gameWindowAnchorItem.right
+//    anchors.bottom: gameWindowAnchorItem.bottom
+//    anchors.bottomMargin: 85
+//    onClicked: menuButtonPressed("store")
+//    visible: enableStoreAndAds
+//  }
 
   // local player tag
   PlayerTag {
@@ -378,38 +378,38 @@ SceneBase {
 
   // enter scene will be called whenever menuScene is shown
   function enterScene() {
-    checkDailyBonus()
+   // checkDailyBonus()
   }
 
-  // check date to give daily bonus
-  function checkDailyBonus() {
-    if(!enableStoreAndAds)
-      return
+//  // check date to give daily bonus
+//  function checkDailyBonus() {
+//    if(!enableStoreAndAds)
+//      return
 
-    var today = new Date()
-    var todayTruncated = new Date(today.getTime()-today.getHours()*3600000-today.getMinutes()*60000-today.getSeconds()*1000-today.getMilliseconds())
-    console.debug("Today truncated is " + todayTruncated.getTime().toString())
-    var storedLastLoginMS = localStorage.lastLogin
-    console.debug("Read from database " + storedLastLoginMS)
-    if(storedLastLoginMS === 0) {
-      // start with 20 tokens
-      _initialTokens = true
-      localStorage.setLastLogin(todayTruncated.getTime().toString()) // initialize
-      if(storeScene.tokens < 20)
-        storeScene.giveTokens(20 - storeScene.tokens)
-    }
-    else if(todayTruncated.getTime().toString() > storedLastLoginMS) {
-      // give daily bonus
-      console.debug("Last login was a day ago, give player bonus")
-      localStorage.setLastLogin(todayTruncated.getTime().toString())
-      storeScene.giveTokens(gameTokensEarnedPerDay) // increase tokens by 1
-      dailyTokenDialog.visible = true
-    }
+//    var today = new Date()
+//    var todayTruncated = new Date(today.getTime()-today.getHours()*3600000-today.getMinutes()*60000-today.getSeconds()*1000-today.getMilliseconds())
+//    console.debug("Today truncated is " + todayTruncated.getTime().toString())
+//    var storedLastLoginMS = localStorage.lastLogin
+//    console.debug("Read from database " + storedLastLoginMS)
+//    if(storedLastLoginMS === 0) {
+//      // start with 20 tokens
+//      _initialTokens = true
+//      localStorage.setLastLogin(todayTruncated.getTime().toString()) // initialize
+//      if(storeScene.tokens < 20)
+//        storeScene.giveTokens(20 - storeScene.tokens)
+//    }
+//    else if(todayTruncated.getTime().toString() > storedLastLoginMS) {
+//      // give daily bonus
+//      console.debug("Last login was a day ago, give player bonus")
+//      localStorage.setLastLogin(todayTruncated.getTime().toString())
+//      storeScene.giveTokens(gameTokensEarnedPerDay) // increase tokens by 1
+//      dailyTokenDialog.visible = true
+//    }
 
-    if (!system.publishBuild && !_initialTokens && storeScene.tokens < 20) {
-      // always start with 20 tokens for debug builds
-      _initialTokens = true
-      storeScene.giveTokens(20 - storeScene.tokens)
-    }
-  }
+//    if (!system.publishBuild && !_initialTokens && storeScene.tokens < 20) {
+//      // always start with 20 tokens for debug builds
+//      _initialTokens = true
+//      storeScene.giveTokens(20 - storeScene.tokens)
+//    }
+//  }
 }

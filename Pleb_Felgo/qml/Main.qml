@@ -29,20 +29,20 @@ GameWindow {
   property GameScene gameScene: sceneLoader.item && sceneLoader.item.gameScene
   property MultiplayerScene matchmakingScene: sceneLoader.item && sceneLoader.item.matchmakingScene
   property GameNetworkScene gameNetworkScene: sceneLoader.item && sceneLoader.item.gameNetworkScene
-  property StoreScene storeScene: sceneLoader.item && sceneLoader.item.storeScene
+//  property StoreScene storeScene: sceneLoader.item && sceneLoader.item.storeScene
 
   property alias loadingScene: loadingScene
 
   // enable / disable store or advertisements
-  readonly property bool enableStoreAndAds: Constants.enableStoreAndAds
-  readonly property bool showAdvertisements: gameTokens < gameTokenNoAdsLimit && enableStoreAndAds
+//  readonly property bool enableStoreAndAds: Constants.enableStoreAndAds
+//  readonly property bool showAdvertisements: gameTokens < gameTokenNoAdsLimit && enableStoreAndAds
   readonly property int gamesPlayed: menuScene ? menuScene.localStorage.gamesPlayed : 0
   readonly property int appStarts: menuScene ? menuScene.localStorage.appStarts : 0
-  readonly property int gameTokens : storeScene ? storeScene.tokens : 0  // tokens are our game currency from in-app purchase store
+//  readonly property int gameTokens : storeScene ? storeScene.tokens : 0  // tokens are our game currency from in-app purchase store
 
-  readonly property int gameTokenEarnedPerVideoWatch: 1
-  readonly property int gameTokensEarnedPerDay: 1
-  readonly property int gameTokenNoAdsLimit: 10
+//  readonly property int gameTokenEarnedPerVideoWatch: 1
+//  readonly property int gameTokensEarnedPerDay: 1
+//  readonly property int gameTokenNoAdsLimit: 10
 
   // create and remove entities at runtime
   EntityManager {
@@ -85,7 +85,6 @@ GameWindow {
     gameId: Constants.gameId
     secret: Constants.gameSecret
     user.deviceId: generateDeviceId()
-//    facebookItem: facebook
 
     property int counterAppInstances: 0
 
@@ -136,29 +135,13 @@ GameWindow {
         menuScene.localStorage.setGamesPlayed(gamesPlayed + 1)
 
         // only reduce token if game is not restarted (once players are in a game they don't need more tokens)
-        if(!gameRestarted && enableStoreAndAds)
-          storeScene.takeTokens(1) // take 1 token from user
+//        if(!gameRestarted && enableStoreAndAds)
+//          storeScene.takeTokens(1) // take 1 token from user
       }
       window.state = "game"
     }
   }
 
-//  Facebook {
-//    id: facebook
-//    // appId: Constants.fbAppId
-//    readPermissions: [ "email", "user_friends" ]
-//    publishPermissions: ["publish_actions"]
-//  }
-
-//  GoogleAnalytics {
-//    id: ga
-//    // propertyId: Constants.gaPropertyId
-//  }
-
-//  Flurry {
-//    id: flurry
-//    // apiKey: Constants.flurryApiKey
-//  }
 
   // loadingScene is our first scene, so set the state to menu initially
   state: "loading"
@@ -235,15 +218,15 @@ GameWindow {
           name: "gn"
           PropertyChanges {target: gameNetworkScene; opacity: 1}
           PropertyChanges {target: window; activeScene: gameNetworkScene}
-      },
-
-      State {
-          name: "store"
-          PropertyChanges {target: storeScene; opacity: 1 }
-          PropertyChanges {target: window; activeScene: storeScene}
-          StateChangeScript {
-              script: { storeScene.enterScene() }
-          }
       }
+
+//      State {
+//          name: "store"
+//          PropertyChanges {target: storeScene; opacity: 1 }
+//          PropertyChanges {target: window; activeScene: storeScene}
+//          StateChangeScript {
+//              script: { storeScene.enterScene() }
+//          }
+ //     }
   ]
 }
