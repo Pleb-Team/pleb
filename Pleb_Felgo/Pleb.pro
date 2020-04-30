@@ -61,10 +61,6 @@ ios {
     OTHER_FILES += $$QMAKE_INFO_PLIST
 }
 
-DISTFILES += \
-    qml/game/blatt52/Card_52.qml \
-    qml/game/blatt52/Deck_52.qml
-
 
 # from here added to integrate C++ game logic and AI component
 
@@ -82,11 +78,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
-# INCLUDEPATH += ../Pleb_GameLogic_QtWrapper
-# LIBS += -L../build-Pleb_GameLogic_QtWrapper-Desktop_Qt_5_13_2_MinGW_32_bit-Debug/debug -llibPleb_GameLogic_QtWrapper
-# LIBS += -L ../build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug -llibPleb_GameLogic_QtWrapper
-# LIBS += -L/Users/joachim/Programmieren/Pleb/build-Pleb_GameLogic_QtWrapper-Felgo_Desktop_Qt_5_13_2_clang-Debug -llibPleb_GameLogic_QtWrapper
 
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
