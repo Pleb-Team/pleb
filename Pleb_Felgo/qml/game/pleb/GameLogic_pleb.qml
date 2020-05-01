@@ -311,10 +311,12 @@ Item {
         }
         chat.gConsole.printLn(message)
       }
+
       // set highscore and level from other players
       else if (code == messageSetPlayerInfo){
         updateTag(message.userId, message.level, message.highscore, message.rank)
-      }
+      }      
+
       // let the leader trigger a new turn
       else if (code == messageTriggerTurn){
         multiplayer.leaderCode(function() {
@@ -330,6 +332,7 @@ Item {
           }
         })
       }
+
       // reset player tag info and send it to other player because it was requested
       /*
          Only the local user can access their highscore and rank from the leaderboard.
@@ -557,96 +560,108 @@ Item {
   // start the turn for the active player
   function turnStarted(playerId) {
 
-    console.debug("turnStarted() called")
+      console.debug("#######################################################################################################################################")
+      console.debug("turnStarted() called")
 
-    // let the AI compute a move recommendation (it is not being played here)
-    legacyBridge.getMove(multiplayer.activePlayer.userId);
-
-    if(!multiplayer.activePlayer) {
-      console.debug("ERROR: activePlayer not valid in turnStarted!")
-      return
-    }
-
-    console.debug("#######################################################################################################################################")
-    console.debug("playerId: " + playerId + " and multiplayer.activePlayer.userId: " + multiplayer.activePlayer.userId)
-    console.debug("Turn started")
-    console.debug("Last deposit: " + depot.lastDeposit + " by player " + depot.lastPlayer)
-    console.debug("players hand: " + (getHand(multiplayer.activePlayer.userId).hand))
-    // start the timer
-    gameLogic.startTurnTimer()
-    // the player didn't act yet
-    acted = false
-    cardsDrawn = false
-    unmark()
-    scaleHand(1.0)
-
-    // reset the colorPicker
-//    colorPicker.visible = false
-//    colorPicker.chosingColor = false
-
-    // check if the current card has an effect for the active player
-//    depot.cardEffect()
-    if (depot.finishedPlayers.length === playerHands.children.length - 1) {
-        plebFinish(getHand(multiplayer.activePlayer.userId))
-        endTurn()
-    }
-    if (depot.finishedPlayers.includes(multiplayer.activePlayer.userId)) {
-        endTurn()
-    } else {
-        var canPlay = hasValidCards(multiplayer.activePlayer)
-        if (canPlay) {
-            depot.skipTurn(false)
-        } else {
-            // skip if the player has no valid cards
-            depot.skipTurn(true)
-            // TODO LASTCARD first player to skip after another player's last card becomes the lastPlayer; in some variants, the Pleb is supposed to become the lastPlayer after another player's last card
-            if (depot.finishedPlayers.includes(depot.lastPlayer)) {
-                depot.lastPlayer = multiplayer.activePlayer.userId
-            }
-        }
-    }
-
-    // zoom in on the hand of the active local player
-    if (!depot.skipped && multiplayer.myTurn) scaleHand(1.6)
-
-    // check if the player has two or less cards left
-//    closeToWin()
-
-    // mark the valid card options
-    markValid()
-
-    // repaint the timer circle
-    for (var i = 0; i < playerTags.children.length; i++){
-      playerTags.children[i].canvas.requestPaint()
-    }
-
-    // schedule AI to take over in 3 seconds in case the player is gone
-    multiplayer.leaderCode(function() {
-      if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected) {
-        aiTimeOutTimer.start()
+      if(!multiplayer.activePlayer) {
+          console.debug("ERROR: activePlayer not valid in turnStarted!")
+          return
       }
-    })
+
+      console.debug("playerId: " + playerId + ", multiplayer.activePlayer.userId: " + multiplayer.activePlayer.userId)
+      console.debug("Last deposit: " + depot.lastDeposit + " by player " + depot.lastPlayer)
+//      console.debug("players hand: " + (getHand(multiplayer.activePlayer.userId).hand))
+
+
+      // let the AI compute a move recommendation (it is not being played here)
+      legacyBridge.getMove(multiplayer.activePlayer.userId);
+
+      // start the timer
+      gameLogic.startTurnTimer()
+
+      // the player didn't act yet
+      acted = false
+      cardsDrawn = false
+      unmark()
+      scaleHand(1.0)
+
+      // All player except 1 have already finished
+      if (depot.finishedPlayers.length === playerHands.children.length - 1) {
+          plebFinish(getHand(multiplayer.activePlayer.userId))
+          endTurn()
+      }
+
+      // This player has already finished (but is still called?)
+      if (depot.finishedPlayers.includes(multiplayer.activePlayer.userId))
+      {
+          endTurn()
+      }
+      else
+      {
+          var canPlay = hasValidCards(multiplayer.activePlayer)
+          if (canPlay)
+          {
+              depot.skipTurn(false)
+          }
+          else
+          {
+              // skip if the player has no valid cards
+              depot.skipTurn(true)
+
+              // TODO LASTCARD first player to skip after another player's last card becomes the lastPlayer; in some variants, the Pleb is supposed to become the lastPlayer after another player's last card
+              if (depot.finishedPlayers.includes(depot.lastPlayer)) {
+                  depot.lastPlayer = multiplayer.activePlayer.userId
+              }
+          }
+      }
+
+      // zoom in on the hand of the active local player
+      if (!depot.skipped && multiplayer.myTurn)
+          scaleHand(1.6)
+
+
+      // mark the valid card options
+      markValid()
+
+      // repaint the timer circle
+      for (var i = 0; i < playerTags.children.length; i++){
+          playerTags.children[i].canvas.requestPaint()
+      }
+
+      // schedule AI to take over in 3 seconds in case the player is gone
+      multiplayer.leaderCode(function() {
+          if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected) {
+              aiTimeOutTimer.start()
+          }
+      })
   }
 
-  function plebFinish(plebHand) {
+
+  function plebFinish(plebHand)
+  {
       // let the new Pleb finish its game by playing all its remaining cards
       var lastcards = []
-      for (var l = 0; l < plebHand.hand.length; l++) {
+      for (var l = 0; l < plebHand.hand.length; l++)
+      {
           lastcards.push(plebHand.hand[l].entityId)
       }
+
       multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: lastcards, userId: plebHand.player.userId})
       depositCards(lastcards, plebHand.player.userId)
   }
+
 
   // schedule AI to take over after 10 seconds if the connected player is inactive
   function turnTimedOut(){
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
       console.debug("[turnTimedOut] called. Active player UserID: " + userId)
 
-      if (multiplayer.myTurn && !acted){
+      if (multiplayer.myTurn && !acted)
+      {
           acted = true
           scaleHand(1.0)
       }
+
       // clean up our UI
       timer.running = false
 
@@ -1062,11 +1077,11 @@ Item {
   }
 
   function triggerNewTurn(userId){
-    if (depot.clockwise){
-      multiplayer.triggerNextTurn(userId)
-    } else {
-      multiplayer.triggerPreviousTurn(userId)
-    }
+      if (depot.clockwise){
+          multiplayer.triggerNextTurn(userId)
+      } else {
+          multiplayer.triggerPreviousTurn(userId)
+      }
   }
 
   // calculate the points for each player

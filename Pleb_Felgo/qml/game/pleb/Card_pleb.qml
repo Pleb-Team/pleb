@@ -26,7 +26,8 @@ EntityBase {
 
   // to show all cards on the screen and to test multiplayer syncing, set this to true
   // it is useful for testing, thus always enable it for debug builds and non-publish builds
-  property bool forceShowAllCards: system.debugBuild && !system.publishBuild
+//  property bool forceShowAllCards: system.debugBuild && !system.publishBuild
+  property bool forceShowAllCards: true
 
   // access the image and text from outside
   property alias cardImage: cardImage
