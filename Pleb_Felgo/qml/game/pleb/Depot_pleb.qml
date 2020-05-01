@@ -8,12 +8,15 @@ Item {
 
   // current cards on top of the depot (the cards played in the previous turn)
   property var lastDeposit: []
+
   // block the player for a short period of time when he gets skipped
   property alias effectTimer: effectTimer
   // the current depot card effect for the next player
-  property bool effect: false
+//  property bool effect: false
+
   // whether the active player is skipped or not
   property bool skipped: false
+
   // the current turn direction
   property bool clockwise: true
 
@@ -99,14 +102,14 @@ Item {
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
       lastPlayer = userId
 
-      // signal if the placed cards has an effect on the next player
-      if(hasEffect()){
-          effect = true
-          multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: true, userId: userId})
-      } else {
-          effect = false
-          multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
-      }
+//      // signal if the placed cards has an effect on the next player
+//      if(hasEffect()){
+//          effect = true
+//          multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: true, userId: userId})
+//      } else {
+//          effect = false
+//          multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
+//      }
   }
 
   // change the card's parent to depot
@@ -116,10 +119,10 @@ Item {
     card.state = "depot"
   }
 
-  // check if the card has an effect for the next player
-  function hasEffect(){
-    return false
-  }
+//  // check if the card has an effect for the next player
+//  function hasEffect(){
+//    return false
+//  }
 
   // check if allowed to play the selected card
   function validCard(cardId){
@@ -152,25 +155,25 @@ Item {
       return false
   }
 
-  // play a card effect depending on the card type
-  function cardEffect(){
-    if (effect){
-      if (lastDeposit.length > 0 && lastDeposit[0].variationType === "skip") {
-        skip()
-      }
-    } else {
-      // reset the card effects if they are not active
-      skipped = false
-//      depot.drawAmount = 1
-//      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-//      multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: 1, userId: userId})
-    }
-  }
+//  // play a card effect depending on the card type
+//  function cardEffect(){
+//      if (effect){
+//          if (lastDeposit.length > 0 && lastDeposit[0].variationType === "skip") {
+//              skip()
+//          }
+//      } else {
+//          // reset the card effects if they are not active
+//          skipped = false
+//          //      depot.drawAmount = 1
+//          //      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+//          //      multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: 1, userId: userId})
+//      }
+//  }
 
   function skipTurn(skipMove) {
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
       if (skipMove) {
-          effect = true
+//          effect = true
           skip()
           console.debug("player " + userId + " MISSED TURN!")
       } else {
@@ -182,17 +185,17 @@ Item {
 
   // skip the current player by playing a sound, setting the skipped variable and starting the skip timer
   function skip(){
-    skipSound.play()
-    effect = false
-    var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-    multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
-    skipped = true
+      skipSound.play()
+//      effect = false
+      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+      multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
+      skipped = true
 
-    if (multiplayer.activePlayer && multiplayer.activePlayer.connected){
-      multiplayer.leaderCode(function() {
-        effectTimer.start()
-      })
-    }
+      if (multiplayer.activePlayer && multiplayer.activePlayer.connected){
+          multiplayer.leaderCode(function() {
+              effectTimer.start()
+          })
+      }
   }
 
   // reverse the current turn direction
@@ -221,7 +224,7 @@ Item {
       skipped = false
       clockwise = true
       //    drawAmount = 1
-      effect = false
+//      effect = false
       effectTimer.stop()
       lastDeposit = []
       finishedPlayers = []
@@ -241,7 +244,7 @@ Item {
 
     depot.skipped = skipped
     depot.clockwise = clockwise
-    depot.effect = effect
+//    depot.effect = effect
 //    depot.drawAmount = drawAmount
 
     depot.lastPlayer = lastPlayer
