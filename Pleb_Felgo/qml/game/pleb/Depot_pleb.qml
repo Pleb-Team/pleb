@@ -121,27 +121,35 @@ Item {
     return false
   }
 
-  // check if the selected card matches with the current reference card
+  // check if allowed to play the selected card
   function validCard(cardId){
       var activeHand
-    // only continue if the selected card is in the hand of the active player
-    for (var i = 0; i < playerHands.children.length; i++) {
-      if (playerHands.children[i].player === multiplayer.activePlayer){
-          activeHand = playerHands.children[i]
-        if (!activeHand.inHand(cardId)) return false
+
+      // only continue if the selected card is in the hand of the active player
+      for (var i = 0; i < playerHands.children.length; i++) {
+          if (playerHands.children[i].player === multiplayer.activePlayer){
+              activeHand = playerHands.children[i]
+              if (!activeHand.inHand(cardId))
+                  return false
+          }
       }
-    }
-    var card = entityManager.getEntityById(cardId)
+      var card = entityManager.getEntityById(cardId)
 
-    // rules
-    if (lastDeposit === undefined || lastDeposit === null || lastDeposit.length === 0) return true
-    if (multiplayer.activePlayer.userId === lastPlayer) return true
-    if (card.points > lastDeposit[0].points && activeHand.countCards(card.points) >= lastDeposit.length) return true
+      // rules
+      if (lastDeposit === undefined || lastDeposit === null || lastDeposit.length === 0)
+          return true
 
-    // TODO LASTCARD the last card of a player may still be beaten, thus this is commented; otherwise, the next player would immediately be able to play
-    // if (finishedPlayers.includes(lastPlayer)) return true
+      if (multiplayer.activePlayer.userId === lastPlayer)
+          return true
 
-    return false
+      // Value is ok and enough cards of this value exist in the players hand
+      if (card.points > lastDeposit[0].points && activeHand.countCards(card.points) >= lastDeposit.length)
+          return true
+
+      // TODO LASTCARD the last card of a player may still be beaten, thus this is commented; otherwise, the next player would immediately be able to play
+      // if (finishedPlayers.includes(lastPlayer)) return true
+
+      return false
   }
 
   // play a card effect depending on the card type
