@@ -107,10 +107,10 @@ Item {
     GameScene {
         id: gameScene
         onBackButtonPressed: {
-            if(!gameScene.leaveGame.visible && !noTokenDialog.visible)
+            if(!gameScene.leaveGame.visible)
                 gameScene.leaveGame.visible = true
             else {
-                //adMobInterstitial.displayInterstitial(true, false, "leaveGame") // true = open menu after interstitial
+                window.state = "menu"
             }
 
         }
@@ -247,6 +247,7 @@ Item {
 //                window.state = "menu"
 //            }
 //        }
+
 
 //        // track interstitial behavior
 //        onInterstitialOpened: {
