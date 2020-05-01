@@ -1,7 +1,6 @@
 import Felgo 3.0
 import QtQuick 2.12
 import "../common"
-import "../game/one"
 import "../game/pleb"
 import "../interface"
 
@@ -13,21 +12,21 @@ SceneBase {
   // game signals
   signal cardSelected(var cardId)
   signal stackSelected()
-  signal colorPicked(var pickedColor)
+//  signal colorPicked(var pickedColor)
   signal depotSelected()
 
   // access the elements from outside
   property alias deck: deck
   property alias depot: depot
   property alias gameLogic: gameLogic
-  property alias onuButton: onuButton
+//  property alias onuButton: onuButton
   property alias gameOver: gameOver
   property alias leaveGame: leaveGame
   property alias switchName: switchName
-  property alias drawCounter: drawCounter
+//  property alias drawCounter: drawCounter
   property alias bottomHand: bottomHand
   property alias playerInfoPopup: playerInfoPopup
-  property alias onuHint: onuHint
+//  property alias onuHint: onuHint
   property alias rightPlayerTag: rightPlayerTag // ad banner will be aligned based on rightPlayerTag
 
 
@@ -151,14 +150,20 @@ SceneBase {
     text: "Close\nRound"
     width: buttonText.contentWidth + 30
     visible: system.debugBuild && !gameLogic.gameOver
-    anchors.horizontalCenter: onuButton.horizontalCenter
-    anchors.bottom: onuButton.top
-    anchors.bottomMargin: 20
+
+//    anchors.horizontalCenter: onuButton.horizontalCenter
+//    anchors.bottom: onuButton.top
+//    anchors.bottomMargin: 20
+
+    anchors.right: depot.left
+    anchors.verticalCenter: depot.verticalCenter
+
     onClicked: {
       gameLogic.endGame(multiplayer.localPlayer.userId)
       multiplayer.sendMessage(gameLogic.messageEndGame, {userId: multiplayer.localPlayer.userId, test: true})
     }
   }
+
   ButtonBase {
     text: "Switch Name"
     //width: buttonText.contentWidth + 30
@@ -174,14 +179,14 @@ SceneBase {
     }
   }
 
-  // onu button on the left of the depot
-  ONUButton {
-    id: onuButton
-    anchors.verticalCenter: depot.verticalCenter
-    anchors.right: depot.left
-    anchors.rightMargin: 85
-    visible: false // remove ONU button (ONU will auto-activate for all users then, makes game a bit easier and faster to play)
-  }
+//  // onu button on the left of the depot
+//  ONUButton {
+//    id: onuButton
+//    anchors.verticalCenter: depot.verticalCenter
+//    anchors.right: depot.left
+//    anchors.rightMargin: 85
+//    visible: false // remove ONU button (ONU will auto-activate for all users then, makes game a bit easier and faster to play)
+//  }
 
   // the deck on the right of the depot
   Deck_pleb {
@@ -192,62 +197,61 @@ SceneBase {
   }
 
   // the drawCounter on top of the depot showing the current drawAmount
-  Text {
-    id: drawCounter
-    anchors.left: depot.right
-    anchors.leftMargin: 18
-    anchors.bottom: depot.top
-    anchors.bottomMargin: 12
-    text: "+" + depot.drawAmount
-    color: "white"
-    font.pixelSize: 40
-    font.family: standardFont.name
-    font.bold: true
-    visible: depot.drawAmount > 1 && !onuHint.visible ? true : false
-  }
+//  Text {
+//    id: drawCounter
+//    anchors.left: depot.right
+//    anchors.leftMargin: 18
+//    anchors.bottom: depot.top
+//    anchors.bottomMargin: 12
+//    text: "+" + depot.drawAmount
+//    color: "white"
+//    font.pixelSize: 40
+//    font.family: standardFont.name
+//    font.bold: true
+//    visible: depot.drawAmount > 1 && !onuHint.visible ? true : false
+//  }
 
-  // the drawCounter on top of the depot showing the current drawAmount
-  Text {
-    id: onuHint
-    anchors.left: depot.right
-    anchors.leftMargin: 18
-    anchors.bottom: depot.top
-    anchors.bottomMargin: 12
-    text: "+2"
-    color: "white"
-    font.pixelSize: 40
-    font.family: standardFont.name
-    font.bold: true
-    visible: false
+//  Text {
+//    id: onuHint
+//    anchors.left: depot.right
+//    anchors.leftMargin: 18
+//    anchors.bottom: depot.top
+//    anchors.bottomMargin: 12
+//    text: "+2"
+//    color: "white"
+//    font.pixelSize: 40
+//    font.family: standardFont.name
+//    font.bold: true
+//    visible: false
 
-    Text {
-      anchors.left: parent.right
-      anchors.leftMargin: 14
-      anchors.verticalCenter: parent.verticalCenter
-      text: "Forgot to press\nOne Button"
-      color: "white"
-      font.pixelSize: 14
-      font.family: standardFont.name
-      font.bold: true
-    }
+//    Text {
+//      anchors.left: parent.right
+//      anchors.leftMargin: 14
+//      anchors.verticalCenter: parent.verticalCenter
+//      text: "Forgot to press\nOne Button"
+//      color: "white"
+//      font.pixelSize: 14
+//      font.family: standardFont.name
+//      font.bold: true
+//    }
 
-    onVisibleChanged: {
-      if (visible){
-        singleTimer.start()
-      }
-    }
+//    onVisibleChanged: {
+//      if (visible){
+//        singleTimer.start()
+//      }
+//    }
 
-    Timer {
-      id: singleTimer
-      interval: 3000
-      repeat: false
-      running: false
+//    Timer {
+//      id: singleTimer
+//      interval: 3000
+//      repeat: false
+//      running: false
 
-      onTriggered: {
-        onuHint.visible = false
-      }
-    }
-  }
+//      onTriggered: {
+//        onuHint.visible = false
+//      }
+//    }
+//  }
 
   // the four playerHands placed around the main game field
   Item {
@@ -334,11 +338,11 @@ SceneBase {
   }
 
   // the colorPicker in the middle of the screen
-  ColorPicker {
-    id: colorPicker
-    visible: false
-    anchors.centerIn: depot
-  }
+//  ColorPicker {
+//    id: colorPicker
+//    visible: false
+//    anchors.centerIn: depot
+//  }
 
   // the gameOver message in the middle of the screen
   GameOverWindow {
@@ -347,7 +351,6 @@ SceneBase {
     visible: false
   }
 
-  // the gameOver message in the middle of the screen
   SwitchNameWindow {
     anchors.centerIn: gameWindowAnchorItem
     id: switchName

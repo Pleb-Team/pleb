@@ -16,8 +16,9 @@ Item {
   property bool skipped: false
   // the current turn direction
   property bool clockwise: true
+
   // the amount of cards to draw, can be increased by draw2 and wild4 cards
-  property int drawAmount: 1
+//  property int drawAmount: 1
 
   property var lastPlayer: null
   property var finishedPlayers: []
@@ -152,9 +153,9 @@ Item {
     } else {
       // reset the card effects if they are not active
       skipped = false
-      depot.drawAmount = 1
-      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-      multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: 1, userId: userId})
+//      depot.drawAmount = 1
+//      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+//      multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: 1, userId: userId})
     }
   }
 
@@ -166,8 +167,8 @@ Item {
           console.debug("player " + userId + " MISSED TURN!")
       } else {
           skipped = false
-          depot.drawAmount = 1
-          multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: 1, userId: userId})
+//          depot.drawAmount = 1
+//          multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: 1, userId: userId})
       }
   }
 
@@ -197,23 +198,23 @@ Item {
   }
 
   // increase the drawAmount when a draw2 or wild4 effect is active
-  function draw(amount){
-    if (drawAmount == 1) {
-      drawAmount = amount
-    } else {
-      drawAmount += amount
-    }
-    var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-    multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: depot.drawAmount, userId: userId})
-  }
+//  function draw(amount){
+//    if (drawAmount == 1) {
+//      drawAmount = amount
+//    } else {
+//      drawAmount += amount
+//    }
+//    var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+//    multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: depot.drawAmount, userId: userId})
+//  }
 
   // reset the depot
   function reset(){
-    skipped = false
-    clockwise = true
-    drawAmount = 1
-    effect = false
-    effectTimer.stop()
+      skipped = false
+      clockwise = true
+      //    drawAmount = 1
+      effect = false
+      effectTimer.stop()
       lastDeposit = []
       finishedPlayers = []
   }
@@ -233,7 +234,7 @@ Item {
     depot.skipped = skipped
     depot.clockwise = clockwise
     depot.effect = effect
-    depot.drawAmount = drawAmount
+//    depot.drawAmount = drawAmount
 
     depot.lastPlayer = lastPlayer
     depot.finishedPlayers = finishedPlayers
