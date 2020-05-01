@@ -33,7 +33,7 @@ Item {
   property int messageSetEffect: 4
   property int messageSetSkipped: 5
   property int messageSetReverse: 6
-  property int messageSetDrawAmount: 7
+//  property int messageSetDrawAmount: 7
 //  property int messagePickColor: 8
 //  property int messagePressONU: 9
   property int messageEndGame: 10 // we could replace this custom message with the new endGame() function from multiplayer, custom end game message was sent before this functionality existed
@@ -254,18 +254,19 @@ Item {
 
         depot.clockwise = message.clockwise
       }
-      // current drawAmount
-      else if (code == messageSetDrawAmount){
-        // if the message wasn't sent by the leader and
-        // if it wasn't sent by the active player, the message is invalid
-        // the message was probably sent after the leader triggered the next turn
-        if (multiplayer.leaderPlayer.userId != message.userId &&
-            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
-          return
-        }
 
-        depot.drawAmount = message.amount
-      }
+//      // current drawAmount
+//      else if (code == messageSetDrawAmount){
+//        // if the message wasn't sent by the leader and
+//        // if it wasn't sent by the active player, the message is invalid
+//        // the message was probably sent after the leader triggered the next turn
+//        if (multiplayer.leaderPlayer.userId != message.userId &&
+//            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
+//          return
+//        }
+
+//        depot.drawAmount = message.amount
+//      }
 
 //      // wild color picked
 //      else if (code == messagePickColor){
@@ -866,7 +867,7 @@ Item {
     message.skipped = depot.skipped
     message.clockwise = depot.clockwise
     message.effect = depot.effect
-    message.drawAmount = depot.drawAmount
+    message.drawAmount = 1 // depot.drawAmount
     message.gameOver = gameOver
 
     // save all card ids of the current depot
