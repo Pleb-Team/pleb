@@ -18,7 +18,7 @@ Item {
   // the owner of the cards
   property var player: MultiplayerUser{}
   // whether the player pressed the ONUButton or not
-  property bool onu: false
+//  property bool onu: false
   // the score at the end of the game
   property int score: 0
   // value used to spread the cards in hand
@@ -78,17 +78,17 @@ Item {
   }
 
   // playerHand bubble image is visible when the player pressed the ONUButton
-  Image {
-    anchors.top: parent.top
-    anchors.right: parent.right
-    source: "../../../assets/img/Bubble.png"
-    rotation: parent.rotation * (-1)
-    width: 60
-    height: width
-    z: 100
-    visible: onu
-    smooth: true
-  }
+//  Image {
+//    anchors.top: parent.top
+//    anchors.right: parent.right
+//    source: "../../../assets/img/Bubble.png"
+//    rotation: parent.rotation * (-1)
+//    width: 60
+//    height: width
+//    z: 100
+//    visible: onu
+//    smooth: true
+//  }
 
   // start the hand by picking up a specified amount of cards
   function startHand(){
@@ -100,7 +100,7 @@ Item {
     while(hand.length) {
       hand.pop()
     }
-    onu = false
+//    onu = false
     scaleHand(1.0)
   }
 
@@ -139,8 +139,9 @@ Item {
 
   // pick up specified amount of cards
   function pickUpCards(amount){
-    onuButton.button.enabled = false
+//    onuButton.button.enabled = false
     var pickUp = deck.handOutCards(amount)
+
     // add the stack cards to the playerHand array
     for (var i = 0; i < pickUp.length; i ++){
       hand.push(pickUp[i])
@@ -150,6 +151,7 @@ Item {
       }
       drawSound.play()
     }
+
     // reorganize the hand
     neatHand()
   }
@@ -255,7 +257,7 @@ Item {
 
   // highlight all valid cards by setting the glowImage visible
   function markValid(){
-    if (!depot.skipped && !gameLogic.gameOver && !colorPicker.chosingColor){
+    if (!depot.skipped && !gameLogic.gameOver ){
         var selectedGroup = getSelectedGroup()
       for (var i = 0; i < hand.length; i ++){
         if (depot.validCard(hand[i].entityId)){
@@ -327,40 +329,44 @@ Item {
 
   // if the player deposited their second to last card without pressing onu
   // they missed their chance to activate the ONUButton
-  function missedOnu(){
-    if (hand.length === 0 && !onu){
-      if (multiplayer.myTurn) onuButton.button.enabled = false
-      return true
-    } else {
-      return false
-    }
-  }
+//  function missedOnu(){
+//    if (hand.length === 0 ){
+//      if (multiplayer.myTurn) onuButton.button.enabled = false
+//      return true
+//    } else {
+//      return false
+//    }
+//  }
 
-  // check if the player can activate the onu button
-  function closeToWin(){
-    // if the player has 2 or less cards in his hand
-    if (hand.length == 2){
-      // automatically activate onu for the player if he's disconnected or when the ONUButton is removed from the game (onuButton.visible = false)
-      // do not auto-activate it when the player is skipped, onu is already active or the game is already over
-      var userDisconnected = (!multiplayer.activePlayer || !multiplayer.activePlayer.connected)
-      if ((!onuButton.visible || userDisconnected) && !depot.skipped && !onu && !gameLogic.gameOver){
-        var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-        onuButton.onu(userId)
-      }
-      // enable the button if the active player is connected
-      var valids = getValidCards()
-      if (multiplayer.myTurn && !depot.skipped && !gameLogic.gameOver && !onu && valids.length > 0){
-        onuButton.button.enabled = true
-      } else if (multiplayer.myTurn){
-        onuButton.button.enabled = false
-      }
-      return true
-    }else if (multiplayer.myTurn){
-      // deactivate the button if the player has more than 2 cards in his hand
-      onuButton.button.enabled = false
-      return false
-    }
-  }
+//  // check if the player can activate the onu button
+//  function closeToWin(){
+//    // if the player has 2 or less cards in his hand
+//    if (hand.length == 2){
+//      // automatically activate onu for the player if he's disconnected or when the ONUButton is removed from the game (onuButton.visible = false)
+//      // do not auto-activate it when the player is skipped, onu is already active or the game is already over
+//      var userDisconnected = (!multiplayer.activePlayer || !multiplayer.activePlayer.connected)
+
+////      if ((!onuButton.visible || userDisconnected) && !depot.skipped &&  !gameLogic.gameOver){
+////        var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+////        onuButton.onu(userId)
+////      }
+
+//      // enable the button if the active player is connected
+//      var valids = getValidCards()
+//      if (multiplayer.myTurn && !depot.skipped && !gameLogic.gameOver && !onu && valids.length > 0){
+//        onuButton.button.enabled = true
+//      } else if (multiplayer.myTurn){
+//        onuButton.button.enabled = false
+//      }
+//      return true
+//    }
+
+//    else if (multiplayer.myTurn){
+//      // deactivate the button if the player has more than 2 cards in his hand
+//      onuButton.button.enabled = false
+//      return false
+//    }
+//  }
 
   // check if the player has finished with zero cards left
   function checkWin(){
