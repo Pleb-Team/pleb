@@ -334,7 +334,7 @@ Item {
                         selectedCard.glowImage.visible = !selectedCard.glowGroupImage.visible
 
                         // convenience for the player to auto-select groups
-                        if (depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayer) { // TODO LASTCARD  && !depot.finishedPlayers.includes(depot.lastPlayer)) {
+                        if (depot.lastPlayer && depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayer) { // TODO LASTCARD  && !depot.finishedPlayers.includes(depot.lastPlayer)) {
                             var activeHand = getHand(multiplayer.localPlayer.userId).hand
                             if (selectedCard.glowGroupImage.visible) {
                                 var groupSize = 1
@@ -453,11 +453,11 @@ Item {
               depot.depositCards(cardIds)
               //          console.debug("player " + userId + " played " + cardIds)
 
-              if (depot.lastDeposit.length > 0 && depot.lastDeposit[0].variationType === "reverse"){
-                  multiplayer.leaderCode(function() {
-                      depot.reverse()
-                  })
-              }
+//              if (depot.lastDeposit.length > 0 && depot.lastDeposit[0].variationType === "reverse"){
+//                  multiplayer.leaderCode(function() {
+//                      depot.reverse()
+//                  })
+//              }
 
               // uncover the card for disconnected players after chosing the color
               if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected){
@@ -530,7 +530,7 @@ Item {
       // Then we have to make sure that the depot is cleared
       if (depot.lastPlayer == multiplayer.activePlayer.userId)
       {
-          depot.lastDeposit = []
+          depot.lastPlayer = null
       }
 
       // let the AI compute a move recommendation (it is not being played here)
@@ -989,14 +989,17 @@ Item {
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
 
       // check if the active player has just won the game and end it in that case
-      for (var i = 0; i < playerHands.children.length; i++) {
-          if (playerHands.children[i].player === multiplayer.activePlayer){
-              if (playerHands.children[i].checkWin()){
-                  console.debug("=================================================================================> " + multiplayer.activePlayer + " HAS FINISHED!!!")
-                  if (!depot.finishedPlayers.includes(userId)) {
+      for (var i = 0; i < playerHands.children.length; i++)
+      {
+          if (playerHands.children[i].player === multiplayer.activePlayer)
+          {
+              if (!depot.finishedPlayers.includes(userId))
+              {
+                  if (playerHands.children[i].checkWin())
+                  {
+                      console.debug("=================================================================================> " + multiplayer.activePlayer + " HAS FINISHED!!!")
                       depot.finishedPlayers.push(userId)
                   }
-
               }
           }
       }

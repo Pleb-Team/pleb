@@ -283,6 +283,7 @@ Item {
                 &&  (
                         depot.lastDeposit.length === 0
                     ||  selectedGroup.length < depot.lastDeposit.length
+                    ||  !depot.lastPlayer
                     ||  player.userId === depot.lastPlayer
                     )
                 )

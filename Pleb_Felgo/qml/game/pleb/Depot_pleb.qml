@@ -34,12 +34,12 @@ Item {
     source: "../../../assets/snd/skip.wav"
   }
 
-  // sound effect plays when a player gets skipped
-  SoundEffect {
-    volume: 0.5
-    id: reverseSound
-    source: "../../../assets/snd/reverse.wav"
-  }
+//  // sound effect plays when a player gets skipped
+//  SoundEffect {
+//    volume: 0.5
+//    id: reverseSound
+//    source: "../../../assets/snd/reverse.wav"
+//  }
 
   // blocks the player for a short period of time and trigger a new turn when he gets skipped
   Timer {
@@ -125,10 +125,11 @@ Item {
       }
       var card = entityManager.getEntityById(cardId)
 
-      // rules
-      if (lastDeposit === undefined || lastDeposit === null || lastDeposit.length === 0)
+      // Depot is empty --> This polayer can play freely
+      if (!lastPlayer || lastDeposit === undefined || lastDeposit === null || lastDeposit.length === 0)
           return true
 
+      // This player played last --> He now can play freely
       if (multiplayer.activePlayer.userId === lastPlayer)
           return true
 
@@ -141,9 +142,6 @@ Item {
 
       if (card.points > lastDeposit[0].points && activeHand.countCards(card.points) >= lastDeposit.length)
           return true
-
-      // TODO LASTCARD the last card of a player may still be beaten, thus this is commented; otherwise, the next player would immediately be able to play
-      // if (finishedPlayers.includes(lastPlayer)) return true
 
       return false
   }
@@ -177,30 +175,31 @@ Item {
       }
   }
 
-  // reverse the current turn direction
-  function reverse(){
-    reverseSound.play()
-    // change direction
-    clockwise ^= true
-    // send current direction to other players
-    var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-    multiplayer.sendMessage(gameLogic.messageSetReverse, {clockwise: clockwise, userId: userId})
-  }
+//  // reverse the current turn direction
+//  function reverse(){
+//    reverseSound.play()
+//    // change direction
+//    clockwise ^= true
+//    // send current direction to other players
+//    var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+//    multiplayer.sendMessage(gameLogic.messageSetReverse, {clockwise: clockwise, userId: userId})
+//  }
 
 
   // reset the depot
-  function reset(){
+  function reset()
+  {
       skipped = false
       clockwise = true
-      //    drawAmount = 1
-//      effect = false
       effectTimer.stop()
       lastDeposit = []
+      lastPlayer = null
       finishedPlayers = []
   }
 
   // sync the depot with the leader
-  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, clockwise, effect, drawAmount, lastPlayer, finishedPlayers){
+  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, clockwise, effect, drawAmount, lastPlayer, finishedPlayers)
+  {
     for (var i = 0; i < depotCardIDs.length; i++){
       depositCards([depotCardIDs[i]])
       deck.cardsInStack --
@@ -213,9 +212,6 @@ Item {
 
     depot.skipped = skipped
     depot.clockwise = clockwise
-//    depot.effect = effect
-//    depot.drawAmount = drawAmount
-
     depot.lastPlayer = lastPlayer
     depot.finishedPlayers = finishedPlayers
   }

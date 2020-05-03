@@ -88,33 +88,33 @@ SceneBase {
       }
     }
 
-    // reverse card
-    Column {
-      spacing: 5
+//    // reverse card
+//    Column {
+//      spacing: 5
 
-      Image {
-        width: 37
-        height: 60
-        anchors.horizontalCenter: parent.horizontalCenter
-        source: "../../assets/img/cards/one/reverse_red.png"
-        smooth: true
-      }
+//      Image {
+//        width: 37
+//        height: 60
+//        anchors.horizontalCenter: parent.horizontalCenter
+//        source: "../../assets/img/cards/one/reverse_red.png"
+//        smooth: true
+//      }
 
-      Text {
-        font.pixelSize: 10
-        color: "#28a3c1"
-        text: "Reverse"
-        font.family: standardFont.name
-      }
+//      Text {
+//        font.pixelSize: 10
+//        color: "#28a3c1"
+//        text: "Reverse"
+//        font.family: standardFont.name
+//      }
 
-      Text {
-        font.pixelSize: 9
-        color: "black"
-        width: 65
-        wrapMode: Text.WordWrap
-        text: "Changes the current turn order."
-      }
-    }
+//      Text {
+//        font.pixelSize: 9
+//        color: "black"
+//        width: 65
+//        wrapMode: Text.WordWrap
+//        text: "Changes the current turn order."
+//      }
+//    }
 
     // draw2 card
     Column {
