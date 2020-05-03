@@ -16,11 +16,10 @@ Item {
   // array with all card entities in the game
   property var cardDeck: []
   // all card types and colors
-  property var types: ["two", "three", "four", "five", "six",
-    "seven", "eight", "nine", "ten", "jack", "queen", "king", "ace"]
+  property var types: ["two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "jack", "queen", "king", "ace"]
   property var cardColor: ["clubs", "diamonds", "hearts", "spades"]
 
-  property bool allowRestack: false
+//  property bool allowRestack: false
 
 
   // shuffle sound in the beginning of the game
@@ -85,45 +84,31 @@ Item {
 
   // hand out cards
   function handOutCards(amount){
-    var handOut = []
-    for (var i = 0; i < (cardsInStack + i) && i < amount; i ++){
-      // highest index for the last card on top of the others
-      var index = deck.cardDeck.length - (deck.cardDeck.length - deck.cardsInStack) - 1
-      handOut.push(cardDeck[index])
-      cardsInStack --
-    }
+      var handOut = []
+      for (var i = 0; i < (cardsInStack + i) && i < amount; i ++){
+          // highest index for the last card on top of the others
+          var index = deck.cardDeck.length - (deck.cardDeck.length - deck.cardsInStack) - 1
+          handOut.push(cardDeck[index])
+          cardsInStack --
+      }
 
-    // deactivate ONU state after drawing cards
-//    passedChance()
+      // deactivate card effects after drawing a card
+//      depot.effect = false
+//      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+//      multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
 
-    // deactivate card effects after drawing a card
-    depot.effect = false
-    var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-    multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
+      if (cardsInStack < playerHands.children.length) {
+          for (; cardsInStack > 0; cardsInStack--) {
+              cardDeck[cardsInStack - 1].newParent = null
+              cardDeck[cardsInStack - 1].state = "void"
+              console.debug("voided " + cardDeck[cardsInStack - 1])
+          }
+      }
 
-    if (cardsInStack < playerHands.children.length) {
-        for (; cardsInStack > 0; cardsInStack--) {
-            cardDeck[cardsInStack - 1].newParent = null
-            cardDeck[cardsInStack - 1].state = "void"
-            console.debug("voided " + cardDeck[cardsInStack - 1])
-        }
-    }
-
-    return handOut
+      return handOut
   }
 
-  // deactivate ONU state for active player after drawing cards
-//  function passedChance(){
-//    for (var i = 0; i < playerHands.children.length; i++) {
-//      if (playerHands.children[i].player === multiplayer.activePlayer){
-//        if (multiplayer.myTurn || !multiplayer.activePlayer || !multiplayer.activePlayer.connected){
-//          playerHands.children[i].onu = false
-//          var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-//          multiplayer.sendMessage(gameLogic.messagePressONU, {userId: userId, onu: false})
-//        }
-//      }
-//    }
-//  }
+
 
   // the leader shuffles the cardInfo array in the beginning of the game
   function shuffleDeck(){
@@ -154,7 +139,7 @@ Item {
   // get the id of the card on top of the stack
   function getTopCardId(){
     // create a new stack from depot cards if there's no card left to draw
-    reStack()
+//    reStack()
     var index = Math.max(cardDeck.length - (cardDeck.length - cardsInStack) - 1, 0)
     return deck.cardDeck[index].entityId
   }
@@ -169,54 +154,19 @@ Item {
     }
   }
 
-  // mark the stack if there are no other valid card options
-  function markStack(){
-    if (cardDeck.length <= 0) return
-    var card = entityManager.getEntityById(getTopCardId())
-    card.glowImage.visible = true
-  }
 
-  // unmark the stack
+  // unmark the stack and the recently dropped cards
   function unmark(){
-    if (cardDeck.length > 0) {
-//        console.debug("Unmarking stack...")
-    var card = entityManager.getEntityById(getTopCardId())
-    card.glowImage.visible = false
-    card.glowGroupImage.visible = false
-    } else {
-//        console.debug("No stack to unmark")
-    }
+      if (cardDeck.length > 0) {
+          //        console.debug("Unmarking stack...")
+          var card = entityManager.getEntityById(getTopCardId())
+          card.glowImage.visible = false
+          card.glowGroupImage.visible = false
+      } else {
+          //        console.debug("No stack to unmark")
+      }
   }
 
-  // move the old depot cards to the stack if there are no cards left to draw
-  function reStack(){
-      if (allowRestack) {
-    var cardIds = []
-    if (cardsInStack <= 1){
-      // find all old depot cards
-      for (var i = 0; i < cardDeck.length; i ++){
-        if (cardDeck[i].state === "depot" && !depot.lastDeposit.includes(cardDeck[i].entityId)){
-          cardIds.push(cardDeck[i].entityId)
-        }
-      }
-      // reparent and hide the cards and move them to the beginning of the cardDeck array
-      for (var j = 0; j < cardIds.length; j++) {
-        for (var k = 0; k < cardDeck.length; k ++){
-          if (cardDeck[k].entityId == cardIds[j]){
-            cardDeck[k].hidden = true
-            cardDeck[k].newParent = deck
-            cardDeck[k].state = "stack"
-            moveElement(k, 0)
-            cardsInStack ++
-            break
-          }
-        }
-      }
-    }
-    // reposition the new cards to create a stack
-    offsetStack()
-      }
-  }
 
   // move the stack cards to the beginning of the cardDeck array
   function moveElement(from, to){

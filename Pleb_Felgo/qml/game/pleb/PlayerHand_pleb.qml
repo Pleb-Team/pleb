@@ -256,38 +256,55 @@ Item {
   }
 
   // highlight all valid cards by setting the glowImage visible
-  function markValid(){
-    if (!depot.skipped && !gameLogic.gameOver ){
-        var selectedGroup = getSelectedGroup()
-      for (var i = 0; i < hand.length; i ++){
-        if (depot.validCard(hand[i].entityId)){
-            if (selectedGroup.length === 0 || (selectedGroup[0].points === hand[i].points && (depot.lastDeposit.length === 0 || selectedGroup.length < depot.lastDeposit.length || player.userId === depot.lastPlayer))) { // TODO LASTCARD || depot.finishedPlayers.includes(depot.lastPlayer)))) {
-                hand[i].glowImage.visible = !hand[i].glowGroupImage.visible
-            } else {
-                hand[i].glowImage.visible = false
-            }
-          hand[i].updateCardImage()
-        }else{
-          hand[i].glowImage.visible = false
-            hand[i].glowGroupImage.visible = false
-        }
+  function markValid()
+  {
+      if (!depot.skipped && !gameLogic.gameOver )
+      {
+          var selectedGroup = getSelectedGroup()
+          for (var i = 0; i < hand.length; i ++)
+          {
+              // Unmark invalid cards
+              if (!depot.validCard(hand[i].entityId))
+              {
+                  hand[i].glowImage.visible = false
+                  hand[i].glowGroupImage.visible = false
+                  continue
+              }
+
+              // Nothing yet selected --> All cards of valid value are allowed
+              if (selectedGroup.length === 0)
+              {
+                  hand[i].glowImage.visible = true
+                  continue
+              }
+
+
+              if (  selectedGroup[0].points === hand[i].points
+                &&  (
+                        depot.lastDeposit.length === 0
+                    ||  selectedGroup.length < depot.lastDeposit.length
+                    ||  !depot.lastPlayer
+                    ||  player.userId === depot.lastPlayer
+                    )
+                )
+              {
+                  // TODO LASTCARD || depot.finishedPlayers.includes(depot.lastPlayer)))) {
+                  hand[i].glowImage.visible = !hand[i].glowGroupImage.visible
+              } else {
+                  hand[i].glowImage.visible = false
+              }
+              hand[i].updateCardImage()
+          }
       }
-      // mark the stack if there are no valid cards in hand
-//      var validId = randomValidId()
-//      if(validId == null){
-//          console.debug("marking STACK AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-//        deck.markStack()
-//      }
-    }
   }
 
   // unmark all cards in hand
   function unmark(){
-    for (var i = 0; i < hand.length; i ++){
-      hand[i].glowImage.visible = false
-        hand[i].glowGroupImage.visible = false
-      hand[i].updateCardImage()
-    }
+      for (var i = 0; i < hand.length; i ++){
+          hand[i].glowImage.visible = false
+          hand[i].glowGroupImage.visible = false
+          hand[i].updateCardImage()
+      }
   }
 
   // scale the whole playerHand of the active localPlayer with a zoom factor

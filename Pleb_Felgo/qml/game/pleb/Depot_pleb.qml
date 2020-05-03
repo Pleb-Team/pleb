@@ -8,12 +8,15 @@ Item {
 
   // current cards on top of the depot (the cards played in the previous turn)
   property var lastDeposit: []
+
   // block the player for a short period of time when he gets skipped
   property alias effectTimer: effectTimer
   // the current depot card effect for the next player
-  property bool effect: false
+//  property bool effect: false
+
   // whether the active player is skipped or not
   property bool skipped: false
+
   // the current turn direction
   property bool clockwise: true
 
@@ -31,12 +34,12 @@ Item {
     source: "../../../assets/snd/skip.wav"
   }
 
-  // sound effect plays when a player gets skipped
-  SoundEffect {
-    volume: 0.5
-    id: reverseSound
-    source: "../../../assets/snd/reverse.wav"
-  }
+//  // sound effect plays when a player gets skipped
+//  SoundEffect {
+//    volume: 0.5
+//    id: reverseSound
+//    source: "../../../assets/snd/reverse.wav"
+//  }
 
   // blocks the player for a short period of time and trigger a new turn when he gets skipped
   Timer {
@@ -98,15 +101,6 @@ Item {
 
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
       lastPlayer = userId
-
-      // signal if the placed cards has an effect on the next player
-      if(hasEffect()){
-          effect = true
-          multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: true, userId: userId})
-      } else {
-          effect = false
-          multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
-      }
   }
 
   // change the card's parent to depot
@@ -116,53 +110,47 @@ Item {
     card.state = "depot"
   }
 
-  // check if the card has an effect for the next player
-  function hasEffect(){
-    return false
-  }
 
-  // check if the selected card matches with the current reference card
+  // check if allowed to play the selected card
   function validCard(cardId){
       var activeHand
-    // only continue if the selected card is in the hand of the active player
-    for (var i = 0; i < playerHands.children.length; i++) {
-      if (playerHands.children[i].player === multiplayer.activePlayer){
-          activeHand = playerHands.children[i]
-        if (!activeHand.inHand(cardId)) return false
+
+      // only continue if the selected card is in the hand of the active player
+      for (var i = 0; i < playerHands.children.length; i++) {
+          if (playerHands.children[i].player === multiplayer.activePlayer){
+              activeHand = playerHands.children[i]
+              if (!activeHand.inHand(cardId))
+                  return false
+          }
       }
-    }
-    var card = entityManager.getEntityById(cardId)
+      var card = entityManager.getEntityById(cardId)
 
-    // rules
-    if (lastDeposit === undefined || lastDeposit === null || lastDeposit.length === 0) return true
-    if (multiplayer.activePlayer.userId === lastPlayer) return true
-    if (card.points > lastDeposit[0].points && activeHand.countCards(card.points) >= lastDeposit.length) return true
+      // Depot is empty --> This polayer can play freely
+      if (!lastPlayer || lastDeposit === undefined || lastDeposit === null || lastDeposit.length === 0)
+          return true
 
-    // TODO LASTCARD the last card of a player may still be beaten, thus this is commented; otherwise, the next player would immediately be able to play
-    // if (finishedPlayers.includes(lastPlayer)) return true
+      // This player played last --> He now can play freely
+      if (multiplayer.activePlayer.userId === lastPlayer)
+          return true
 
-    return false
+      // Value is ok and enough cards of this value exist in the players hand
+//      console.assert(activeHand)
+      if (!activeHand)
+      {
+          return false
+      }
+
+      if (card.points > lastDeposit[0].points && activeHand.countCards(card.points) >= lastDeposit.length)
+          return true
+
+      return false
   }
 
-  // play a card effect depending on the card type
-  function cardEffect(){
-    if (effect){
-      if (lastDeposit.length > 0 && lastDeposit[0].variationType === "skip") {
-        skip()
-      }
-    } else {
-      // reset the card effects if they are not active
-      skipped = false
-//      depot.drawAmount = 1
-//      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-//      multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: 1, userId: userId})
-    }
-  }
 
   function skipTurn(skipMove) {
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
       if (skipMove) {
-          effect = true
+//          effect = true
           skip()
           console.debug("player " + userId + " MISSED TURN!")
       } else {
@@ -174,53 +162,44 @@ Item {
 
   // skip the current player by playing a sound, setting the skipped variable and starting the skip timer
   function skip(){
-    skipSound.play()
-    effect = false
-    var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-    multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
-    skipped = true
+      skipSound.play()
+//      effect = false
+      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+      multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
+      skipped = true
 
-    if (multiplayer.activePlayer && multiplayer.activePlayer.connected){
-      multiplayer.leaderCode(function() {
-        effectTimer.start()
-      })
-    }
+      if (multiplayer.activePlayer && multiplayer.activePlayer.connected){
+          multiplayer.leaderCode(function() {
+              effectTimer.start()
+          })
+      }
   }
 
-  // reverse the current turn direction
-  function reverse(){
-    reverseSound.play()
-    // change direction
-    clockwise ^= true
-    // send current direction to other players
-    var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-    multiplayer.sendMessage(gameLogic.messageSetReverse, {clockwise: clockwise, userId: userId})
-  }
-
-  // increase the drawAmount when a draw2 or wild4 effect is active
-//  function draw(amount){
-//    if (drawAmount == 1) {
-//      drawAmount = amount
-//    } else {
-//      drawAmount += amount
-//    }
+//  // reverse the current turn direction
+//  function reverse(){
+//    reverseSound.play()
+//    // change direction
+//    clockwise ^= true
+//    // send current direction to other players
 //    var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-//    multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: depot.drawAmount, userId: userId})
+//    multiplayer.sendMessage(gameLogic.messageSetReverse, {clockwise: clockwise, userId: userId})
 //  }
 
+
   // reset the depot
-  function reset(){
+  function reset()
+  {
       skipped = false
       clockwise = true
-      //    drawAmount = 1
-      effect = false
       effectTimer.stop()
       lastDeposit = []
+      lastPlayer = null
       finishedPlayers = []
   }
 
   // sync the depot with the leader
-  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, clockwise, effect, drawAmount, lastPlayer, finishedPlayers){
+  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, clockwise, effect, drawAmount, lastPlayer, finishedPlayers)
+  {
     for (var i = 0; i < depotCardIDs.length; i++){
       depositCards([depotCardIDs[i]])
       deck.cardsInStack --
@@ -233,9 +212,6 @@ Item {
 
     depot.skipped = skipped
     depot.clockwise = clockwise
-    depot.effect = effect
-//    depot.drawAmount = drawAmount
-
     depot.lastPlayer = lastPlayer
     depot.finishedPlayers = finishedPlayers
   }
