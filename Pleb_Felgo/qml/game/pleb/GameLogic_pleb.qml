@@ -257,39 +257,6 @@ Item {
         depot.clockwise = message.clockwise
       }
 
-//      // current drawAmount
-//      else if (code == messageSetDrawAmount){
-//        // if the message wasn't sent by the leader and
-//        // if it wasn't sent by the active player, the message is invalid
-//        // the message was probably sent after the leader triggered the next turn
-//        if (multiplayer.leaderPlayer.userId != message.userId &&
-//            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
-//          return
-//        }
-
-//        depot.drawAmount = message.amount
-//      }
-
-//      // wild color picked
-//      else if (code == messagePickColor){
-//        // if the message wasn't sent by the leader and
-//        // if it wasn't sent by the active player, the message is invalid
-//        // the message was probably sent after the leader triggered the next turn
-//        if (multiplayer.leaderPlayer.userId != message.userId &&
-//            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
-//          return
-//        }
-
-//        pickColor(message.color)
-//      }
-
-      // someone pressed onu
-//      else if (code == messagePressONU){
-//        var playerHand = getHand(message.userId)
-//        if (playerHand) {
-//          playerHand.onu = message.onu
-//        }
-//      }
 
       // game ends
       else if (code == messageEndGame){
@@ -412,21 +379,8 @@ Item {
         console.debug("DEPOT ITSELF SELECTED")
         skipOrPlay()
     }
-
-//    // the player selected a color
-//    onColorPicked: {
-//      if (multiplayer.myTurn && !acted){
-//        acted = true
-//        colorSound.play()
-//        pickColor(pickedColor)
-//        multiplayer.sendMessage(messagePickColor, {color: pickedColor, userId: multiplayer.localPlayer.userId})
-//        endTurn()
-//        // not relevant for google analytics, causes to exceed the free limit
-//        //ga.logEvent("User", "Color Picked", "singlePlayer", multiplayer.singlePlayer)
-////        flurry.logEvent("User.ColorPicked", "singlePlayer", multiplayer.singlePlayer)
-//      }
-//    }
   }
+
 
   function skipOrPlay() {
       if (multiplayer.myTurn && !depot.skipped && !acted) {
@@ -572,9 +526,16 @@ Item {
       console.debug("Last deposit: " + depot.lastDeposit + " by player " + depot.lastPlayer)
 //      console.debug("players hand: " + (getHand(multiplayer.activePlayer.userId).hand))
 
+      // Player can play a second time in a row, meaning all other players have passed.
+      // Then we have to make sure that the depot is cleared
+      if (depot.lastPlayer == multiplayer.activePlayer.userId)
+      {
+          depot.lastDeposit = []
+      }
 
       // let the AI compute a move recommendation (it is not being played here)
       legacyBridge.getMove(multiplayer.activePlayer.userId);
+      var s = legacyBridge.arschlochGameLogic.getPlayerCardsText()
 
       // start the timer
       gameLogic.startTurnTimer()
@@ -709,90 +670,76 @@ Item {
       if (calledFromGameOverScreen) {
           console.debug("************************************ NEW GAME ***************************************")
       }
-//    ga.logEvent("System", "Start Game", "singlePlayer", multiplayer.singlePlayer)
-//    flurry.logEvent("System.StartGame", "singlePlayer", multiplayer.singlePlayer)
 
-    // add own event whether the game was started new from the main menu or re-started - this is only sent from the leader and not from the clients!
-    // for the client events, see System.GameRestarted and System.GameStarted in the onGameStarted handler
-    if(calledFromGameOverScreen) {
-//      ga.logEvent("User", "Restart Game", "singlePlayer", multiplayer.singlePlayer)
-//      flurry.logEvent("User.RestartGame", "singlePlayer", multiplayer.singlePlayer)
-    } else {
-//      ga.logEvent("User", "Start New Game", "singlePlayer", multiplayer.singlePlayer)
-//      flurry.logEvent("User.StartNewGame", "singlePlayer", multiplayer.singlePlayer)
-    }
 
-    if(!multiplayer.initialized && !multiplayer.singlePlayer){
-      createGame()
-    }
-
-    console.debug("multiplayer.localPlayer " + multiplayer.localPlayer)
-    //console.debug("multiplayer.localPlayer.userId " + multiplayer.localPlayer.userId)
-    console.debug("multiplayer.players.length " + multiplayer.players.length)
-    for (var i = 0; i < multiplayer.players.length; i++){
-      console.debug("multiplayer.players[" + i +"].userId " + multiplayer.players[i].userId)
-    }
-    console.debug("multiplayer.myTurn " + multiplayer.myTurn)
-
-    var lastGameOutcome = depot.finishedPlayers
-    // reset all values at the start of the game
-    gameOver = false
-    timer.start()
-    scaleHand()
-    markValid()
-    gameScene.gameOver.visible = false
-    gameScene.leaveGame.visible = false
-    gameScene.switchName.visible = false
-    playerInfoPopup.visible = false
-//    onuButton.button.enabled = false
-    chat.reset()
-    depot.reset()
-
-    // initialize the players, the deck and the individual hands
-    initPlayers()
-    initDeck()
-    initHands()
-    // reset all tags and set tag data of the leader
-    initTags()
-
-    // set the game state for all players
-    multiplayer.leaderCode(function () {
-      // NOTE: only the leader must set this to true! the clients only get initialized after the initial syncing game state message is received
-      initialized = true
-
-      // if we call this here, gameStarted is called twice. it is not needed to call, because it is already called when the room is setup
-      // thus we must not call this! forceStartGame() is called from the MatchMakingView, not from the GameScene!
-      if(calledFromGameOverScreen) {
-        // by calling restartGame, we emit a gameStarted call on the leader and the clients
-        multiplayer.restartGame()
+      if(!multiplayer.initialized && !multiplayer.singlePlayer){
+          createGame()
       }
 
-      // we want to send the state to all players in this case, thus set the playerId to undefined and this case is handled in onMessageReceived so all players handle the game state syncing if playerId is undefined
-      // send game state after forceStartGame, otherwise the message will not be received by the initial players!
-      if (!multiplayer.singlePlayer) {
-        sendGameStateToPlayer(undefined)
+      console.debug("multiplayer.localPlayer " + multiplayer.localPlayer)
+      //console.debug("multiplayer.localPlayer.userId " + multiplayer.localPlayer.userId)
+      console.debug("multiplayer.players.length " + multiplayer.players.length)
+      for (var i = 0; i < multiplayer.players.length; i++){
+          console.debug("multiplayer.players[" + i +"].userId " + multiplayer.players[i].userId)
       }
+      console.debug("multiplayer.myTurn " + multiplayer.myTurn)
 
-      // only the leader needs to call this
-      // lets always the leader take the first turn on the first game
-      if (lastGameOutcome.length < 1) {
-          gameLogic.triggerNewTurn(multiplayer.leaderPlayer.userId)
-      } else {
-          gameLogic.triggerNewTurn(lastGameOutcome[lastGameOutcome.length - 1])
-      }
-    })
+      var lastGameOutcome = depot.finishedPlayers
 
-    // start by scaling the playerHand of the active localPlayer
-    scaleHand()
+      // reset all values at the start of the game
+      gameOver = false
+      timer.start()
+      scaleHand()
+      markValid()
+      gameScene.gameOver.visible = false
+      gameScene.leaveGame.visible = false
+      gameScene.switchName.visible = false
+      playerInfoPopup.visible = false
+      chat.reset()
+      depot.reset()
 
-    // check if the player has two or less cards left
-//    closeToWin()
+      // initialize the players, the deck and the individual hands
+      initPlayers()
+      initDeck()
+      initHands()
 
-//    ga.logEvent("User", "Restart Game", "singlePlayer", multiplayer.singlePlayer)
-//    flurry.logEvent("User.RestartGame", "singlePlayer", multiplayer.singlePlayer)
+      // reset all tags and set tag data of the leader
+      initTags()
 
-    console.debug("InitGame finished!")
+      // set the game state for all players
+      multiplayer.leaderCode(function ()
+      {
+          // NOTE: only the leader must set this to true! the clients only get initialized after the initial syncing game state message is received
+          initialized = true
+
+          // if we call this here, gameStarted is called twice. it is not needed to call, because it is already called when the room is setup
+          // thus we must not call this! forceStartGame() is called from the MatchMakingView, not from the GameScene!
+          if(calledFromGameOverScreen) {
+              // by calling restartGame, we emit a gameStarted call on the leader and the clients
+              multiplayer.restartGame()
+          }
+
+          // we want to send the state to all players in this case, thus set the playerId to undefined and this case is handled in onMessageReceived so all players handle the game state syncing if playerId is undefined
+          // send game state after forceStartGame, otherwise the message will not be received by the initial players!
+          if (!multiplayer.singlePlayer) {
+              sendGameStateToPlayer(undefined)
+          }
+
+          // only the leader needs to call this
+          // lets always the leader take the first turn on the first game
+          if (lastGameOutcome.length < 1) {
+              gameLogic.triggerNewTurn(multiplayer.leaderPlayer.userId)
+          } else {
+              gameLogic.triggerNewTurn(lastGameOutcome[lastGameOutcome.length - 1])
+          }
+      })
+
+      // start by scaling the playerHand of the active localPlayer
+      scaleHand()
+
+      console.debug("InitGame finished!")
   }
+
 
   /*
     Is only called if leader. The leader does not receive the messageSyncGameState message anyway, because messages are not sent to self.
@@ -824,9 +771,11 @@ Item {
     message.playerHands = currentPlayerHands
     // save the deck information to create an identical one
     message.deck = deck.cardInfo
+
     // sync the depot variables
     message.lastDepositIDs = []
     message.lastDepositCardColors = []
+
     for (var l = 0; l < depot.lastDeposit.length; l++) {
         message.lastDepositIDs.push(depot.lastDeposit[l].entityId)
         message.lastDepositCardColors.push(depot.lastDeposit[l].cardColor)
@@ -1039,7 +988,7 @@ Item {
 
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
 
-      // check if the active player has won the game and end it in that case
+      // check if the active player has just won the game and end it in that case
       for (var i = 0; i < playerHands.children.length; i++) {
           if (playerHands.children[i].player === multiplayer.activePlayer){
               if (playerHands.children[i].checkWin()){

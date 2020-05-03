@@ -101,15 +101,6 @@ Item {
 
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
       lastPlayer = userId
-
-//      // signal if the placed cards has an effect on the next player
-//      if(hasEffect()){
-//          effect = true
-//          multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: true, userId: userId})
-//      } else {
-//          effect = false
-//          multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
-//      }
   }
 
   // change the card's parent to depot
@@ -119,10 +110,6 @@ Item {
     card.state = "depot"
   }
 
-//  // check if the card has an effect for the next player
-//  function hasEffect(){
-//    return false
-//  }
 
   // check if allowed to play the selected card
   function validCard(cardId){
@@ -146,6 +133,12 @@ Item {
           return true
 
       // Value is ok and enough cards of this value exist in the players hand
+//      console.assert(activeHand)
+      if (!activeHand)
+      {
+          return false
+      }
+
       if (card.points > lastDeposit[0].points && activeHand.countCards(card.points) >= lastDeposit.length)
           return true
 
@@ -155,20 +148,6 @@ Item {
       return false
   }
 
-//  // play a card effect depending on the card type
-//  function cardEffect(){
-//      if (effect){
-//          if (lastDeposit.length > 0 && lastDeposit[0].variationType === "skip") {
-//              skip()
-//          }
-//      } else {
-//          // reset the card effects if they are not active
-//          skipped = false
-//          //      depot.drawAmount = 1
-//          //      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-//          //      multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: 1, userId: userId})
-//      }
-//  }
 
   function skipTurn(skipMove) {
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
@@ -208,16 +187,6 @@ Item {
     multiplayer.sendMessage(gameLogic.messageSetReverse, {clockwise: clockwise, userId: userId})
   }
 
-  // increase the drawAmount when a draw2 or wild4 effect is active
-//  function draw(amount){
-//    if (drawAmount == 1) {
-//      drawAmount = amount
-//    } else {
-//      drawAmount += amount
-//    }
-//    var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-//    multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: depot.drawAmount, userId: userId})
-//  }
 
   // reset the depot
   function reset(){

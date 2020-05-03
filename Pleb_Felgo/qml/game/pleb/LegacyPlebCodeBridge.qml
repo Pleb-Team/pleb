@@ -5,16 +5,19 @@ Item {
     id: legacyPlebCodeBridge
 
     property var idMap: []
+    property alias arschlochGameLogic: arschlochGameLogic
 
     BackEnd  {
         id: arschlochGameLogic
     }
 
 
-    function getMove(userId) {
+    function getMove(userId)
+    {
         var result = []
         var userHand
         var legacyPlayerId
+        var s = ""
 		
         arschlochGameLogic.resetGameState()
 		
@@ -39,10 +42,13 @@ Item {
         // Last player move, i.e. what do we see in the middle of the table right now?
         // arschlochGameLogic.setLastMoveSimple(int nLastPlayerID, nNumberCards,  nValueCards);
         // Example: Player 3 has played one card of value 8
-        if (depot.lastDeposit && depot.lastDeposit.length > 0) {
+        if (depot.lastDeposit && depot.lastDeposit.length > 0)
+        {
             arschlochGameLogic.setLastMoveSimple(retrieveLegacyPlayerId(depot.lastPlayer), depot.lastDeposit.length, depot.lastDeposit[0].points - 7)
-        } else {
-            // what TODO here? if no cards have been played yet, at the beginning of a game?
+        }
+        else
+        {
+            // do nothing: last Move is empty, i.e. this player can play freely
         }
 		
         // Whos turn is it? AI will compute a move for this playerS
@@ -50,14 +56,15 @@ Item {
         arschlochGameLogic.setActualPlayerID(retrieveLegacyPlayerId(userId))
 		
         // Verify correct transport of card information via console text output
-        console.debug("[thinkAIWrapper] GameState: \n" + arschlochGameLogic.getPlayerCardsText() )
+        s = arschlochGameLogic.getPlayerCardsText()
+        console.debug("[thinkAIWrapper] GameState: \n" +  s)
 
 
 		// Now let the AI think
         arschlochGameLogic.think()
         console.debug("[thinkAIWrapper] AI computed move for Player " + arschlochGameLogic.getActualPlayerID() + ": " + arschlochGameLogic.getMoveSimpleAIText())
 
-        // Decode legace card meanings (Number, Value) to Pleb coding
+        // Decode legacy card meanings (Number, Value) to Pleb coding
         var movePoints = arschlochGameLogic.getMoveSimpleAIValue() + 7
         var groupSize = arschlochGameLogic.getMoveSimpleAINumber()
         for (var k = 0; (result.length < groupSize) && (k < userHand.length); k++) {
