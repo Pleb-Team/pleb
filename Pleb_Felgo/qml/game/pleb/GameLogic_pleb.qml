@@ -16,7 +16,7 @@ Item {
   property int userInterval: multiplayer.myTurn && !multiplayer.amLeader ? 30 : 30
 
   // turn time for AI players, in milliseconds
-  property int aiTurnTime: 600
+  property int aiTurnTime: 1000
 
   // restart the game at the end after a few seconds
   property int restartTime: 8000
