@@ -16,7 +16,7 @@ Item {
   property int userInterval: multiplayer.myTurn && !multiplayer.amLeader ? 30 : 30
 
   // turn time for AI players, in milliseconds
-  property int aiTurnTime: 600
+  property int aiTurnTime: 1000
 
   // restart the game at the end after a few seconds
   property int restartTime: 8000
@@ -161,7 +161,7 @@ Item {
           syncPlayers()
           initTags()
           syncDeck(message.deck)
-          depot.syncDepot(message.depot, message.lastDepositIDs, message.lastDepositCardColors, message.skipped, message.clockwise, message.effect, message.drawAmount, message.lastPlayer, message.finishedPlayers)
+          depot.syncDepot(message.depot, message.lastDepositIDs, message.lastDepositCardColors, message.skipped, message.clockwise, message.effect, message.drawAmount, message.lastPlayerUserID, message.finishedPlayers)
           syncHands(message.playerHands)
 
           // join a game which is already over
@@ -334,7 +334,9 @@ Item {
                         selectedCard.glowImage.visible = !selectedCard.glowGroupImage.visible
 
                         // convenience for the player to auto-select groups
-                        if (depot.lastPlayer && depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayer) { // TODO LASTCARD  && !depot.finishedPlayers.includes(depot.lastPlayer)) {
+                        // if there is a last move by another player which has to be beaten
+                        if (depot.lastPlayerUserID && depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayerUserID)
+                        {
                             var activeHand = getHand(multiplayer.localPlayer.userId).hand
                             if (selectedCard.glowGroupImage.visible) {
                                 var groupSize = 1
@@ -396,11 +398,14 @@ Item {
 
           // Move cards to depot and inform Multiplayer
           acted = true
-          if (cardIds.length > 0) {
+          if (cardIds.length > 0)
+          {
               console.debug("Player " + multiplayer.localPlayer.userId + " is playing: " + cardIds)
               depositCards(cardIds, multiplayer.localPlayer.userId)
               multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: multiplayer.localPlayer.userId})
-          } else {
+          }
+          else
+          {
               console.debug("Player " + multiplayer.localPlayer.userId + "skipped its turn")
           }
 
@@ -451,13 +456,6 @@ Item {
 
               // deposit the cards
               depot.depositCards(cardIds)
-              //          console.debug("player " + userId + " played " + cardIds)
-
-//              if (depot.lastDeposit.length > 0 && depot.lastDeposit[0].variationType === "reverse"){
-//                  multiplayer.leaderCode(function() {
-//                      depot.reverse()
-//                  })
-//              }
 
               // uncover the card for disconnected players after chosing the color
               if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected){
@@ -483,8 +481,14 @@ Item {
   }
 
   function playPlebCustom() {
+
+      // Compute AI move and play it
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+      if (!userId)
+          return
+
       var cardIds = legacyBridge.getMove(userId)
+      // Play card animation or skip sound
       if (cardIds.length > 0) {
           multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
           depositCards(cardIds, userId)
@@ -523,14 +527,14 @@ Item {
       }
 
       console.debug("playerId: " + playerId + ", multiplayer.activePlayer.userId: " + multiplayer.activePlayer.userId)
-      console.debug("Last deposit: " + depot.lastDeposit + " by player " + depot.lastPlayer)
+      console.debug("Last deposit: " + depot.lastDeposit + " by player " + depot.lastPlayerUserID)
 //      console.debug("players hand: " + (getHand(multiplayer.activePlayer.userId).hand))
 
       // Player can play a second time in a row, meaning all other players have passed.
       // Then we have to make sure that the depot is cleared
-      if (depot.lastPlayer == multiplayer.activePlayer.userId)
+      if (depot.lastPlayerUserID === multiplayer.activePlayer.userId)
       {
-          depot.lastPlayer = null
+          depot.lastPlayerUserID = null
       }
 
       // let the AI compute a move recommendation (it is not being played here)
@@ -570,9 +574,9 @@ Item {
               depot.skipTurn(true)
 
               // TODO LASTCARD first player to skip after another player's last card becomes the lastPlayer; in some variants, the Pleb is supposed to become the lastPlayer after another player's last card
-              if (depot.finishedPlayers.includes(depot.lastPlayer)) {
-                  depot.lastPlayer = multiplayer.activePlayer.userId
-              }
+ //             if (depot.finishedPlayers.includes(depot.lastPlayer)) {
+ //                 depot.lastPlayer = multiplayer.activePlayer.userId
+ //             }
           }
       }
 
@@ -799,7 +803,7 @@ Item {
     // send the message to the newly joined player
     message.receiverPlayerId = playerId
 
-    message.lastPlayer = depot.lastPlayer
+    message.lastPlayerUserID = depot.lastPlayerUserID
     message.finishedPlayers = depot.finishedPlayers
 
     console.debug("Send Message: " + JSON.stringify(message))

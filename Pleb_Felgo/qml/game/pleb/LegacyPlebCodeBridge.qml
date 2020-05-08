@@ -42,9 +42,9 @@ Item {
         // Last player move, i.e. what do we see in the middle of the table right now?
         // arschlochGameLogic.setLastMoveSimple(int nLastPlayerID, nNumberCards,  nValueCards);
         // Example: Player 3 has played one card of value 8
-        if (depot.lastPlayer && depot.lastDeposit && depot.lastDeposit.length > 0)
+        if (depot.lastPlayerUserID && depot.lastDeposit && depot.lastDeposit.length > 0)
         {
-            arschlochGameLogic.setLastMoveSimple(retrieveLegacyPlayerId(depot.lastPlayer), depot.lastDeposit.length, depot.lastDeposit[0].points - 7)
+            arschlochGameLogic.setLastMoveSimple(retrieveLegacyPlayerId(depot.lastPlayerUserID), depot.lastDeposit.length, depot.lastDeposit[0].points - 7)
         }
         else
         {

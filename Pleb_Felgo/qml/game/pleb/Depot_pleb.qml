@@ -23,7 +23,7 @@ Item {
   // the amount of cards to draw, can be increased by draw2 and wild4 cards
 //  property int drawAmount: 1
 
-  property var lastPlayer: null
+  property var lastPlayerUserID: null
   property var finishedPlayers: []
 
 
@@ -100,7 +100,7 @@ Item {
       }
 
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-      lastPlayer = userId
+      lastPlayerUserID = userId
   }
 
   // change the card's parent to depot
@@ -123,22 +123,29 @@ Item {
                   return false
           }
       }
-      var card = entityManager.getEntityById(cardId)
-
-      // Depot is empty --> This polayer can play freely
-      if (!lastPlayer || lastDeposit === undefined || lastDeposit === null || lastDeposit.length === 0)
-          return true
-
-      // This player played last --> He now can play freely
-      if (multiplayer.activePlayer.userId === lastPlayer)
-          return true
-
       // Value is ok and enough cards of this value exist in the players hand
-//      console.assert(activeHand)
       if (!activeHand)
       {
           return false
       }
+
+      var card = entityManager.getEntityById(cardId)
+
+      // Depot is empty --> This polayer can play freely
+      if (      !lastPlayerUserID
+            ||  lastDeposit === undefined
+            ||  lastDeposit === null
+            ||  lastDeposit.length === 0
+          )
+      {
+          return true
+      }
+
+      // This player played last --> He now can play freely
+      // TODO hier sollten wir niemals landen, denn in dem Fall sollte schon lastPlayerUserID == null sein
+      if (multiplayer.activePlayer.userId === lastPlayerUserID)
+          return true
+
 
       if (card.points > lastDeposit[0].points && activeHand.countCards(card.points) >= lastDeposit.length)
           return true
@@ -193,12 +200,12 @@ Item {
       clockwise = true
       effectTimer.stop()
       lastDeposit = []
-      lastPlayer = null
+      lastPlayerUserID = null
       finishedPlayers = []
   }
 
   // sync the depot with the leader
-  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, clockwise, effect, drawAmount, lastPlayer, finishedPlayers)
+  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, clockwise, effect, drawAmount, lastPlayerUserID, finishedPlayers)
   {
     for (var i = 0; i < depotCardIDs.length; i++){
       depositCards([depotCardIDs[i]])
@@ -212,7 +219,7 @@ Item {
 
     depot.skipped = skipped
     depot.clockwise = clockwise
-    depot.lastPlayer = lastPlayer
+    depot.lastPlayerUserID = lastPlayerUserID
     depot.finishedPlayers = finishedPlayers
   }
 }
