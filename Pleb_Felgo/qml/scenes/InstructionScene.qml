@@ -156,7 +156,7 @@ SceneBase {
   ButtonBase {
     width: 25
     height: 25
-    buttonImage.source: "../../assets/img/Exit.png"
+    buttonImage.source: "../../assets/img/ArrowLeft.png"
     anchors.left: gameWindowAnchorItem.left
     anchors.leftMargin: 10
     anchors.bottom: gameWindowAnchorItem.bottom

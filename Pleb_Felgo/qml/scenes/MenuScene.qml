@@ -276,7 +276,7 @@ SceneBase {
       width: columnButtons.width
       height: columnButtons.width
       buttonImage.source: "../../assets/img/Instructions.png"
-      onClicked: window.state = "instructions"
+      onClicked: window.state = "introduction"
     }
 
 
