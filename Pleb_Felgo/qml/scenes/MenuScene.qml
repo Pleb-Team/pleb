@@ -186,20 +186,23 @@ SceneBase {
 
     MenuButton {
       anchors.horizontalCenter: parent.horizontalCenter
-      text: "Quick Game"
+      text: "Single Player"
+      action: "single"
+    }
+
+    MenuButton {
+      opacity: 0.4
+      anchors.horizontalCenter: parent.horizontalCenter
+      text: "Quick Game (beta)"
       action: "quick"
     }
 
     MenuButton {
+      opacity: 0.4
       anchors.horizontalCenter: parent.horizontalCenter
-      text: "Matchmaking"
+      text: "Matchmaking (beta)"
     }
 
-    MenuButton {
-      anchors.horizontalCenter: parent.horizontalCenter
-      text: "Single Player"
-      action: "single"
-    }
   }
 
 
@@ -217,6 +220,7 @@ SceneBase {
     MenuButton {
       action: "friends"
       color: "transparent"
+      opacity: 0.6
       width: columnButtons.width
       height: columnButtons.width
       buttonImage.source: "../../assets/img/Friends.png"
@@ -225,9 +229,30 @@ SceneBase {
     MenuButton {
       action: "leaderboard"
       color: "transparent"
+      opacity: 0.6
       width: columnButtons.width
       height: columnButtons.width
       buttonImage.source: "../../assets/img/Network.png"
+    }
+
+    MenuButton {
+      id: inboxButton
+      action: "inbox"
+      color: "transparent"
+      opacity: 0.6
+      width: columnButtons.width
+      height: columnButtons.width
+      buttonImage.source: "../../assets/img/Messages.png"
+    }
+
+    // button leading to the profile view
+    MenuButton {
+      action: "profile"
+      color: "transparent"
+      opacity: 0.6
+      width: columnButtons.width
+      height: columnButtons.width
+      buttonImage.source: "../../assets/img/Settings.png"
     }
 
     // button to share the game
@@ -245,25 +270,6 @@ SceneBase {
                         + gameNetwork.displayName, "https://github.com/Pleb-team/pleb/")
       }
     }
-
-    MenuButton {
-      id: inboxButton
-      action: "inbox"
-      color: "transparent"
-      width: columnButtons.width
-      height: columnButtons.width
-      buttonImage.source: "../../assets/img/Messages.png"
-    }
-
-    // button leading to the profile view
-    MenuButton {
-      action: "profile"
-      color: "transparent"
-      width: columnButtons.width
-      height: columnButtons.width
-      buttonImage.source: "../../assets/img/Settings.png"
-    }
-
 
     ButtonBase {
       color: "transparent"
