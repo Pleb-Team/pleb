@@ -1,6 +1,7 @@
 ﻿import QtQuick 2.12
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.1
+import Qt.labs.folderlistmodel 1.0
 
 import Felgo 3.0
 import "../common"
@@ -20,17 +21,31 @@ SceneBase {
   BackgroundMusic {
     volume: 0.20
     id: ambienceMusic
-    source: "../../assets/snd/bg.mp3"
+//    source: "../../assets/snd/bg.mp3"
+  }
+
+  FolderListModel {
+      id: folderModel
+      nameFilters: "*.mp3"
+      folder: "../../assets/music"
+      showDotAndDotDot: false
+      showDirs: false
   }
 
   // timer plays the background music
   Timer {
-    id: timerMusic
-    interval: 100; running: true; repeat: true
-    onTriggered: {
-      ambienceMusic.play()
-      running = false
-    }
+      id: timerMusic
+      interval: 100; running: true; repeat: true
+      onTriggered:
+      {
+//          ambienceMusic.play()
+          running = false
+          var nIndex = Math.floor(Math.random() * folderModel.count)
+
+          var s = folderModel.get(nIndex, "filePath")
+          ambienceMusic.source = s
+          ambienceMusic.play()
+      }
   }
 
   // background
