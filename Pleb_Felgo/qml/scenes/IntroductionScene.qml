@@ -92,7 +92,10 @@ SceneBase {
                 color: "black"
                 width: 200
                 wrapMode: Text.WordWrap
-                text: "https://github.com/Pleb-Team/pleb"
+                text: "More inforamtion on the <a href=\"https://github.com/Pleb-Team/pleb\">Pleb project website</a>."
+                onLinkActivated: Qt.openUrlExternally(link)
+//                onLinkActivated: console.log(link + " link activated")
+
             }
         }
 
@@ -108,12 +111,6 @@ SceneBase {
     }
 
 
-    // switch between the scenes with swipe motions
-    SwipeArea {
-        anchors.fill: parent
-        onSwipeRight: cardButton.clicked()
-        onSwipeLeft: backButtonPressed()
-    }
 
     // back button to leave scene
     ButtonBase {
