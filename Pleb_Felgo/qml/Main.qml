@@ -24,7 +24,7 @@ GameWindow {
   // references to Pleb scenes (loaded with sceneLoader)
   property MenuScene menuScene: sceneLoader.item && sceneLoader.item.menuScene
   property InstructionScene instructionScene: sceneLoader.item && sceneLoader.item.instructionScene
-  property CardScene cardScene: sceneLoader.item && sceneLoader.item.cardScene
+  property IntroductionScene introductionScene: sceneLoader.item && sceneLoader.item.introductionScene
   property LicenseScene licenseScene: sceneLoader.item && sceneLoader.item.licenseScene
   property GameScene gameScene: sceneLoader.item && sceneLoader.item.gameScene
   property MultiplayerScene matchmakingScene: sceneLoader.item && sceneLoader.item.matchmakingScene
@@ -147,6 +147,7 @@ GameWindow {
   state: "loading"
   activeScene: loadingScene
 
+
   // loading scene is shown initially
   LoadingScene {
     id: loadingScene
@@ -154,15 +155,24 @@ GameWindow {
 
   // other scenes are loaded at runtime, when finished menu is shown
   Loader {
-    id: sceneLoader
-    onLoaded: window.state = "menu"
+      id: sceneLoader
+      onLoaded:
+      {
+          if (    (menuScene.localStorage.getValue("appstarts") === undefined)
+                  || (menuScene.localStorage.getValue("appstarts") <= 3)
+                  )
+              window.state = "indroduction"
+          else
+              window.state = "menu"
+      }
 
-    // start loading other scenes after 500 ms
-    Timer {
-      id: loadingTimer
-      interval: 500
-      onTriggered: sceneLoader.source = Qt.resolvedUrl("MainItem.qml")
-    }
+
+      // start loading other scenes after 500 ms
+      Timer {
+          id: loadingTimer
+          interval: 500
+          onTriggered: sceneLoader.source = Qt.resolvedUrl("MainItem.qml")
+      }
   }
 
   Component.onCompleted: loadingTimer.start()   // start loading other scenes after main item is complete
@@ -185,15 +195,15 @@ GameWindow {
       },
 
       State {
-          name: "instructions"
-          PropertyChanges {target: instructionScene; opacity: 1}
-          PropertyChanges {target: window; activeScene: instructionScene}
+          name: "introduction"
+          PropertyChanges {target: introductionScene; opacity: 1}
+          PropertyChanges {target: window; activeScene: introductionScene}
       },
 
       State {
-          name: "cards"
-          PropertyChanges {target: cardScene; opacity: 1}
-          PropertyChanges {target: window; activeScene: cardScene}
+          name: "instructions"
+          PropertyChanges {target: instructionScene; opacity: 1}
+          PropertyChanges {target: window; activeScene: instructionScene}
       },
 
       State {

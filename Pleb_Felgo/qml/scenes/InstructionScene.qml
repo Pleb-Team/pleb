@@ -27,7 +27,7 @@ SceneBase {
     height: gameWindowAnchorItem.height - 70
     color: "white"
     border.color: "#28a3c1"
-    border.width: 2.5
+    border.width: 1
   }
 
   // credits
@@ -41,32 +41,32 @@ SceneBase {
     text: "Music: Bensound.com, Sound Effects: freesound.org"
   }
 
-  // the header
-  Text {
-    anchors.horizontalCenter: gameWindowAnchorItem.horizontalCenter
-    horizontalAlignment: Text.AlignHCenter
-    anchors.top: gameWindowAnchorItem.top
-    anchors.topMargin: 60
-    font.pixelSize: 20
-    font.family: standardFont.name
-    color: "#28a3c1"
-    text: "Instructions"
-  }
+//  // the header
+//  Text {
+//    anchors.horizontalCenter: gameWindowAnchorItem.horizontalCenter
+//    horizontalAlignment: Text.AlignHCenter
+//    anchors.top: gameWindowAnchorItem.top
+//    anchors.topMargin: 30
+//    font.pixelSize: 16
+//    font.family: standardFont.name
+//    color: "#28a3c1"
+//    text: "Instructions"
+//  }
 
   // row with the main game rules
   Row {
     spacing: 25
     anchors.horizontalCenter: gameWindowAnchorItem.horizontalCenter
     anchors.top: gameWindowAnchorItem.top
-    anchors.topMargin: 100
+    anchors.topMargin: 60
 
     // objectives
     Column {
       spacing: 5
 
       Image {
-        width: 60
-        height: 60
+        width: 45
+        height: 45
         anchors.horizontalCenter: parent.horizontalCenter
         source: "../../assets/img/Bubble.png"
         smooth: true
@@ -80,11 +80,11 @@ SceneBase {
       }
 
       Text {
-        font.pixelSize: 9
+        font.pixelSize: 8
         color: "black"
         width: 100
         wrapMode: Text.WordWrap
-        text: "Get rid of all cards in your hand before your opponents. When it is your turn, match the card on the Discard pile by either number, symbol or color."
+        text: "Become president and be the first to get rid of all cards in your hand! Or be the last to finish and be the pleb. At the start of each game, the pleb has to pass his 2 highest cards to the president, whereas the president will pass 2 arbitrary (usually lowest) cards back to him."
       }
     }
 
@@ -93,8 +93,8 @@ SceneBase {
       spacing: 5
 
       Image {
-        width: 33
-        height: 60
+        width: 24
+        height: 45
         anchors.horizontalCenter: parent.horizontalCenter
         source: "../../assets/img/Stack.png"
         smooth: true
@@ -103,16 +103,16 @@ SceneBase {
       Text {
         font.pixelSize: 10
         color: "#28a3c1"
-        text: "Draw Card"
+        text: "Rules"
         font.family: standardFont.name
       }
 
       Text {
-        font.pixelSize: 9
+        font.pixelSize: 8
         color: "black"
         width: 100
         wrapMode: Text.WordWrap
-        text: "If you do not have a matching card, you must draw one from the Draw pile. You get the chance to play the valid card before your turn ends."
+        text: "Upon fresh start, you may freely play 1,2,3 or 4 cards of the same value (e.g. one 8 or triple Queen). Else, play the same amount of cards, but exceed the value compared to the discard pile. If you cannot or don't want to play, you pass. If everyone passes, the last player can restart freshly. "
       }
     }
 
@@ -121,8 +121,8 @@ SceneBase {
       spacing: 5
 
       Image {
-        width: 60
-        height: 60
+        width: 45
+        height: 45
         anchors.horizontalCenter: parent.horizontalCenter
         source: "../../assets/img/ONUButton2.png"
         smooth: true
@@ -131,16 +131,16 @@ SceneBase {
       Text {
         font.pixelSize: 10
         color: "#28a3c1"
-        text: "One Button"
+        text: "How to play"
         font.family: standardFont.name
       }
 
       Text {
-        font.pixelSize: 9
+        font.pixelSize: 8
         color: "black"
         width: 100
         wrapMode: Text.WordWrap
-        text: "Press the One button before playing your second to last card. You have to pick up 2 cards from the Draw pile if you fail."
+        text: "When it's your turn, possible cards are highlighted in yellow. Select your move by tapping the cards which will become green. Press the center of the screen to play. Select noghint and tap center to pass."
       }
     }
   }
@@ -178,12 +178,5 @@ SceneBase {
     anchors.rightMargin: 10
     anchors.bottom: gameWindowAnchorItem.bottom
     anchors.bottomMargin: 10
-  }
-
-  onVisibleChanged: {
-    if(visible) {
-//      ga.logScreen("InstructionScene")
-//      flurry.logEvent("Screen.InstructionScene")
-    }
   }
 }

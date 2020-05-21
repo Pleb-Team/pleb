@@ -13,7 +13,7 @@ Item {
     property alias menuScene: menuScene
     property alias gameScene: gameScene
     property alias instructionScene: instructionScene
-    property alias cardScene: cardScene
+    property alias introductionScene: introductionScene
     property alias licenseScene: licenseScene
     property alias matchmakingScene: matchmakingScene
     property alias gameNetworkScene: gameNetworkScene
@@ -109,31 +109,30 @@ Item {
         onBackButtonPressed: {
             if(!gameScene.leaveGame.visible)
                 gameScene.leaveGame.visible = true
-            else {
+            else
                 window.state = "menu"
-            }
-
         }
+    }
+
+
+    // card scene
+    IntroductionScene {
+        id: introductionScene
+        onBackButtonPressed: window.state = "menu"
+        onMenuButtonPressed: window.state = "instructions"
     }
 
     // instruction scene
     InstructionScene {
         id: instructionScene
-        onBackButtonPressed: window.state = "menu"
-        onMenuButtonPressed: window.state = "cards"
-    }
-
-    // card scene
-    CardScene {
-        id: cardScene
-        onBackButtonPressed: window.state = "instructions"
+        onBackButtonPressed: window.state = "introduction"
         onMenuButtonPressed: window.state = "license"
     }
 
     // licenseScene scene
     LicenseScene {
         id: licenseScene
-        onBackButtonPressed: window.state = "cards"
+        onBackButtonPressed: window.state = "instructions"
         onMenuButtonPressed: window.state = "menu"
     }
 
