@@ -37,22 +37,12 @@ SceneBase {
             anchors.margins: 10
             flickableItem.flickableDirection: Flickable.AutoFlickIfNeeded
 
-//            horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
-//            verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
-
-//            flickableItem.boundsBehavior: Flickable.StopAtBounds
-        //    flickableItem.flickableDirection: Flickable.VerticalFlick
-
-//            clip: true
-
-
             Image {
                 anchors.top: parent.top
                 anchors.topMargin: 10
                 anchors.right: parent.right
                 anchors.rightMargin: 10
                 height: 35
-
                 source: "../../assets/img/gplv3-127x51.png"
             }
 

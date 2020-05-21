@@ -156,7 +156,7 @@ SceneBase {
   ButtonBase {
     width: 25
     height: 25
-    buttonImage.source: "../../assets/img/ArrowLeft.png"
+    buttonImage.source: "../../assets/img/Exit.png"
     anchors.left: gameWindowAnchorItem.left
     anchors.leftMargin: 10
     anchors.bottom: gameWindowAnchorItem.bottom
@@ -178,12 +178,5 @@ SceneBase {
     anchors.rightMargin: 10
     anchors.bottom: gameWindowAnchorItem.bottom
     anchors.bottomMargin: 10
-  }
-
-  onVisibleChanged: {
-    if(visible) {
-//      ga.logScreen("InstructionScene")
-//      flurry.logEvent("Screen.InstructionScene")
-    }
   }
 }

@@ -24,7 +24,7 @@ GameWindow {
   // references to Pleb scenes (loaded with sceneLoader)
   property MenuScene menuScene: sceneLoader.item && sceneLoader.item.menuScene
   property InstructionScene instructionScene: sceneLoader.item && sceneLoader.item.instructionScene
-  property CardScene cardScene: sceneLoader.item && sceneLoader.item.cardScene
+//  property CardScene cardScene: sceneLoader.item && sceneLoader.item.cardScene
   property LicenseScene licenseScene: sceneLoader.item && sceneLoader.item.licenseScene
   property GameScene gameScene: sceneLoader.item && sceneLoader.item.gameScene
   property MultiplayerScene matchmakingScene: sceneLoader.item && sceneLoader.item.matchmakingScene
@@ -190,11 +190,11 @@ GameWindow {
           PropertyChanges {target: window; activeScene: instructionScene}
       },
 
-      State {
-          name: "cards"
-          PropertyChanges {target: cardScene; opacity: 1}
-          PropertyChanges {target: window; activeScene: cardScene}
-      },
+//      State {
+//          name: "cards"
+//          PropertyChanges {target: cardScene; opacity: 1}
+//          PropertyChanges {target: window; activeScene: cardScene}
+//      },
 
       State {
           name: "license"
