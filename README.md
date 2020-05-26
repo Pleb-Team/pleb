@@ -1,6 +1,8 @@
 <img src="docs/licenses/gplv3-88x31.png">
 Copyright (c) 2020 Pleb-Team
 
+Contact: stuggihackaton@gmail.com
+
 
 # Pleb
 A cooperative project to write a fancy cross platform card game with various AI styles.
