@@ -22,7 +22,7 @@ Item {
     anchors.fill: parent
     color: "white"
     border.color: "#28a3c1"
-    border.width: 5
+    border.width: Constants.nBorderWidth
 
     // catch the mouse clicks
     MouseArea {

@@ -1,6 +1,8 @@
 import Felgo 3.0
 import QtQuick 2.2
 
+import "../common"
+
 // displayer username, profile image and remaining time
 EntityBase {
   id: playerTag
@@ -153,15 +155,13 @@ EntityBase {
 
   // displays the detailed playerInfoPopup
   MouseArea {
-    id: infoButton
-    anchors.fill: parent
-    enabled: player && player.connected ? true: false
-    onClicked: {
-//      ga.logEvent("User", "Show PlayerInfo")
-//      flurry.logEvent("User.ShowPlayerInfo")
-      gameScene.playerInfoPopup.visible = true
-      gameScene.playerInfoPopup.refTag = playerTag
-    }
+      id: infoButton
+      anchors.fill: parent
+      enabled: player && player.connected && Constants.bShowBetaFeatures ? true: false
+      onClicked: {
+          gameScene.playerInfoPopup.visible = true
+          gameScene.playerInfoPopup.refTag = playerTag
+      }
   }
 
   // get the avatar for auto and connected users

@@ -71,92 +71,57 @@ SceneBase {
 
   // detailed playerInfo window
   Rectangle {
-    id: info
-    radius: 15
-    color: "white"
-    border.color: "#28a3c1"
-    border.width: 2.5
-    visible: true
-    width: 130
+      id: playerInfo
+      radius: 15
+      color: "white"
+      border.color: "#28a3c1"
+      border.width: Constants.nBorderWidth
+      visible: Constants.bShowBetaFeatures
+      width: 130
 
-    anchors {
-      top: localTag.top
-      bottom: localTag.bottom
-      right: localTag.right
-      topMargin: localTag.height / 2 - 9
-      bottomMargin: - 6
-      rightMargin: - 3
-    }
-
-    // detailed playerInfo text
-    Item {
-      y: 34
-
-      Text {
-        id: infoText
-        text: "Rank: " + rank + "\nLevel: " + localTag.level + "\nScore: " + localTag.highscore
-        font.family: standardFont.name
-        color: "black"
-        font.pixelSize: 8
-        width: contentWidth
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.left: parent.left
-        anchors.leftMargin: 14
-        verticalAlignment: Text.AlignVCenter
-
-        property string rank: localTag.rank > 0 ? "#" + localTag.rank : "-"
+      anchors {
+          top: localTag.top
+          bottom: localTag.bottom
+          right: localTag.right
+          topMargin: localTag.height / 2 - 9
+          bottomMargin: - 6
+          rightMargin: - 3
       }
-    }
 
-    // clickable area to hide the detailed playerInfo
-    MouseArea {
-      anchors.fill: parent
-      onClicked: info.visible ^= true
-    }
+      // detailed playerInfo text
+      Item {
+          y: 34
+
+          Text {
+              id: infoText
+              text: "Rank: " + rank + "\nLevel: " + localTag.level + "\nScore: " + localTag.highscore
+              font.family: standardFont.name
+              color: "black"
+              font.pixelSize: 8
+              width: contentWidth
+              anchors.verticalCenter: parent.verticalCenter
+              anchors.left: parent.left
+              anchors.leftMargin: 14
+              verticalAlignment: Text.AlignVCenter
+
+              property string rank: localTag.rank > 0 ? "#" + localTag.rank : "-"
+          }
+      }
+
+      // clickable area to hide the detailed playerInfo
+      MouseArea {
+          enabled: Constants.bShowBetaFeatures
+          anchors.fill: parent
+          onClicked: playerInfo.visible ^= true
+      }
   }
-
-
-//  GameButton {
-//    anchors.right: gameWindowAnchorItem.right
-//    anchors.bottom: increaseTokenButton.top
-//    text: storeScene.tokens === 0 ? "Set to 20" : "Set to 0"
-//    onClicked: storeScene.tokens === 0 ? storeScene.giveTokens(20 - storeScene.tokens) : storeScene.takeTokens(storeScene.tokens)
-//    visible: system.desktopPlatform && !system.publishBuild && enableStoreAndAds
-//  }
-
-//  GameButton {
-//    anchors.right: increaseTokenButton.left
-//    anchors.bottom: increaseTokenButton.bottom
-//    text: "Token--"
-//    onClicked: storeScene.takeTokens(1)
-//    visible: system.desktopPlatform && !system.publishBuild && enableStoreAndAds
-//  }
-
-//  GameButton {
-//    id: increaseTokenButton
-//    anchors.right: gameWindowAnchorItem.right
-//    anchors.bottom: tokenInfo.top
-//    anchors.bottomMargin: 15
-//    text: "Token++"
-//    onClicked: storeScene.giveTokens(1)
-//    visible: system.desktopPlatform && !system.publishBuild && enableStoreAndAds
-//  }
-
-//  TokenInfo {
-//    id: tokenInfo
-//    tokens: storeScene.tokens
-//    anchors.right: gameWindowAnchorItem.right
-//    anchors.bottom: gameWindowAnchorItem.bottom
-//    anchors.bottomMargin: 85
-//    onClicked: menuButtonPressed("store")
-//    visible: enableStoreAndAds
-//  }
 
   // local player tag
   PlayerTag {
     id: localTag
+    visible: Constants.bShowBetaFeatures
     player: gameNetwork.user
-    nameColor: info.visible ? "#28a3c1" : "white"
+    nameColor: playerInfo.visible ? "#28a3c1" : "white"
     menu: true
     avatarSource: gameNetwork.user.profileImageUrl ? gameNetwork.user.profileImageUrl : "../../assets/img/User.png"
     level: Math.max(1, Math.min(Math.floor(gameNetwork.userHighscoreForCurrentActiveLeaderboard / 300), 999))
@@ -170,41 +135,44 @@ SceneBase {
     anchors.right: gameWindowAnchorItem.right
     anchors.rightMargin: 10
 
-    infoButton.enabled: player.name !== ""
+    infoButton.enabled: player.name !== "" && Constants.bShowBetaFeatures
     infoButton.onClicked: {
-      info.visible ^= true
+      playerInfo.visible ^= true
     }
   }
 
   // main menu
   Column {
-    id: gameMenu
-    anchors.top: titleImage.bottom
-    anchors.topMargin: 10
-    anchors.horizontalCenter: gameWindowAnchorItem.horizontalCenter
-    spacing: 6
+      id: gameMenu
+      anchors.top: titleImage.bottom
+      anchors.topMargin: 10
+      anchors.horizontalCenter: gameWindowAnchorItem.horizontalCenter
+      spacing: 6
 
-    MenuButton {
-      anchors.horizontalCenter: parent.horizontalCenter
-      text: "Single Player"
-      action: "single"
-    }
+      MenuButton {
+          visible: Constants.bShowBetaFeatures
+          opacity: 0.4
+          anchors.horizontalCenter: parent.horizontalCenter
+          text: "Quick Game (beta)"
+          action: "quick"
+      }
 
-    MenuButton {
-      opacity: 0.4
-      anchors.horizontalCenter: parent.horizontalCenter
-      text: "Quick Game (beta)"
-      action: "quick"
-    }
-
-    MenuButton {
-      opacity: 0.4
-      anchors.horizontalCenter: parent.horizontalCenter
-      text: "Matchmaking (beta)"
-    }
-
+      MenuButton {
+          visible: Constants.bShowBetaFeatures
+          opacity: 0.4
+          anchors.horizontalCenter: parent.horizontalCenter
+          text: "Matchmaking (beta)"
+      }
   }
 
+  // Move bacjk to the above column when the other buttons get reactivated
+  MenuButton {
+      anchors.horizontalCenter: gameWindowAnchorItem.horizontalCenter
+      anchors.bottom: gameWindowAnchorItem.bottom
+      anchors.bottomMargin: 50
+      text: "Single Player"
+      action: "single"
+  }
 
   // columnButtons submenu
   Column {
@@ -218,6 +186,7 @@ SceneBase {
 
 
     MenuButton {
+      visible: Constants.bShowBetaFeatures
       action: "friends"
       color: "transparent"
       opacity: 0.6
@@ -227,6 +196,7 @@ SceneBase {
     }
 
     MenuButton {
+      visible: Constants.bShowBetaFeatures
       action: "leaderboard"
       color: "transparent"
       opacity: 0.6
@@ -237,6 +207,7 @@ SceneBase {
 
     MenuButton {
       id: inboxButton
+      visible: Constants.bShowBetaFeatures
       action: "inbox"
       color: "transparent"
       opacity: 0.6
@@ -247,6 +218,7 @@ SceneBase {
 
     // button leading to the profile view
     MenuButton {
+      visible: Constants.bShowBetaFeatures
       action: "profile"
       color: "transparent"
       opacity: 0.6
@@ -282,6 +254,7 @@ SceneBase {
 
     // button to toggle the music
     ButtonBase {
+      id: buttonMusic
       color: "transparent"
       width: columnButtons.width
       height: columnButtons.width

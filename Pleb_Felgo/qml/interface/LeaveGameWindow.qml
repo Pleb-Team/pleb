@@ -30,7 +30,7 @@ Item {
     anchors.fill: parent
     color: "white"
     border.color: "#28a3c1"
-    border.width: 5
+    border.width: Constants.nBorderWidth
   }
 
   Column {
@@ -77,7 +77,7 @@ Item {
     height: (20 + buttonText.height + paddingVertical * 2)
     paddingHorizontal: 8
     paddingVertical: 4
-    box.border.width: 5
+    box.border.width: Constants.nBorderWidth
     box.radius: 30
     textSize: 28
     text: "Cancel"
@@ -93,7 +93,7 @@ Item {
     height: (20 + buttonText.height + paddingVertical * 2)
     paddingHorizontal: 8
     paddingVertical: 4
-    box.border.width: 5
+    box.border.width: Constants.nBorderWidth
     box.radius: 30
     textSize: 28
     text: "Quit Game"

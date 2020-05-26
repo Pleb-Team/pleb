@@ -12,18 +12,15 @@ SceneBase {
   // game signals
   signal cardSelected(var cardId)
   signal stackSelected()
-//  signal colorPicked(var pickedColor)
   signal depotSelected()
 
   // access the elements from outside
   property alias deck: deck
   property alias depot: depot
   property alias gameLogic: gameLogic
-//  property alias onuButton: onuButton
   property alias gameOver: gameOver
   property alias leaveGame: leaveGame
   property alias switchName: switchName
-//  property alias drawCounter: drawCounter
   property alias bottomHand: bottomHand
   property alias playerInfoPopup: playerInfoPopup
 //  property alias onuHint: onuHint
@@ -46,10 +43,6 @@ SceneBase {
       if(multiplayer.amLeader && activeScene === gameScene) {
         console.debug("Leader send game state to player")
         gameLogic.sendGameStateToPlayer(player.userId)
-
-        // log event when a player joined the game
-//        ga.logEvent("System", "Player Joined", "singlePlayer", multiplayer.singlePlayer)
-//        flurry.logEvent("System.PlayerJoined", "singlePlayer", multiplayer.singlePlayer)
       }
     }
 
@@ -121,15 +114,6 @@ SceneBase {
     id: gameLogic
   }
 
-  // lose keyboard focus after clicking outside of the chat
-  MouseArea {
-    id: unfocus
-    anchors.fill: gameWindowAnchorItem
-    enabled: chat.inputText.focus
-    onClicked: chat.inputText.focus = false
-    z: multiplayer.myTurn ? 0 : 150
-  }
-
   // back button to leave scene
   ButtonBase {
     id: backButton
@@ -179,14 +163,6 @@ SceneBase {
     }
   }
 
-//  // onu button on the left of the depot
-//  ONUButton {
-//    id: onuButton
-//    anchors.verticalCenter: depot.verticalCenter
-//    anchors.right: depot.left
-//    anchors.rightMargin: 85
-//    visible: false // remove ONU button (ONU will auto-activate for all users then, makes game a bit easier and faster to play)
-//  }
 
   // the deck on the right of the depot
   Deck_pleb {
@@ -196,20 +172,6 @@ SceneBase {
     anchors.leftMargin: 90
   }
 
-  // the drawCounter on top of the depot showing the current drawAmount
-//  Text {
-//    id: drawCounter
-//    anchors.left: depot.right
-//    anchors.leftMargin: 18
-//    anchors.bottom: depot.top
-//    anchors.bottomMargin: 12
-//    text: "+" + depot.drawAmount
-//    color: "white"
-//    font.pixelSize: 40
-//    font.family: standardFont.name
-//    font.bold: true
-//    visible: depot.drawAmount > 1 && !onuHint.visible ? true : false
-//  }
 
 //  Text {
 //    id: onuHint
@@ -337,12 +299,6 @@ SceneBase {
     }
   }
 
-  // the colorPicker in the middle of the screen
-//  ColorPicker {
-//    id: colorPicker
-//    visible: false
-//    anchors.centerIn: depot
-//  }
 
   // the gameOver message in the middle of the screen
   GameOverWindow {
@@ -374,12 +330,22 @@ SceneBase {
   // chat on the bottom left corner for all connected players
   Chat {
     id: chat
+    visible: Constants.bShowBetaFeatures
     height: gameWindowAnchorItem.height - bottomHand.width / 2
     width: (gameWindowAnchorItem.width - bottomHand.width) / 2 - 20
     anchors.left: gameWindowAnchorItem.left
     anchors.leftMargin: 20
     anchors.bottom: gameWindowAnchorItem.bottom
     anchors.bottomMargin: 20
+  }
+
+  // lose keyboard focus after clicking outside of the chat
+  MouseArea {
+    id: unfocus
+    anchors.fill: gameWindowAnchorItem
+    enabled: chat.inputText.focus
+    onClicked: chat.inputText.focus = false
+    z: multiplayer.myTurn ? 0 : 150
   }
 
   // init the game after switching to the gameScene

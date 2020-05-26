@@ -32,7 +32,7 @@ Item {
     radius: 15
     color: "white"
     border.color: "#28a3c1"
-    border.width: 2.5
+    border.width: Common.Constants.nBorderWidth
     visible: false
 
     // MouseArea covers the inputWindow and focuses the inputText when clicked

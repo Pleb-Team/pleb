@@ -36,7 +36,7 @@ Item {
     height: content.height + content.anchors.topMargin * 2
     color: "white"
     border.color: "#28a3c1"
-    border.width: 5 * _internalScale
+    border.width: Constants.nBorderWidth
 
     // content
     Column {
@@ -93,7 +93,7 @@ Item {
         height: 20 * _internalScale + buttonText.height + paddingVertical * 2
         paddingHorizontal: 8 * _internalScale
         paddingVertical: 4 * _internalScale
-        box.border.width: 5 * _internalScale
+        box.border.width: Constants.nBorderWidth
         box.radius: 30 * _internalScale
         textSize: 28 * _internalScale
         text: modelData
