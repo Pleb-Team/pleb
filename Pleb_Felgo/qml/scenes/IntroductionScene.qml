@@ -83,7 +83,8 @@ SceneBase {
                 color: "black"
                 width: 200
                 wrapMode: Text.WordWrap
-                text: "Contributors: Joachim, Ben, Max, Sebastian, Sven\nHappy playing! "
+                text: "Contributors: Joachim, Ben, Max, Sebastian, Sven\n" +
+                      "Happy playing! "
             }
 
             Text
@@ -92,10 +93,18 @@ SceneBase {
                 color: "black"
                 width: 200
                 wrapMode: Text.WordWrap
-                text: "More inforamtion on the <a href=\"https://github.com/Pleb-Team/pleb\">Pleb project website</a>."
+                text: "Find more information on our <a href=\"https://github.com/Pleb-Team/pleb\">Pleb project website</a>."
                 onLinkActivated: Qt.openUrlExternally(link)
-//                onLinkActivated: console.log(link + " link activated")
+            }
 
+            Text
+            {
+                font.pixelSize: 8
+                color: "black"
+                width: 200
+                wrapMode: Text.WordWrap
+                text: "Contact or feedback: <a href=\"mailto:stuggihackaton@gmail.com?subject=Feedback\%20about\%20Pleb\">stuggihackaton@gmail.com</a>."
+                onLinkActivated: Qt.openUrlExternally(link)
             }
         }
 
