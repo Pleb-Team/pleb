@@ -68,21 +68,6 @@ SceneBase {
     width: 380
   }
 
-  // button opens powered by Felgo message and links to the websiteWindow
-  MouseArea {
-    anchors.top: titleImage.top
-    anchors.bottom: titleImage.bottom
-    anchors.left: titleImage.left
-    anchors.leftMargin: 55
-    anchors.right: titleImage.right
-    anchors.rightMargin: 55
-    width: 240
-    height: 30
-
-    onClicked: {
-      websiteWindow.visible = true
-    }
-  }
 
   // detailed playerInfo window
   Rectangle {
@@ -321,13 +306,6 @@ SceneBase {
   }
 
 
-
-  WebsiteWindow {
-    id: websiteWindow
-    visible: false
-    scale: 0.5
-    anchors.centerIn: gameWindowAnchorItem
-  }
 
   // connect to the FelgoGameNetwork to handle new inbox entries
   Connections{
