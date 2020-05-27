@@ -22,7 +22,7 @@ Item {
     anchors.fill: parent
     color: "white"
     border.color: "#28a3c1"
-    border.width: 5
+    border.width: Constants.nBorderWidth
 
     // catch the mouse clicks
     MouseArea {
@@ -101,7 +101,7 @@ Item {
     height: (20 + buttonText.height + paddingVertical * 2)
     paddingHorizontal: 8
     paddingVertical: 4
-    box.border.width: 5
+    box.border.width: Constants.nBorderWidth
     box.radius: 30
     textSize: 28
     text: "New Game"
