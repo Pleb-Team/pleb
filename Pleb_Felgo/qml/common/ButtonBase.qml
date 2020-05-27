@@ -31,7 +31,7 @@ Rectangle {
     radius: 15
     color: "white"
     border.color: "#28a3c1"
-    border.width: 2.5
+    border.width: Constants.nBorderWidth
     visible: text !== ""
     anchors.fill: parent
   }

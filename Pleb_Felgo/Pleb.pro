@@ -8,8 +8,8 @@ CONFIG += felgo
 # Project identifier and version
 # More information: https://felgo.com/doc/felgo-publishing/#project-configuration
 PRODUCT_IDENTIFIER = de.stuggi.hackaton.pleb
-PRODUCT_VERSION_NAME = 0.0.1
-PRODUCT_VERSION_CODE = 1
+PRODUCT_VERSION_NAME = 0.9
+PRODUCT_VERSION_CODE = 9
 
 # Optionally set a license key that is used instead of the license key from
 # main.qml file (App::licenseKey for your app or GameWindow::licenseKey for your game)
@@ -81,15 +81,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
-QML_IMPORT_PATH =
+#QML_IMPORT_PATH =
 
 # Additional import path used to resolve QML modules just for Qt Quick Designer
-QML_DESIGNER_IMPORT_PATH =
+#QML_DESIGNER_IMPORT_PATH =
 
 # Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+#qnx: target.path = /tmp/$${TARGET}/bin
+#else: unix:!android: target.path = /opt/$${TARGET}/bin
+#!isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
     ../Pleb_GameLogic_QtWrapper/BackEnd.h \
