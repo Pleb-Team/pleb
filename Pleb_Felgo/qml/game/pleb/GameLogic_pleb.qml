@@ -417,22 +417,20 @@ Item {
 
   // sync deck with leader and set up the game
   function syncDeck(cardInfo){
-    console.debug("syncDeck()")
-    deck.syncDeck(cardInfo)
-    // takes off 1st card
-    depot.createDepot()
+      console.debug("GameLogic::syncDeck()")
+      deck.syncDeck(cardInfo)
+      depot.createDepot()
 
-    // reset all values at the start of the game
-    gameOver = false
-    timer.start()
-    scaleHand()
-    markValid()
-    gameScene.gameOver.visible = false
-    gameScene.leaveGame.visible = false
-    gameScene.switchName.visible = false
-    playerInfoPopup.visible = false
-//    onuButton.button.enabled = false
-    chat.reset()
+      // reset all values at the start of the game
+      gameOver = false
+      timer.start()
+      scaleHand()
+      markValid()
+      gameScene.gameOver.visible = false
+      gameScene.leaveGameWindow.visible = false
+      gameScene.switchName.visible = false
+      playerInfoPopup.visible = false
+      chat.reset()
   }
 
   // deposit the selected cards
@@ -642,25 +640,26 @@ Item {
   }
 
   function createGame(){
-    multiplayer.createGame()
+      multiplayer.createGame()
   }
 
   // stop the timers and reset the deck at the end of the game
-  function leaveGame(){
-    aiTimeOutTimer.stop()
-    restartGameTimer.stop()
-    timer.running = false
-    depot.effectTimer.stop()
-    deck.reset()
-    chat.gConsole.clear()
-    multiplayer.leaveGame()
-    scaleHand(1.0)
-    initialized = false
-    receivedMessageBeforeGameStateInSync = false
+  function leaveGame()
+  {
+      console.debug("GameLogic::leaveGame() start")
 
-//    ga.logEvent("User", "Exit Game", "singlePlayer", multiplayer.singlePlayer)
-//    flurry.logEvent("User.ExitGame", "singlePlayer", multiplayer.singlePlayer)
-//    flurry.endTimedEvent("Game.TimeInGameTotal", {"singlePlayer": multiplayer.singlePlayer})
+      aiTimeOutTimer.stop()
+      restartGameTimer.stop()
+      timer.running = false
+      depot.effectTimer.stop()
+      deck.reset()
+      chat.gConsole.clear()
+      multiplayer.leaveGame()
+      scaleHand(1.0)
+      initialized = false
+      receivedMessageBeforeGameStateInSync = false
+
+      console.debug("GameLogic::leaveGame() finish")
   }
 
   function joinGame(room){
@@ -669,12 +668,12 @@ Item {
 
   // initialize the game
   // is called from GameOverWindow when the leader restarts the game, and from GameScene when it got visible from GameScene.onVisibleChanged
-  function initGame(calledFromGameOverScreen){
-      console.debug("INIT called: " + calledFromGameOverScreen)
+  function initGame(calledFromGameOverScreen)
+  {
+      console.debug("initGame() called: " + calledFromGameOverScreen)
       if (calledFromGameOverScreen) {
           console.debug("************************************ NEW GAME ***************************************")
       }
-
 
       if(!multiplayer.initialized && !multiplayer.singlePlayer){
           createGame()
@@ -696,7 +695,7 @@ Item {
       scaleHand()
       markValid()
       gameScene.gameOver.visible = false
-      gameScene.leaveGame.visible = false
+      gameScene.leaveGameWindow.visible = false
       gameScene.switchName.visible = false
       playerInfoPopup.visible = false
       chat.reset()

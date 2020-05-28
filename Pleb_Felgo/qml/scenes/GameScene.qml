@@ -19,7 +19,7 @@ SceneBase {
   property alias depot: depot
   property alias gameLogic: gameLogic
   property alias gameOver: gameOver
-  property alias leaveGame: leaveGame
+  property alias leaveGameWindow: leaveGameWindow
   property alias switchName: switchName
   property alias bottomHand: bottomHand
   property alias playerInfoPopup: playerInfoPopup
@@ -124,7 +124,7 @@ SceneBase {
     anchors.rightMargin: 20
     anchors.bottom: gameWindowAnchorItem.bottom
     anchors.bottomMargin: 20
-    onClicked: leaveGame.visible = true
+    onClicked: leaveGameWindow.visible = true
   }
 
   // button to finish the game
@@ -323,7 +323,7 @@ SceneBase {
   // the leaveGame message in the middle of the screen
   LeaveGameWindow {
     anchors.centerIn: gameWindowAnchorItem
-    id: leaveGame
+    id: leaveGameWindow
     visible: false
   }
 
@@ -349,11 +349,13 @@ SceneBase {
   }
 
   // init the game after switching to the gameScene
-  onVisibleChanged: {
-    if(visible){
-//      ga.logScreen("GameScene")
-//      flurry.logEvent("Screen.GameScene")
-      gameLogic.initGame()
-    }
+  onVisibleChanged:
+  {
+      console.debug("GameScene::onVisibleChanged() start")
+
+      if(visible)
+          gameLogic.initGame()
+
+      console.debug("GameScene::onVisibleChanged() finish")
   }
 }
