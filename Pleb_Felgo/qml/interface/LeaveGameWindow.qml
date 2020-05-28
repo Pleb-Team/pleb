@@ -3,7 +3,7 @@ import "../common"
 
 // leaveGame window when trying to exit the game
 Item {
-  id: leaveGame
+  id: leaveGameWindow
   width: 400
   height: content.height + content.anchors.topMargin * 2
   z: 110
@@ -81,26 +81,32 @@ Item {
     box.radius: 30
     textSize: 28
     text: "Cancel"
-    onClicked: leaveGame.visible = false
+    onClicked: leaveGameWindow.visible = false
   }
 
   // button to leave the game
   ButtonBase {
-    anchors.right: parent.right
-    anchors.top: parent.bottom
-    anchors.topMargin: 10
-    width: parent.width / 2 - anchors.topMargin / 2
-    height: (20 + buttonText.height + paddingVertical * 2)
-    paddingHorizontal: 8
-    paddingVertical: 4
-    box.border.width: Constants.nBorderWidth
-    box.radius: 30
-    textSize: 28
-    text: "Quit Game"
-    onClicked: {
-      gameLogic.leaveGame()
-      backButtonPressed()
-      leaveGame.visible = false
-    }
+      anchors.right: parent.right
+      anchors.top: parent.bottom
+      anchors.topMargin: 10
+      width: parent.width / 2 - anchors.topMargin / 2
+      height: (20 + buttonText.height + paddingVertical * 2)
+      paddingHorizontal: 8
+      paddingVertical: 4
+      box.border.width: Constants.nBorderWidth
+      box.radius: 30
+      textSize: 28
+      text: "Quit Game"
+
+      onClicked:
+      {
+          console.debug("LeaveGameWindow.buttonQuitGame::onClicked() start")
+
+          gameLogic.leaveGame()
+          backButtonPressed()
+          leaveGameWindow.visible = false
+
+          console.debug("LeaveGameWindow.buttonQuitGame::onClicked() finish")
+      }
   }
 }

@@ -110,36 +110,34 @@ GameWindow {
   }
 
   FelgoMultiplayer {
-    id: multiplayer
+      id: multiplayer
 
-    playerCount: 4
-    startGameWhenReady: true
-    gameNetworkItem: gameNetwork
-    multiplayerView: matchmakingScene && matchmakingScene.mpView
-    maxJoinTries: 5
-    fewRoomsThreshold: 3
-    joinRankingIncrease: 200
-    enableLateJoin: true // allow joining a running match after it was started (if the match has non-human (AI) players to fill the game
-    appVersion: "1.5.0" // 1.5.0 (changed on 8.8.2016, with versionCode 17) adds new messages that correctly trigger a new game start (also a restart). changing it is important, to not interfere with players of the published Pleb games that did not update yet and to prevent players of the old and new version can play together
-    latencySimulationTime: system.desktopPlatform && !system.publishBuild ? 2000 : 0 // allows to simulate latency values on Desktop. for published games, always set this to 0!
+      playerCount: 4
+      startGameWhenReady: true
+      gameNetworkItem: gameNetwork
+      multiplayerView: matchmakingScene && matchmakingScene.mpView
+      maxJoinTries: 5
+      fewRoomsThreshold: 3
+      joinRankingIncrease: 200
+      enableLateJoin: true // allow joining a running match after it was started (if the match has non-human (AI) players to fill the game
+      appVersion: "1.5.0" // 1.5.0 (changed on 8.8.2016, with versionCode 17) adds new messages that correctly trigger a new game start (also a restart). changing it is important, to not interfere with players of the published Pleb games that did not update yet and to prevent players of the old and new version can play together
+      latencySimulationTime: system.desktopPlatform && !system.publishBuild ? 2000 : 0 // allows to simulate latency values on Desktop. for published games, always set this to 0!
 
-    appKey: Constants.appKey
-    pushKey: Constants.pushKey
-    // NOTE: do NOT use these demo keys for publishing your game, we might remove the demo apps in the future!
-    // instead, use your own ones from https://cloud.felgo.com/
+      appKey: Constants.appKey
+      pushKey: Constants.pushKey
+      // NOTE: do NOT use these demo keys for publishing your game, we might remove the demo apps in the future!
+      // instead, use your own ones from https://cloud.felgo.com/
 
-    onGameStarted: {
-      console.debug("yyy-gameStarted")
-      // increase gamesPlayed counter for every game start and decrease tokens
-      if(menuScene) {
-        menuScene.localStorage.setGamesPlayed(gamesPlayed + 1)
+      onGameStarted: {
+          console.debug("[FelgoMultiplayer] onGameStarted")
 
-        // only reduce token if game is not restarted (once players are in a game they don't need more tokens)
-//        if(!gameRestarted && enableStoreAndAds)
-//          storeScene.takeTokens(1) // take 1 token from user
+          // increase gamesPlayed counter for every game start and decrease tokens
+          if(menuScene)
+          {
+              menuScene.localStorage.setGamesPlayed(gamesPlayed + 1)
+          }
+          window.state = "game"
       }
-      window.state = "game"
-    }
   }
 
 
@@ -229,14 +227,5 @@ GameWindow {
           PropertyChanges {target: gameNetworkScene; opacity: 1}
           PropertyChanges {target: window; activeScene: gameNetworkScene}
       }
-
-//      State {
-//          name: "store"
-//          PropertyChanges {target: storeScene; opacity: 1 }
-//          PropertyChanges {target: window; activeScene: storeScene}
-//          StateChangeScript {
-//              script: { storeScene.enterScene() }
-//          }
- //     }
   ]
 }
