@@ -45,7 +45,7 @@ EntityBase {
     anchors.centerIn: parent
     width: parent.width * 1.3
     height: parent.height * 1.2
-    source: "../../../assets/img/cards/blatt52/glow.png"
+    source: "../../../assets/img/cards/glow.png"
     visible: false
     smooth: true
   }
@@ -56,7 +56,7 @@ EntityBase {
     anchors.centerIn: parent
     width: parent.width * 1.3
     height: parent.height * 1.2
-    source: "../../../assets/img/cards/blatt52/glowGroup.png"
+    source: "../../../assets/img/cards/glowGroup.png"
     visible: false
     smooth: true
   }
@@ -65,7 +65,7 @@ EntityBase {
   Image {
     id: cardImage
     anchors.fill: parent
-    source: "../../../assets/img/cards/blatt52/back.png"
+    source: "../../../assets/img/cards/back.png"
     smooth: true
   }
 
@@ -154,13 +154,13 @@ EntityBase {
   function updateCardImage(){
     // hidden cards show the back side without effect
     if (hidden){
-      cardImage.source = "../../../assets/img/cards/blatt52/back.png"
+      cardImage.source = "../../../assets/img/cards/back.png"
     } else if (variationType == "ten") {
-        cardImage.source = "../../../assets/img/cards/blatt52/" + "X" + cardColor.charAt(0).toLowerCase() + ".png"
+        cardImage.source = "../../../assets/img/cards/" + "X" + cardColor.charAt(0).toLowerCase() + ".png"
     } else if (variationType == "jack" || variationType == "queen" || variationType == "king" || variationType == "ace"){
-      cardImage.source = "../../../assets/img/cards/blatt52/" + variationType.charAt(0).toUpperCase() + cardColor.charAt(0).toLowerCase() + ".png"
+      cardImage.source = "../../../assets/img/cards/" + variationType.charAt(0).toUpperCase() + cardColor.charAt(0).toLowerCase() + ".png"
     } else {
-        cardImage.source = "../../../assets/img/cards/blatt52/" + points + cardColor.charAt(0).toLowerCase() + ".png"
+        cardImage.source = "../../../assets/img/cards/" + points + cardColor.charAt(0).toLowerCase() + ".png"
     }
   }
 }
