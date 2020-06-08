@@ -26,7 +26,7 @@ SceneBase {
         width: gameWindowAnchorItem.width - 70
         height: gameWindowAnchorItem.height - 70
         color: "white"
-        border.color: "#28a3c1"
+        border.color: Constants.sBorderColor
         border.width: 1
     }
     
