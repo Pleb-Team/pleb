@@ -26,7 +26,7 @@ SceneBase {
     width: gameWindowAnchorItem.width - 70
     height: gameWindowAnchorItem.height - 70
     color: "white"
-    border.color: "#28a3c1"
+    border.color: Constants.sBorderColor
     border.width: 1
   }
 
@@ -146,11 +146,11 @@ SceneBase {
   }
 
   // switch between the scenes with swipe motions
-  SwipeArea {
-    anchors.fill: parent
-    onSwipeRight: cardButton.clicked()
-    onSwipeLeft: backButtonPressed()
-  }
+//  SwipeArea {
+//    anchors.fill: parent
+//    onSwipeRight: cardButton.clicked()
+//    onSwipeLeft: backButtonPressed()
+//  }
 
   // back button to leave scene
   ButtonBase {
