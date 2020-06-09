@@ -10,6 +10,7 @@ Item {
 
   // the remaining turn time for the active player
   property double remainingTime
+  property double elapsedHintTime
 
   // turn time for the active player, in seconds
   // do not set this too low, otherwise players with higher latency could run into problems as they get skipped by the leader
@@ -54,50 +55,85 @@ Item {
 
   // timer decreases the remaining turn time for the active player
   Timer {
-    id: timer
-    repeat: true
-    running: !gameOver
-    interval: 1000
+      id: timer
+      repeat: true
+      running: !gameOver
+      interval: 1000
 
-    onTriggered: {
-      remainingTime -= 1
+      onTriggered: {
+          remainingTime -= 1
 
-      // let the AI play for the connected player after 10 seconds
-      if (remainingTime === 0) {
-        gameLogic.turnTimedOut()
+          // let the AI play for the connected player after 10 seconds
+          if (remainingTime === 0) {
+              gameLogic.turnTimedOut()
+          }
+
+          // mark the valid card options for the active player
+          if (multiplayer.myTurn){
+              markValid()
+              scaleHand()
+          }
+
+          // repaint the timer circle on the playerTag every second
+          for (var i = 0; i < playerTags.children.length; i++){
+              playerTags.children[i].canvas.requestPaint()
+          }
       }
-
-      // mark the valid card options for the active player
-      if (multiplayer.myTurn){
-        markValid()
-        scaleHand()
-      }
-
-      // repaint the timer circle on the playerTag every second
-      for (var i = 0; i < playerTags.children.length; i++){
-        playerTags.children[i].canvas.requestPaint()
-      }
-    }
   }
+
+  // timer decreases the remaining turn time for the active player
+  Timer {
+      id: hintTimer
+      repeat: true
+      running: false
+      interval: 1000
+
+      onTriggered:
+      {
+          elapsedHintTime += 1
+
+          if (elapsedHintTime >= 5)
+          {
+              var s2
+              var s
+
+              if (depot.lastPlayerUserID && depot.lastDeposit)
+              {
+                  s2 = "Play higher than " + depot.lastDeposit[0].variationType + "!"
+              }
+              else
+              {
+                  s2 = "You may start freely and play arbitrary cards. Get rid of something :-)"
+              }
+
+              s = "Select some cards and press the screen center to play or pass!"
+              gameScene.hintRectangleText.text = s + "\n" + s2
+              gameScene.hintRectangle.visible = true
+          }
+      }
+  }
+
 
   // AI takes over after a few seconds if the player is not connected
   Timer {
-    id: aiTimeOutTimer
-    interval: aiTurnTime
-    onTriggered: {
-      gameLogic.executeAIMove()
-      endTurn()
-    }
+      id: aiTimeOutTimer
+      interval: aiTurnTime
+      onTriggered:
+      {
+          gameLogic.executeAIMove()
+          endTurn()
+      }
   }
 
   // start a new match after a few seconds
   Timer {
-    id: restartGameTimer
-    interval: restartTime
-    onTriggered: {
-      restartGameTimer.stop()
-      startNewGame()
-    }
+      id: restartGameTimer
+      interval: restartTime
+      onTriggered:
+      {
+          restartGameTimer.stop()
+          startNewGame()
+      }
   }
 
   // connect to the FelgoMultiplayer object and handle all messages
@@ -151,7 +187,8 @@ Item {
       }
 
       // sync the game state for existing and newly joined players
-      if (code == messageSyncGameState) {
+      if (code == messageSyncGameState)
+      {
         if (!message.receiverPlayerId || message.receiverPlayerId === multiplayer.localPlayer.userId || !compareGameStateWithLeader(message.playerHands)) {
           console.debug("Sync Game State now")
           console.debug("Received Message: " + JSON.stringify(message))
@@ -186,12 +223,15 @@ Item {
           }
         }
       }
+
       // send a new game state to the requesting user
-      else if (code == messageRequestGameState){
+      else if (code == messageRequestGameState)
+      {
         multiplayer.leaderCode(function() {
           sendGameStateToPlayer(message)
         })
       }
+
       // move card to hand
       else if (code == messageMoveCardsHand){
         // if there is an active player with a different userId, the message is invalid
@@ -205,8 +245,10 @@ Item {
 
         getCards(message.cards, message.userId)
       }
+
       // move card to depot
-      else if (code == messageMoveCardsDepot){
+      else if (code == messageMoveCardsDepot)
+      {
         // if there is an active player with a different userId, the message is invalid
         // the message was probably sent after the leader triggered the next turn
         if (multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
@@ -233,7 +275,8 @@ Item {
 //      }
 
       // sync skipped state
-      else if (code == messageSetSkipped){
+      else if (code == messageSetSkipped)
+      {
         // if the message wasn't sent by the leader and
         // if it wasn't sent by the active player, the message is invalid
         // the message was probably sent after the leader triggered the next turn
@@ -500,18 +543,6 @@ Item {
     return valids.length > 0
   }
 
-  // give the connected player 10 seconds until the AI takes over
-  function startTurnTimer() {
-    timer.stop()
-
-    // 7 seconds
-    remainingTime = userInterval
-    if (!gameOver) {
-      timer.start()
-      scaleHand()
-      markValid()
-    }
-  }
 
   // start the turn for the active player
   function turnStarted(playerId) {
@@ -535,12 +566,25 @@ Item {
           depot.lastPlayerUserID = null
       }
 
+      // give the connected player <xxx> seconds until the AI takes over
+      remainingTime = userInterval
+      timer.stop()
+      if (!gameOver)
+      {
+          timer.start()
+          scaleHand()
+          markValid()
+      }
+
+      gameScene.hintRectangle.visible = false;
+      elapsedHintTime = 0;
+      hintTimer.start();
+
+
       // let the AI compute a move recommendation (it is not being played here)
       legacyBridge.getMove(multiplayer.activePlayer.userId);
       var s = legacyBridge.arschlochGameLogic.getPlayerCardsText()
 
-      // start the timer
-      gameLogic.startTurnTimer()
 
       // the player didn't act yet
       acted = false
@@ -570,11 +614,6 @@ Item {
           {
               // skip if the player has no valid cards
               depot.skipTurn(true)
-
-              // TODO LASTCARD first player to skip after another player's last card becomes the lastPlayer; in some variants, the Pleb is supposed to become the lastPlayer after another player's last card
- //             if (depot.finishedPlayers.includes(depot.lastPlayer)) {
- //                 depot.lastPlayer = multiplayer.activePlayer.userId
- //             }
           }
       }
 
@@ -585,6 +624,9 @@ Item {
 
       // mark the valid card options
       markValid()
+
+      elapsedHintTime = 0;
+      hintTimer.start()
 
       // repaint the timer circle
       for (var i = 0; i < playerTags.children.length; i++){
@@ -630,11 +672,8 @@ Item {
 
       // player timed out, so leader should take over
       multiplayer.leaderCode(function () {
-          // if the player is in the process of chosing a color
-          //      if (!colorPicker.chosingColor){
           // play an AI bone if this player never played anything (this happens in the case where the player left some time during his turn, and so the early 3 second AI move didn't get scheduled
           executeAIMove()
-          //      }
           endTurn()
       })
   }
@@ -649,6 +688,7 @@ Item {
       console.debug("GameLogic::leaveGame() start")
 
       aiTimeOutTimer.stop()
+      hintTimer.stop()
       restartGameTimer.stop()
       timer.running = false
       depot.effectTimer.stop()
@@ -1154,7 +1194,7 @@ Item {
     // stop all timers and end the game
     scaleHand(1.0)
     gameOver = true
-//    onuButton.blinkAnimation.stop()
+    hintTimer.stop()
     aiTimeOutTimer.stop()
     timer.running = false
     depot.effectTimer.stop()

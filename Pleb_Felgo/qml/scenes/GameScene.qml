@@ -23,7 +23,8 @@ SceneBase {
   property alias switchName: switchName
   property alias bottomHand: bottomHand
   property alias playerInfoPopup: playerInfoPopup
-//  property alias onuHint: onuHint
+  property alias hintRectangle: hintRectangle
+  property alias hintRectangleText: hintRectangleText
   property alias rightPlayerTag: rightPlayerTag // ad banner will be aligned based on rightPlayerTag
 
 
@@ -172,48 +173,39 @@ SceneBase {
     anchors.leftMargin: 90
   }
 
+  // content window
+  Rectangle {
+      id: hintRectangle
+      radius: 10
+      anchors.left: depotImage.right
+      anchors.leftMargin: 5
+      anchors.verticalCenter: depotImage.verticalCenter
+//      anchors.right: rightHand.left
+//      anchors.rightMargin: 5
+//      anchors.top: depotImage.top
+//      anchors.topMargin: 5
+//      anchors.bottom: depotImage.bottom
+//      anchors.bottomMargin: 5
 
-//  Text {
-//    id: onuHint
-//    anchors.left: depot.right
-//    anchors.leftMargin: 18
-//    anchors.bottom: depot.top
-//    anchors.bottomMargin: 12
-//    text: "+2"
-//    color: "white"
-//    font.pixelSize: 40
-//    font.family: standardFont.name
-//    font.bold: true
-//    visible: false
 
-//    Text {
-//      anchors.left: parent.right
-//      anchors.leftMargin: 14
-//      anchors.verticalCenter: parent.verticalCenter
-//      text: "Forgot to press\nOne Button"
-//      color: "white"
-//      font.pixelSize: 14
-//      font.family: standardFont.name
-//      font.bold: true
-//    }
+      width: 180
+//      width: gameWindowAnchorItem.width / 2 - depotImage.width / 2 - rightHand.height - 30;
+      height: 120
+      color: "white"
+      border.color: Constants.sBorderColor
+      border.width: 1
 
-//    onVisibleChanged: {
-//      if (visible){
-//        singleTimer.start()
-//      }
-//    }
 
-//    Timer {
-//      id: singleTimer
-//      interval: 3000
-//      repeat: false
-//      running: false
+      Text {
+          id: hintRectangleText
+          anchors.fill: parent
+          anchors.margins: 5
+          font.pixelSize: 12
+          wrapMode: Text.Wrap
+          text: "Hint:"
+      }
+  }
 
-//      onTriggered: {
-//        onuHint.visible = false
-//      }
-//    }
-//  }
 
   // the four playerHands placed around the main game field
   Item {

@@ -41,17 +41,6 @@ SceneBase {
     text: "Music: Bensound.com, Sound Effects: freesound.org"
   }
 
-//  // the header
-//  Text {
-//    anchors.horizontalCenter: gameWindowAnchorItem.horizontalCenter
-//    horizontalAlignment: Text.AlignHCenter
-//    anchors.top: gameWindowAnchorItem.top
-//    anchors.topMargin: 30
-//    font.pixelSize: 16
-//    font.family: standardFont.name
-//    color: "#28a3c1"
-//    text: "Instructions"
-//  }
 
   // row with the main game rules
   Row {
@@ -84,7 +73,7 @@ SceneBase {
         color: "black"
         width: 100
         wrapMode: Text.WordWrap
-        text: "Become president and be the first to get rid of all cards in your hand! Or be the last to finish and be the pleb. At the start of each game, the pleb has to pass his 2 highest cards to the president, whereas the president will pass 2 arbitrary (usually lowest) cards back to him."
+        text: "Become president and be the first to get rid of all cards in your hand! Or be the last to finish and be the pleb. At the start of each game, the pleb has to pass his or her 2 highest cards to the president, who in turn discards 2 arbitrary (usually lowest) cards back to the pleb [not yet implemented]."
       }
     }
 
@@ -112,7 +101,7 @@ SceneBase {
         color: "black"
         width: 100
         wrapMode: Text.WordWrap
-        text: "Upon fresh start, you may freely play 1,2,3 or 4 cards of the same value (e.g. one 8 or triple Queen). Else, play the same amount of cards, but exceed the value compared to the discard pile. If you cannot or don't want to play, you pass. If everyone passes, the last player can restart freshly. "
+        text: "Upon fresh start, you may freely play 1,2,3 or 4 cards of the same value (e.g. one 8 or triple Queen). Else, play the same amount of cards, but exceed the value on the discard pile. If you can't or don't want to play, you pass. If everyone passes, the last player can restart freshly. "
       }
     }
 
@@ -140,7 +129,7 @@ SceneBase {
         color: "black"
         width: 100
         wrapMode: Text.WordWrap
-        text: "When it's your turn, possible cards are highlighted in yellow. Select your move by tapping the cards which will become green. Press the center of the screen to play. Select noghint and tap center to pass."
+        text: "Upon your turn, possible cards are highlighted in yellow. Select your move by tapping the cards which will become green. Tab screen center to play. Select nothing and tap center to pass."
       }
     }
   }
