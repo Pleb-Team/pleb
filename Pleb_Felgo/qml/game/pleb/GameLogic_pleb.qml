@@ -98,16 +98,18 @@ Item {
               var s
 
               if (depot.lastPlayerUserID && depot.lastDeposit)
-              {
-                  s2 = "Play higher than " + depot.lastDeposit[0].variationType + "!"
-              }
+                  s2 = "Beat your opponent and play higher than " + depot.lastDeposit[0].variationType + "!"
               else
-              {
                   s2 = "You may start freely and play arbitrary cards. Get rid of something :-)"
-              }
 
-              s = "Select some cards and press the screen center to play or pass!"
-              gameScene.hintRectangleText.text = s + "\n" + s2
+              if (depot.lastPlayerUserID && depot.lastDeposit.length === 1)
+                  s = "Select 1 card and press the screen center to play, or simply press screen center to pass."
+              else if (depot.lastPlayerUserID && depot.lastDeposit.length > 1)
+                  s = "Select " + depot.lastDeposit.length + " cards and press the screen center to play, or simply press screen center to pass."
+              else
+                  s = "Select arbitrary cards of the same value and press the screen center to play."
+
+              gameScene.hintRectangleText.text = s2 + "\n\n" + s
               gameScene.hintRectangle.visible = true
           }
       }

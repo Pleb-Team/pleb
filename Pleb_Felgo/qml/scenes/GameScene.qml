@@ -178,7 +178,7 @@ SceneBase {
       id: hintRectangle
       radius: 10
       anchors.left: depotImage.right
-      anchors.leftMargin: 5
+//      anchors.leftMargin: 5
       anchors.verticalCenter: depotImage.verticalCenter
 //      anchors.right: rightHand.left
 //      anchors.rightMargin: 5
@@ -188,9 +188,9 @@ SceneBase {
 //      anchors.bottomMargin: 5
 
 
-      width: 180
-//      width: gameWindowAnchorItem.width / 2 - depotImage.width / 2 - rightHand.height - 30;
-      height: 120
+//      width: 180
+      width: gameWindowAnchorItem.width / 2 - depotImage.width / 2 - rightHand.height * 1.3;
+      height: depotImage.height / 400 * (400 - 35 * 2) // Höhe des grauen Kreises (ohne weiße Pfeile)
       color: "white"
       border.color: Constants.sBorderColor
       border.width: 1
@@ -200,7 +200,7 @@ SceneBase {
           id: hintRectangleText
           anchors.fill: parent
           anchors.margins: 5
-          font.pixelSize: 12
+          font.pixelSize: 15
           wrapMode: Text.Wrap
           text: "Hint:"
       }
