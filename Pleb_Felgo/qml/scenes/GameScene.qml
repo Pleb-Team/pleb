@@ -200,7 +200,7 @@ SceneBase {
           id: hintRectangleText
           anchors.fill: parent
           anchors.margins: 5
-          font.pixelSize: 16
+          font.pixelSize: 18
           wrapMode: Text.Wrap
           text: "Hint:"
       }
