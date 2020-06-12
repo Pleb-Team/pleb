@@ -38,10 +38,10 @@ SceneBase {
       interval: 100; running: true; repeat: true
       onTriggered:
       {
-//          ambienceMusic.play()
           running = false
-          var nIndex = Math.floor(Math.random() * folderModel.count)
 
+          // Chose an existing sound folder by random
+          var nIndex = Math.floor(Math.random() * folderModel.count)
           var s = folderModel.get(nIndex, "filePath")
           ambienceMusic.source = s
           ambienceMusic.play()

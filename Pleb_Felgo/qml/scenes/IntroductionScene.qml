@@ -30,16 +30,16 @@ SceneBase {
         border.width: 1
     }
     
-    // credits
-    Text {
-        anchors.bottom: infoRect.bottom
-        anchors.bottomMargin: 5
-        anchors.right: infoRect.right
-        anchors.rightMargin: 15
-        font.pixelSize: 6
-        color: "#28a3c1"
-        text: "Music: Bensound.com, Sound Effects: freesound.org"
-    }
+//    // credits
+//    Text {
+//        anchors.bottom: infoRect.bottom
+//        anchors.bottomMargin: 5
+//        anchors.right: infoRect.right
+//        anchors.rightMargin: 15
+//        font.pixelSize: 8
+//        color: Constants.sBorderColor
+//        text: "Music: Bensound.com, Sound Effects: freesound.org"
+//    }
 
 
     // the header
@@ -50,11 +50,10 @@ SceneBase {
         anchors.topMargin: 60
         font.pixelSize: 20
         font.family: standardFont.name
-        color: "#28a3c1"
+        color: Constants.sBorderColor
         text: "Welcome to Pleb"
     }
 
-    // row with the main game rules
     Row
     {
         spacing: 13
@@ -68,30 +67,22 @@ SceneBase {
 
             Text
             {
-                font.pixelSize: 8
+                font.pixelSize: 9
                 color: "black"
-                width: 200
+                width: 300
                 wrapMode: Text.WordWrap
                 text: "This new implementation of the popular card came 'President' (a.k.a. 'Arschloch') is the outcome of our team hackaton in Stuttgart, 2020, " +
                       "established during the crisis. We aim at demonstrating that despite the lockdown, it is possible to stick together and use the " +
-                      "time meaningfully e.g. by studying a new, fun technique of creating games."
-            }
-
-            Text
-            {
-                font.pixelSize: 8
-                color: "black"
-                width: 200
-                wrapMode: Text.WordWrap
-                text: "Contributors: Joachim, Ben, Max, Sebastian, Sven\n" +
+                      "time meaningfully e.g. by studying a new, fun technique of creating games." + "\n\n" +
+                      "Contributors: Joachim, Ben, Max, Sebastian, Sven" + "\n" +
                       "Happy playing! "
             }
 
             Text
             {
-                font.pixelSize: 8
+                font.pixelSize: 9
                 color: "black"
-                width: 200
+                width: 300
                 wrapMode: Text.WordWrap
                 text: "Find more information on our <a href=\"https://github.com/Pleb-Team/pleb\">Pleb project website</a>."
                 onLinkActivated: Qt.openUrlExternally(link)
@@ -99,7 +90,7 @@ SceneBase {
 
             Text
             {
-                font.pixelSize: 8
+                font.pixelSize: 9
                 color: "black"
                 width: 200
                 wrapMode: Text.WordWrap

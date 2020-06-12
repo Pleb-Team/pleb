@@ -20,9 +20,6 @@ Item {
   // the current turn direction
   property bool clockwise: true
 
-  // the amount of cards to draw, can be increased by draw2 and wild4 cards
-//  property int drawAmount: 1
-
   property var lastPlayerUserID: null
   property var finishedPlayers: []
 
@@ -182,15 +179,6 @@ Item {
       }
   }
 
-//  // reverse the current turn direction
-//  function reverse(){
-//    reverseSound.play()
-//    // change direction
-//    clockwise ^= true
-//    // send current direction to other players
-//    var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-//    multiplayer.sendMessage(gameLogic.messageSetReverse, {clockwise: clockwise, userId: userId})
-//  }
 
 
   // reset the depot
