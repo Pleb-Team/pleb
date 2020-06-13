@@ -8,8 +8,8 @@ CONFIG += felgo
 # Project identifier and version
 # More information: https://felgo.com/doc/felgo-publishing/#project-configuration
 PRODUCT_IDENTIFIER = de.stuggi.hackaton.pleb
-PRODUCT_VERSION_NAME = 0.91
-PRODUCT_VERSION_CODE = 10
+PRODUCT_VERSION_NAME = 0.912
+PRODUCT_VERSION_CODE = 12
 
 # Optionally set a license key that is used instead of the license key from
 # main.qml file (App::licenseKey for your app or GameWindow::licenseKey for your game)
