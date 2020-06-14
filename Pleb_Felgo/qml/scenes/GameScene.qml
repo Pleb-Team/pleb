@@ -258,37 +258,40 @@ SceneBase {
 
   // the playerTags for each playerHand
   Item {
-    id: playerTags
-    anchors.fill: gameWindowAnchorItem
+      id: playerTags
+      anchors.fill: gameWindowAnchorItem
 
-    PlayerTag {
-      anchors.bottom: parent.bottom
-      anchors.bottomMargin: 5
-      anchors.right: parent.right
-      anchors.rightMargin: (parent.width - bottomHand.width) / 2 - width * 0.8
-    }
+      PlayerTag {
+          id: bottomPlayerTag
+          anchors.bottom: parent.bottom
+          anchors.bottomMargin: 5
+          anchors.right: parent.right
+          anchors.rightMargin: (parent.width - bottomHand.width) / 2 - width * 0.8
+      }
 
-    PlayerTag {
-      anchors.left: parent.left
-      anchors.leftMargin: 5
-      anchors.top: parent.top
-      anchors.topMargin: 10
-    }
+      PlayerTag {
+          id: leftPlayerTag
+          anchors.left: parent.left
+          anchors.leftMargin: 5
+          anchors.top: parent.top
+          anchors.topMargin: 10
+      }
 
-    PlayerTag {
-      anchors.top: parent.top
-      anchors.topMargin: 10
-      anchors.left: parent.left
-      anchors.leftMargin: (parent.width - topHand.width) / 2 - width
-    }
+      PlayerTag {
+          id: topPlayerTag
+          anchors.top: parent.top
+          anchors.topMargin: 10
+          anchors.left: parent.left
+          anchors.leftMargin: (parent.width - topHand.width) / 2 - width
+      }
 
-    PlayerTag {
-      id: rightPlayerTag
-      anchors.right: parent.right
-      anchors.rightMargin: 5
-      anchors.top: parent.top
-      anchors.topMargin: 10
-    }
+      PlayerTag {
+          id: rightPlayerTag
+          anchors.right: parent.right
+          anchors.rightMargin: 5
+          anchors.top: parent.top
+          anchors.topMargin: 10
+      }
   }
 
 

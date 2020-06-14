@@ -6,6 +6,7 @@ import "../common"
 // displayer username, profile image and remaining time
 EntityBase {
   id: playerTag
+  entityType: "playerTag"
   width: 120
   height: canvas.height + name.contentHeight + name.anchors.topMargin
 
