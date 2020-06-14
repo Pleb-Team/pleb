@@ -29,20 +29,10 @@ GameWindow {
   property GameScene gameScene: sceneLoader.item && sceneLoader.item.gameScene
   property MultiplayerScene matchmakingScene: sceneLoader.item && sceneLoader.item.matchmakingScene
   property GameNetworkScene gameNetworkScene: sceneLoader.item && sceneLoader.item.gameNetworkScene
-//  property StoreScene storeScene: sceneLoader.item && sceneLoader.item.storeScene
-
   property alias loadingScene: loadingScene
 
-  // enable / disable store or advertisements
-//  readonly property bool enableStoreAndAds: Constants.enableStoreAndAds
-//  readonly property bool showAdvertisements: gameTokens < gameTokenNoAdsLimit && enableStoreAndAds
   readonly property int gamesPlayed: menuScene ? menuScene.localStorage.gamesPlayed : 0
   readonly property int appStarts: menuScene ? menuScene.localStorage.appStarts : 0
-//  readonly property int gameTokens : storeScene ? storeScene.tokens : 0  // tokens are our game currency from in-app purchase store
-
-//  readonly property int gameTokenEarnedPerVideoWatch: 1
-//  readonly property int gameTokensEarnedPerDay: 1
-//  readonly property int gameTokenNoAdsLimit: 10
 
   // create and remove entities at runtime
   EntityManager {
