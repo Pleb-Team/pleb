@@ -2,7 +2,7 @@
 #include <FelgoApplication>
 
 #include <QQmlApplicationEngine>
-#include <QtQml>
+//#include <QtQml>
 
 #include "../Pleb_GameLogic_QtWrapper/BackEnd.h"
 
@@ -12,9 +12,9 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 	
     // Add this line to match your application identifier:
-    app.setOrganizationDomain("de.stuggi.hackaton.pleb");
+    //app.setOrganizationDomain("de.stuggi.hackaton.pleb");
     // Set your app's current version number here:
-    app.setApplicationVersion("0.0.1");
+    //app.setApplicationVersion("0.0.1");
 
     FelgoApplication felgo;
 
@@ -22,6 +22,10 @@ int main(int argc, char *argv[])
     // if you have older projects using Qt App wizards from previous QtCreator versions than 3.1, please change them to QQmlApplicationEngine
     QQmlApplicationEngine engine;
     felgo.initialize(&engine);
+
+    // Set an optional license key from project file
+    // This does not work if using Felgo Live, only for Felgo Cloud Builds and local builds
+    felgo.setLicenseKey(PRODUCT_LICENSE_KEY);
 
     // use this during development
     // for PUBLISHING, use the entry point below

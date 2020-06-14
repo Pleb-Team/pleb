@@ -1,6 +1,7 @@
 ﻿import QtQuick 2.12
 import QtQuick.Controls 1.4
 import QtQuick.Dialogs 1.1
+import QtQml 2.12
 import Qt.labs.folderlistmodel 1.0
 
 import Felgo 3.0
@@ -297,47 +298,53 @@ SceneBase {
   // define Storage item for loading/storing key-value data
   // ask the user for feedback after opening the app 5 times
   Storage {
-    id: localStorage
-    property int appStarts: 0
-    property int gamesPlayed: 0 // store number of games played
-    property real lastLogin: 0   // date (day) of last login (reward received)
+      id: localStorage
+      property int appStarts: 0
+      property int gamesPlayed: 0 // store number of games played
+      property real lastLogin: 0   // date (day) of last login (reward received)
 
-    // update app starts counter
-    Component.onCompleted: {
-      // uncomment this to clear the storage
-      //localStorage.clearValue("appstarts")
-      //localStorage.clearValue("gamesplayed")
-      //localStorage.clearValue("lastlogin")
+      // update app starts counter
+      Component.onCompleted:
+      {
+          // uncomment this to clear the storage
+          //localStorage.clearValue("appstarts")
+          //localStorage.clearValue("gamesplayed")
+          //localStorage.clearValue("lastlogin")
+          console.debug("[MenuScene::Storage::onCompleted] Qt.application.version:" + Qt.application.version)
+          console.debug("[MenuScene::Storage::onCompleted] Qt.application.name:" + Qt.application.name)
+          console.debug("[MenuScene::Storage::onCompleted] Qt.application.organization:" + Qt.application.organization)
+          console.debug("[MenuScene::Storage::onCompleted] Qt.application.domain:" + Qt.application.domain)
 
-      var nr = localStorage.getValue("appstarts")
-      if(nr === undefined) nr = 0
 
-      nr++
-      localStorage.setValue("appstarts", nr)
-      appStarts = nr
+          var nr = localStorage.getValue("appstarts")
+          if(nr === undefined) nr = 0
 
-      // init or load gamesPlayed counter
-      if(localStorage.getValue("gamesplayed") === undefined)
-        localStorage.setValue("gamesplayed", 0)
-      gamesPlayed = localStorage.getValue("gamesplayed")
+          nr++
+          localStorage.setValue("appstarts", nr)
+          appStarts = nr
 
-      // init or load last login day
-      if(localStorage.getValue("lastlogin") === undefined)
-        localStorage.setValue("lastlogin", 0) // will be correctly set when first checked
-      lastLogin = localStorage.getValue("lastlogin")
-    }
+          // init or load gamesPlayed counter
+          if(localStorage.getValue("gamesplayed") === undefined)
+              localStorage.setValue("gamesplayed", 0)
+          gamesPlayed = localStorage.getValue("gamesplayed")
 
-    // set and store gamesPlayed locally
-    function setGamesPlayed(count) {
-      localStorage.setValue("gamesplayed", count)
-      localStorage.gamesPlayed = count
-    }
+          // init or load last login day
+          if(localStorage.getValue("lastlogin") === undefined)
+              localStorage.setValue("lastlogin", 0) // will be correctly set when first checked
+          lastLogin = localStorage.getValue("lastlogin")
+      }
 
-    // set and store last login day
-    function setLastLogin(day) {
-      localStorage.setValue("lastlogin", day)
-      localStorage.lastLogin = day
-    }
+      // set and store gamesPlayed locally
+      function setGamesPlayed(count) {
+          localStorage.setValue("gamesplayed", count)
+          localStorage.gamesPlayed = count
+      }
+
+      // set and store last login day
+      function setLastLogin(day) {
+          localStorage.setValue("lastlogin", day)
+          localStorage.lastLogin = day
+      }
   }
 
   // sync messages on the main menu page

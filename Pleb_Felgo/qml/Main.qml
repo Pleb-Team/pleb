@@ -15,7 +15,7 @@ GameWindow {
   width: 960
 
   // generate your own license key which includes the OneSignal Push Notification plugin & the Facebook plugin at https://felgo.com/licenseKey
-  // licenseKey: Constants.licenseKey
+  licenseKey: "F1EDD573D22CD7C8C63D330B6B0516B4E915E25F0CAD8674F678BCA698455B3B6F03B985D0815C64DAB1784F3738C8EA451056D2B25B477D746C806F20362CD0C2A394674877499D34EE281CCD8247DE1EFDC3ACCAEB759A4861BF3A64FE201522BF202C3F75F0BB043F21DFE96FFB1DCA485F6BFE972603484A97EBBA837078ECDA21910FC8E3EEE242629EDE83D15F64022B4D782A9DF69DD06AF133281E22D596291162F59ECAFAABF1F2A87FC4F21FA51C76367FB47F39783C057B04FD7E0816FC8BDD88C6929F9398A62732F5E1B4E3E722DFD0B0F6BF64174B58A86B0B2CBD12EE4AABBBA6380EA5DCEE81563A83E4592542DFE44505508936E7045EF594725B37E7B8481EEC1AE6D2B8D8F1CAE888B939D5D8404BA905CA304D4D36BD7528F1F1BB2A80A3BABDBA7E6D0DAC614B9CDBB02C84EF4D8F038CF64B74BCBF6855E2E5CF39E40C250D43E3376BF734"
   title: gameNetwork.user.deviceId + " - " + gameNetwork.user.name
 
   // this is used in the sharing dialog, rating dialog
@@ -29,20 +29,10 @@ GameWindow {
   property GameScene gameScene: sceneLoader.item && sceneLoader.item.gameScene
   property MultiplayerScene matchmakingScene: sceneLoader.item && sceneLoader.item.matchmakingScene
   property GameNetworkScene gameNetworkScene: sceneLoader.item && sceneLoader.item.gameNetworkScene
-//  property StoreScene storeScene: sceneLoader.item && sceneLoader.item.storeScene
-
   property alias loadingScene: loadingScene
 
-  // enable / disable store or advertisements
-//  readonly property bool enableStoreAndAds: Constants.enableStoreAndAds
-//  readonly property bool showAdvertisements: gameTokens < gameTokenNoAdsLimit && enableStoreAndAds
   readonly property int gamesPlayed: menuScene ? menuScene.localStorage.gamesPlayed : 0
   readonly property int appStarts: menuScene ? menuScene.localStorage.appStarts : 0
-//  readonly property int gameTokens : storeScene ? storeScene.tokens : 0  // tokens are our game currency from in-app purchase store
-
-//  readonly property int gameTokenEarnedPerVideoWatch: 1
-//  readonly property int gameTokensEarnedPerDay: 1
-//  readonly property int gameTokenNoAdsLimit: 10
 
   // create and remove entities at runtime
   EntityManager {
