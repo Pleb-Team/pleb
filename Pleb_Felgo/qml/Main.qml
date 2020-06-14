@@ -149,9 +149,15 @@ GameWindow {
           if (    (menuScene.localStorage.getValue("appstarts") === undefined)
                   || (menuScene.localStorage.getValue("appstarts") <= 3)
                   )
-              window.state = "indroduction"
+          {
+              console.debug("Loader::onLoaded goint to window.state = introduction")
+              window.state = "introduction"
+          }
           else
+          {
+              console.debug("Loader::onLoaded goint to window.state = menu")
               window.state = "menu"
+          }
       }
 
 
