@@ -37,6 +37,10 @@ void CGame::ShuffleCards()
 //--------------------------------------------------------------------------------------------------
 CMove CGame::TakeOneCard( int PlayerID ) 
 {
+    // Suppress unused parameter warning. Note that this parameter is used in derived classes!
+    // https://stackoverflow.com/questions/4115641/fixng-unused-formal-parameter-warnings-without-making-an-abstract-class
+    (void) PlayerID;
+
 	CMove Ergebnis;
 	
 	// Check ob noch Karten da sind
