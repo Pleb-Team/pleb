@@ -1,5 +1,6 @@
 <RCC>
 <qresource prefix="/">
+  <file>assets</file>
   <file>qml</file>
   <file>qml/common</file>
   <file>qml/game</file>
