@@ -109,26 +109,19 @@ Item {
 
 
   // check if allowed to play the selected card
-  function validCard(cardId){
-      var activeHand
+  function validCard(cardId)
+  {
+      var activeHand = gameLogic.getHand(multiplayer.activePlayer.userId)
 
-      // only continue if the selected card is in the hand of the active player
-      for (var i = 0; i < playerHands.children.length; i++) {
-          if (playerHands.children[i].player === multiplayer.activePlayer){
-              activeHand = playerHands.children[i]
-              if (!activeHand.inHand(cardId))
-                  return false
-          }
-      }
       // Value is ok and enough cards of this value exist in the players hand
       if (!activeHand)
-      {
           return false
-      }
+      else if (!activeHand.inHand(cardId))
+          return false
 
       var card = entityManager.getEntityById(cardId)
 
-      // Depot is empty --> This polayer can play freely
+      // Depot is empty --> This player can play freely
       if (      !lastPlayerUserID
             ||  lastDeposit === undefined
             ||  lastDeposit === null
