@@ -374,26 +374,26 @@ Item {
                 if (depot.validCard(cardId)){
 
                     var selectedCard = entityManager.getEntityById(cardId)
-                    if (selectedCard.glowImage.visible || selectedCard.glowGroupImage.visible) {
-                        selectedCard.glowGroupImage.visible = !selectedCard.glowGroupImage.visible
-                        selectedCard.glowImage.visible = !selectedCard.glowGroupImage.visible
+                    if (selectedCard.glowImage.visible || selectedCard.selected) {
+                        selectedCard.selected = !selectedCard.selected
+                        selectedCard.glowImage.visible = !selectedCard.selected
 
                         // convenience for the player to auto-select groups
                         // if there is a last move by another player which has to be beaten
                         if (depot.lastPlayerUserID && depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayerUserID)
                         {
                             var activeHand = getHand(multiplayer.localPlayer.userId).hand
-                            if (selectedCard.glowGroupImage.visible) {
+                            if (selectedCard.selected) {
                                 var groupSize = 1
                                 for (var i = 0; i < activeHand.length; i++) {
                                     if (activeHand[i].entityId !== selectedCard.entityId) {
                                         if (activeHand[i].points === selectedCard.points) {
                                             if (groupSize < depot.lastDeposit.length) {
-                                                activeHand[i].glowGroupImage.visible = true
+                                                activeHand[i].selected = true
                                                 activeHand[i].glowImage.visible = false
                                                 groupSize++
                                             } else {
-                                                activeHand[i].glowGroupImage.visible = false
+                                                activeHand[i].selected = false
                                                 activeHand[i].glowImage.visible = false
                                             }
                                         }
@@ -403,7 +403,7 @@ Item {
                                 for (var j = 0; j < activeHand.length; j++) {
                                     if (activeHand[j].entityId !== selectedCard.entityId) {
                                         if (activeHand[j].points === selectedCard.points) {
-                                            activeHand[j].glowGroupImage.visible = false
+                                            activeHand[j].selected = false
                                         }
                                     }
                                 }
@@ -436,7 +436,7 @@ Item {
           var cardIds = []
           var activeHand = getHand(multiplayer.localPlayer.userId).hand
           for (var i = 0; i < activeHand.length; i++) {
-              if (activeHand[i].glowGroupImage.visible) {
+              if (activeHand[i].selected) {
                   cardIds.push(activeHand[i].entityId)
               }
           }
@@ -898,14 +898,16 @@ Item {
   }
 
   // find hand by userId
-  function getHand(userId){
-    for (var i = 0; i < playerHands.children.length; i++){
-      if (playerHands.children[i].player.userId == userId){
-        return playerHands.children[i]
+  function getHand(userId)
+  {
+      for (var i = 0; i < playerHands.children.length; i++){
+          if (playerHands.children[i].player.userId === userId){
+              return playerHands.children[i]
+          }
       }
-    }
-    console.debug("ERROR: could not find player with id", userId, "in the multiplayer.players list!")
-    return undefined
+
+      console.debug("ERROR: could not find player with id", userId, "in the multiplayer.players list!")
+      return undefined
   }
 
   // update tag by player userId

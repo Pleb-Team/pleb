@@ -161,7 +161,7 @@ Item {
           //        console.debug("Unmarking stack...")
           var card = entityManager.getEntityById(getTopCardId())
           card.glowImage.visible = false
-          card.glowGroupImage.visible = false
+          card.selected = false
       } else {
           //        console.debug("No stack to unmark")
       }
