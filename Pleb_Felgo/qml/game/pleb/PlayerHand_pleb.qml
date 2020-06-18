@@ -247,37 +247,37 @@ Item {
           var selectedGroup = getSelectedGroup()
           for (var i = 0; i < hand.length; i ++)
           {
+              hand[i].glowImage.visible = depot.validCard(hand[i].entityId)
+
               // Unmark invalid cards
-              if (!depot.validCard(hand[i].entityId))
-              {
-                  hand[i].glowImage.visible = false
-                  hand[i].selected = false
-                  continue
-              }
+//              if (!depot.validCard(hand[i].entityId))
+//              {
+//                  hand[i].glowImage.visible = false
+//                  continue
+//              }
 
-              // Nothing yet selected --> All cards of valid value are allowed
-              if (selectedGroup.length === 0)
-              {
-                  hand[i].glowImage.visible = true
-                  continue
-              }
+//              // Nothing yet selected --> All cards of valid value are allowed
+//              if (selectedGroup.length === 0)
+//              {
+//                  hand[i].glowImage.visible = true
+//                  continue
+//              }
 
 
-              if (  selectedGroup[0].points === hand[i].points
-                &&  (
-                        depot.lastDeposit.length === 0
-                    ||  selectedGroup.length < depot.lastDeposit.length
-                    ||  !depot.lastPlayerUserID
-                    ||  player.userId === depot.lastPlayerUserID
-                    )
-                )
-              {
-                  // TODO LASTCARD || depot.finishedPlayers.includes(depot.lastPlayer)))) {
-                  hand[i].glowImage.visible = !hand[i].selected
-              } else {
-                  hand[i].glowImage.visible = false
-              }
-              hand[i].updateCardImage()
+//              if (  selectedGroup[0].points === hand[i].points
+//                &&  (
+//                        depot.lastDeposit.length === 0
+//                    ||  selectedGroup.length < depot.lastDeposit.length
+//                    ||  !depot.lastPlayerUserID
+//                    ||  player.userId === depot.lastPlayerUserID
+//                    )
+//                )
+//              {
+//                  hand[i].glowImage.visible = !hand[i].selected
+//              } else {
+//                  hand[i].glowImage.visible = false
+//              }
+//              hand[i].updateCardImage()
           }
       }
   }

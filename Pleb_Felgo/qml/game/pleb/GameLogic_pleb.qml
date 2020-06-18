@@ -371,12 +371,12 @@ Item {
         } else if (entityManager.getEntityById(cardId).state === "player"){
             if (multiplayer.myTurn && !depot.skipped && !acted) {
 
-                if (depot.validCard(cardId)){
-
+                if (depot.validCard(cardId))
+                {
                     var selectedCard = entityManager.getEntityById(cardId)
                     if (selectedCard.glowImage.visible || selectedCard.selected) {
                         selectedCard.selected = !selectedCard.selected
-                        selectedCard.glowImage.visible = !selectedCard.selected
+//                        selectedCard.glowImage.visible = !selectedCard.selected
 
                         // convenience for the player to auto-select groups
                         // if there is a last move by another player which has to be beaten
@@ -388,13 +388,15 @@ Item {
                                 for (var i = 0; i < activeHand.length; i++) {
                                     if (activeHand[i].entityId !== selectedCard.entityId) {
                                         if (activeHand[i].points === selectedCard.points) {
-                                            if (groupSize < depot.lastDeposit.length) {
+                                            if (groupSize < depot.lastDeposit.length)
+                                            {
                                                 activeHand[i].selected = true
-                                                activeHand[i].glowImage.visible = false
+//                                                activeHand[i].glowImage.visible = false
                                                 groupSize++
-                                            } else {
+                                            } else
+                                            {
                                                 activeHand[i].selected = false
-                                                activeHand[i].glowImage.visible = false
+//                                                activeHand[i].glowImage.visible = false
                                             }
                                         }
                                     }
