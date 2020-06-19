@@ -55,7 +55,7 @@ Item {
 
   // timer decreases the remaining turn time for the active player
   Timer {
-      id: timer
+      id: timerPlayerThinking
       repeat: true
       running: !gameOver
       interval: 1000
@@ -165,11 +165,11 @@ Item {
       }
       if(multiplayer.amLeader) {
         console.debug("this player just became the new leader")
-        if(!timer.running && !gameOver) {
+        if(!timerPlayerThinking.running && !gameOver) {
           console.debug("New leader selected, but the timer is currently not running, thus trigger a new turn now")
           // even when we comment this, the game does not stall 100%, thus it is likely that we would skip a player here. but better to skip a player once and make sure the game is continued than stalling the game. hard to reproduce, as it does not happen every time the leader changes!
           triggerNewTurn()
-        } else if (!timer.running){
+        } else if (!timerPlayerThinking.running){
           restartGameTimer.start()
         }
       }
@@ -206,7 +206,7 @@ Item {
           // join a game which is already over
           gameOver = message.gameOver
           gameScene.gameOver.visible = gameOver
-          timer.running = !gameOver
+          timerPlayerThinking.running = !gameOver
 
           console.debug("finished syncGameState, setting initialized to true now")
           initialized = true
@@ -468,7 +468,7 @@ Item {
 
       // reset all values at the start of the game
       gameOver = false
-      timer.start()
+      timerPlayerThinking.start()
       scaleHand()
       markValid()
       gameScene.gameOver.visible = false
@@ -570,10 +570,10 @@ Item {
 
       // give the connected player <xxx> seconds until the AI takes over
       remainingTime = userInterval
-      timer.stop()
+      timerPlayerThinking.stop()
       if (!gameOver)
       {
-          timer.start()
+          timerPlayerThinking.start()
           scaleHand()
           markValid()
       }
@@ -670,7 +670,7 @@ Item {
       }
 
       // clean up our UI
-      timer.running = false
+      timerPlayerThinking.running = false
 
       // player timed out, so leader should take over
       multiplayer.leaderCode(function () {
@@ -692,7 +692,7 @@ Item {
       aiTimeOutTimer.stop()
       hintTimer.stop()
       restartGameTimer.stop()
-      timer.running = false
+      timerPlayerThinking.running = false
       depot.effectTimer.stop()
       deck.reset()
       chat.gConsole.clear()
@@ -733,7 +733,7 @@ Item {
 
       // reset all values at the start of the game
       gameOver = false
-      timer.start()
+      timerPlayerThinking.start()
       scaleHand()
       markValid()
       gameScene.gameOver.visible = false
@@ -1009,7 +1009,7 @@ Item {
           playerHands.children[i].unmark()
       }
       // unmark the highlighted deck card
-      deck.unmark()
+//      deck.unmark()
   }
 
   // scale the playerHand of the active localPlayer
@@ -1200,7 +1200,7 @@ Item {
     gameOver = true
     hintTimer.stop()
     aiTimeOutTimer.stop()
-    timer.running = false
+    timerPlayerThinking.running = false
     depot.effectTimer.stop()
 
     multiplayer.leaderCode(function () {

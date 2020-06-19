@@ -136,13 +136,6 @@ Item {
     }
   }
 
-  // get the id of the card on top of the stack
-  function getTopCardId(){
-    // create a new stack from depot cards if there's no card left to draw
-//    reStack()
-    var index = Math.max(cardDeck.length - (cardDeck.length - cardsInStack) - 1, 0)
-    return deck.cardDeck[index].entityId
-  }
 
   // reposition the remaining cards to create a stack
   function offsetStack(){
@@ -155,17 +148,24 @@ Item {
   }
 
 
+
+//  // get the id of the card on top of the stack
+//  function getTopCardId()
+//  {
+//      var index = Math.max(cardDeck.length - (cardDeck.length - cardsInStack) - 1, 0)
+//      return deck.cardDeck[index].entityId
+//  }
+
   // unmark the stack and the recently dropped cards
-  function unmark(){
-      if (cardDeck.length > 0) {
-          //        console.debug("Unmarking stack...")
-          var card = entityManager.getEntityById(getTopCardId())
-          card.glowImage.visible = false
-          card.selected = false
-      } else {
-          //        console.debug("No stack to unmark")
-      }
-  }
+//  function unmark()
+//  {
+//      if (cardDeck.length > 0)
+//      {
+//          var card = entityManager.getEntityById(getTopCardId())
+//          card.glowImage.visible = false
+//          card.selected = false
+//      }
+//  }
 
 
   // move the stack cards to the beginning of the cardDeck array
