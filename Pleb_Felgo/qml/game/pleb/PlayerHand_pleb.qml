@@ -12,13 +12,11 @@ Item {
   property int originalHeight: 134
 
   // amount of cards in hand in the beginning of the game
-  property int start: 8
+  property int numberCardsAtBeginningOfGame: 8
   // array with all cards in hand
   property var hand: []
   // the owner of the cards
   property var player: MultiplayerUser{}
-  // whether the player pressed the ONUButton or not
-//  property bool onu: false
   // the score at the end of the game
   property int score: 0
   // value used to spread the cards in hand
@@ -77,69 +75,62 @@ Item {
     smooth: true
   }
 
-  // playerHand bubble image is visible when the player pressed the ONUButton
-//  Image {
-//    anchors.top: parent.top
-//    anchors.right: parent.right
-//    source: "../../../assets/img/Bubble.png"
-//    rotation: parent.rotation * (-1)
-//    width: 60
-//    height: width
-//    z: 100
-//    visible: onu
-//    smooth: true
-//  }
-
   // start the hand by picking up a specified amount of cards
-  function startHand(){
-    pickUpCards(start)
+  function startHand()
+  {
+      pickUpCards(numberCardsAtBeginningOfGame)
   }
 
   // reset the hand by removing all cards
-  function reset(){
-    while(hand.length) {
-      hand.pop()
-    }
-//    onu = false
-    scaleHand(1.0)
+  function reset()
+  {
+      while(hand.length)
+      {
+          hand.pop()
+      }
+
+      scaleHand(1.0)
   }
 
   // organize the hand and spread the cards
-  function neatHand(){
-    // sort all cards by their natural order
-    hand.sort(function(a, b) {
-      return a.order - b.order
-    })
+  function neatHand()
+  {
+      // sort all cards by their natural order
+      hand.sort(function(a, b)
+      {
+          return a.order - b.order
+      })
 
-    // recalculate the offset between cards if there are too many in the hand
-    // make sure they stay within the playerHand
-    offset = originalWidth * zoom / 10
-    if (hand.length > 7){
-      offset = playerHandPleb.originalWidth * zoom / hand.length / 1.5
-    }
+      // recalculate the offset between cards if there are too many in the hand
+      // make sure they stay within the playerHand
+      offset = originalWidth * zoom / 10
+      if (hand.length > 7){
+          offset = playerHandPleb.originalWidth * zoom / hand.length / 1.5
+      }
 
-    // calculate the card position and rotation in the hand and change the z order
-    for (var i = 0; i < hand.length; i ++){
-      var card = hand[i]
-      // angle span for spread cards in hand
-      var handAngle = 40
-      // card angle depending on the array position
-      var cardAngle = handAngle / hand.length * (i + 0.5) - handAngle / 2
-      //offset of all cards + one card width
-      var handWidth = offset * (hand.length - 1) + card.originalWidth * zoom
-      // x value depending on the array position
-      var cardX = (playerHandPleb.originalWidth * zoom - handWidth) / 2 + (i * offset)
+      // calculate the card position and rotation in the hand and change the z order
+      for (var i = 0; i < hand.length; i ++){
+          var card = hand[i]
+          // angle span for spread cards in hand
+          var handAngle = 40
+          // card angle depending on the array position
+          var cardAngle = handAngle / hand.length * (i + 0.5) - handAngle / 2
+          //offset of all cards + one card width
+          var handWidth = offset * (hand.length - 1) + card.originalWidth * zoom
+          // x value depending on the array position
+          var cardX = (playerHandPleb.originalWidth * zoom - handWidth) / 2 + (i * offset)
 
-      card.rotation = cardAngle
-      card.y = Math.abs(cardAngle) * 1.5
-      card.x = cardX
-      card.z = i + 50 + playerHandImage.z
-    }
+          card.rotation = cardAngle
+//          card.posX = cardX
+//          card.posY = Math.abs(cardAngle) * 1.5
+//          card.posZ = i + 50 + playerHandImage.z
+
+          card.setPosInPlayerHand(cardX, Math.abs(cardAngle) * 1.5, i + 50 + playerHandImage.z)
+      }
   }
 
   // pick up specified amount of cards
   function pickUpCards(amount){
-//    onuButton.button.enabled = false
     var pickUp = deck.handOutCards(amount)
 
     // add the stack cards to the playerHand array
@@ -200,13 +191,6 @@ Item {
       return result
   }
 
-  function canBeatDepot() {
-      var beat = false
-      for (var i = 0; !beat && i < hand.length; i++) {
-          beat = hand[i].points > depot.lastDeposit[0].points && countCards(hand[i].points) >= depot.lastDeposit.length
-      }
-      return beat
-  }
 
   // remove card with a specific id from hand
   function removeFromHand(cardId){
@@ -225,7 +209,7 @@ Item {
   function getSelectedGroup() {
       var result = []
       for (var i = 0; i < hand.length; i++) {
-          if (hand[i].glowGroupImage.visible === true) {
+          if (hand[i].selected === true) {
               result.push(hand[i])
           }
       }
@@ -267,7 +251,7 @@ Item {
               if (!depot.validCard(hand[i].entityId))
               {
                   hand[i].glowImage.visible = false
-                  hand[i].glowGroupImage.visible = false
+                  hand[i].selected = false
                   continue
               }
 
@@ -289,7 +273,7 @@ Item {
                 )
               {
                   // TODO LASTCARD || depot.finishedPlayers.includes(depot.lastPlayer)))) {
-                  hand[i].glowImage.visible = !hand[i].glowGroupImage.visible
+                  hand[i].glowImage.visible = !hand[i].selected
               } else {
                   hand[i].glowImage.visible = false
               }
@@ -302,7 +286,7 @@ Item {
   function unmark(){
       for (var i = 0; i < hand.length; i ++){
           hand[i].glowImage.visible = false
-          hand[i].glowGroupImage.visible = false
+          hand[i].selected = false
           hand[i].updateCardImage()
       }
   }
@@ -319,17 +303,6 @@ Item {
     neatHand()
   }
 
-  // get a random valid card id from the playerHand
-  function randomValidId(){
-    var valids = getValidCards()
-    if (valids.length > 0){
-      // return a random valid card from the array
-      var randomIndex = Math.floor(Math.random() * (valids.length))
-      return valids[randomIndex].entityId
-    }else{
-      return null
-    }
-  }
 
   // get an array with all valid cards
   function getValidCards(){
@@ -344,46 +317,6 @@ Item {
     return valids
   }
 
-  // if the player deposited their second to last card without pressing onu
-  // they missed their chance to activate the ONUButton
-//  function missedOnu(){
-//    if (hand.length === 0 ){
-//      if (multiplayer.myTurn) onuButton.button.enabled = false
-//      return true
-//    } else {
-//      return false
-//    }
-//  }
-
-//  // check if the player can activate the onu button
-//  function closeToWin(){
-//    // if the player has 2 or less cards in his hand
-//    if (hand.length == 2){
-//      // automatically activate onu for the player if he's disconnected or when the ONUButton is removed from the game (onuButton.visible = false)
-//      // do not auto-activate it when the player is skipped, onu is already active or the game is already over
-//      var userDisconnected = (!multiplayer.activePlayer || !multiplayer.activePlayer.connected)
-
-////      if ((!onuButton.visible || userDisconnected) && !depot.skipped &&  !gameLogic.gameOver){
-////        var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-////        onuButton.onu(userId)
-////      }
-
-//      // enable the button if the active player is connected
-//      var valids = getValidCards()
-//      if (multiplayer.myTurn && !depot.skipped && !gameLogic.gameOver && !onu && valids.length > 0){
-//        onuButton.button.enabled = true
-//      } else if (multiplayer.myTurn){
-//        onuButton.button.enabled = false
-//      }
-//      return true
-//    }
-
-//    else if (multiplayer.myTurn){
-//      // deactivate the button if the player has more than 2 cards in his hand
-//      onuButton.button.enabled = false
-//      return false
-//    }
-//  }
 
   // check if the player has finished with zero cards left
   function checkWin(){
@@ -394,6 +327,7 @@ Item {
       return false
     }
   }
+
 
   // calculate all card points in hand
   function points(){

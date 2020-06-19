@@ -27,7 +27,8 @@ EntityBase {
   // to show all cards on the screen and to test multiplayer syncing, set this to true
   // it is useful for testing, thus always enable it for debug builds and non-publish builds
   property bool forceShowAllCards: system.debugBuild && !system.publishBuild
-//  property bool forceShowAllCards: true
+
+  property bool selected: false
 
   // access the image and text from outside
   property alias cardImage: cardImage
@@ -38,6 +39,36 @@ EntityBase {
   // used to reparent the cards at runtime
   property var newParent
 
+  property int posX: 0
+  property int posY: 0
+  property int posZ: 0
+
+  function setPosInPlayerHand(newX, newY, newZ)
+  {
+      posX = newX
+      posY = newY
+      posZ = newZ
+
+      x = posX
+      y = posY
+      z = posZ
+
+      adjustGeometry()
+  }
+
+  onSelectedChanged:
+  {
+//      glowGroupImage.visible = selected
+      adjustGeometry()
+  }
+
+  function adjustGeometry()
+  {
+      if (selected)
+          y = posY - 40
+      else
+          y = posY
+  }
 
   // glow image highlights a valid card
   Image {

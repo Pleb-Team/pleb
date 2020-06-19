@@ -55,7 +55,7 @@ Item {
 
   // timer decreases the remaining turn time for the active player
   Timer {
-      id: timer
+      id: timerPlayerThinking
       repeat: true
       running: !gameOver
       interval: 1000
@@ -165,11 +165,11 @@ Item {
       }
       if(multiplayer.amLeader) {
         console.debug("this player just became the new leader")
-        if(!timer.running && !gameOver) {
+        if(!timerPlayerThinking.running && !gameOver) {
           console.debug("New leader selected, but the timer is currently not running, thus trigger a new turn now")
           // even when we comment this, the game does not stall 100%, thus it is likely that we would skip a player here. but better to skip a player once and make sure the game is continued than stalling the game. hard to reproduce, as it does not happen every time the leader changes!
           triggerNewTurn()
-        } else if (!timer.running){
+        } else if (!timerPlayerThinking.running){
           restartGameTimer.start()
         }
       }
@@ -206,7 +206,7 @@ Item {
           // join a game which is already over
           gameOver = message.gameOver
           gameScene.gameOver.visible = gameOver
-          timer.running = !gameOver
+          timerPlayerThinking.running = !gameOver
 
           console.debug("finished syncGameState, setting initialized to true now")
           initialized = true
@@ -374,26 +374,26 @@ Item {
                 if (depot.validCard(cardId)){
 
                     var selectedCard = entityManager.getEntityById(cardId)
-                    if (selectedCard.glowImage.visible || selectedCard.glowGroupImage.visible) {
-                        selectedCard.glowGroupImage.visible = !selectedCard.glowGroupImage.visible
-                        selectedCard.glowImage.visible = !selectedCard.glowGroupImage.visible
+                    if (selectedCard.glowImage.visible || selectedCard.selected) {
+                        selectedCard.selected = !selectedCard.selected
+                        selectedCard.glowImage.visible = !selectedCard.selected
 
                         // convenience for the player to auto-select groups
                         // if there is a last move by another player which has to be beaten
                         if (depot.lastPlayerUserID && depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayerUserID)
                         {
                             var activeHand = getHand(multiplayer.localPlayer.userId).hand
-                            if (selectedCard.glowGroupImage.visible) {
+                            if (selectedCard.selected) {
                                 var groupSize = 1
                                 for (var i = 0; i < activeHand.length; i++) {
                                     if (activeHand[i].entityId !== selectedCard.entityId) {
                                         if (activeHand[i].points === selectedCard.points) {
                                             if (groupSize < depot.lastDeposit.length) {
-                                                activeHand[i].glowGroupImage.visible = true
+                                                activeHand[i].selected = true
                                                 activeHand[i].glowImage.visible = false
                                                 groupSize++
                                             } else {
-                                                activeHand[i].glowGroupImage.visible = false
+                                                activeHand[i].selected = false
                                                 activeHand[i].glowImage.visible = false
                                             }
                                         }
@@ -403,7 +403,7 @@ Item {
                                 for (var j = 0; j < activeHand.length; j++) {
                                     if (activeHand[j].entityId !== selectedCard.entityId) {
                                         if (activeHand[j].points === selectedCard.points) {
-                                            activeHand[j].glowGroupImage.visible = false
+                                            activeHand[j].selected = false
                                         }
                                     }
                                 }
@@ -436,7 +436,7 @@ Item {
           var cardIds = []
           var activeHand = getHand(multiplayer.localPlayer.userId).hand
           for (var i = 0; i < activeHand.length; i++) {
-              if (activeHand[i].glowGroupImage.visible) {
+              if (activeHand[i].selected) {
                   cardIds.push(activeHand[i].entityId)
               }
           }
@@ -468,7 +468,7 @@ Item {
 
       // reset all values at the start of the game
       gameOver = false
-      timer.start()
+      timerPlayerThinking.start()
       scaleHand()
       markValid()
       gameScene.gameOver.visible = false
@@ -570,10 +570,10 @@ Item {
 
       // give the connected player <xxx> seconds until the AI takes over
       remainingTime = userInterval
-      timer.stop()
+      timerPlayerThinking.stop()
       if (!gameOver)
       {
-          timer.start()
+          timerPlayerThinking.start()
           scaleHand()
           markValid()
       }
@@ -670,7 +670,7 @@ Item {
       }
 
       // clean up our UI
-      timer.running = false
+      timerPlayerThinking.running = false
 
       // player timed out, so leader should take over
       multiplayer.leaderCode(function () {
@@ -692,7 +692,7 @@ Item {
       aiTimeOutTimer.stop()
       hintTimer.stop()
       restartGameTimer.stop()
-      timer.running = false
+      timerPlayerThinking.running = false
       depot.effectTimer.stop()
       deck.reset()
       chat.gConsole.clear()
@@ -733,7 +733,7 @@ Item {
 
       // reset all values at the start of the game
       gameOver = false
-      timer.start()
+      timerPlayerThinking.start()
       scaleHand()
       markValid()
       gameScene.gameOver.visible = false
@@ -898,14 +898,16 @@ Item {
   }
 
   // find hand by userId
-  function getHand(userId){
-    for (var i = 0; i < playerHands.children.length; i++){
-      if (playerHands.children[i].player.userId == userId){
-        return playerHands.children[i]
+  function getHand(userId)
+  {
+      for (var i = 0; i < playerHands.children.length; i++){
+          if (playerHands.children[i].player.userId === userId){
+              return playerHands.children[i]
+          }
       }
-    }
-    console.debug("ERROR: could not find player with id", userId, "in the multiplayer.players list!")
-    return undefined
+
+      console.debug("ERROR: could not find player with id", userId, "in the multiplayer.players list!")
+      return undefined
   }
 
   // update tag by player userId
@@ -1007,7 +1009,7 @@ Item {
           playerHands.children[i].unmark()
       }
       // unmark the highlighted deck card
-      deck.unmark()
+//      deck.unmark()
   }
 
   // scale the playerHand of the active localPlayer
@@ -1198,7 +1200,7 @@ Item {
     gameOver = true
     hintTimer.stop()
     aiTimeOutTimer.stop()
-    timer.running = false
+    timerPlayerThinking.running = false
     depot.effectTimer.stop()
 
     multiplayer.leaderCode(function () {
