@@ -18,7 +18,7 @@ SceneBase {
   property alias deck: deck
   property alias depot: depot
   property alias gameLogic: gameLogic
-  property alias gameOver: gameOver
+  property alias gameOverWindow: gameOverWindow
   property alias leaveGameWindow: leaveGameWindow
   property alias switchName: switchName
   property alias bottomHand: bottomHand
@@ -83,21 +83,21 @@ SceneBase {
     height: width
     anchors.centerIn: depot
     smooth: true
-    mirror: !depot.clockwise
+//    mirror: !depot.clockwise
 
-    onMirrorChanged: {
-      if (!mirror){
-        mirrorAnimation.from = 0
-        mirrorAnimation.to = 180
-      } else {
-        mirrorAnimation.from = 180
-        mirrorAnimation.to = 0
-      }
-      mirrorAnimation.start()
-    }
+//    onMirrorChanged: {
+//      if (!mirror){
+//        mirrorAnimation.from = 0
+//        mirrorAnimation.to = 180
+//      } else {
+//        mirrorAnimation.from = 180
+//        mirrorAnimation.to = 0
+//      }
+//      mirrorAnimation.start()
+//    }
 
-    NumberAnimation { id: mirrorAnimation; target: depotImage; properties: "rotation";
-      from: 0; to: 180; duration: 400; easing.type: Easing.InOutQuad }
+//    NumberAnimation { id: mirrorAnimation; target: depotImage; properties: "rotation";
+//      from: 0; to: 180; duration: 400; easing.type: Easing.InOutQuad }
 
     // clickable depot area
     MouseArea {
@@ -298,7 +298,7 @@ SceneBase {
   // the gameOver message in the middle of the screen
   GameOverWindow {
     anchors.centerIn: gameWindowAnchorItem
-    id: gameOver
+    id: gameOverWindow
     visible: false
   }
 
