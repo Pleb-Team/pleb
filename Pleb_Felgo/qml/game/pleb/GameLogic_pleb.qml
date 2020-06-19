@@ -22,8 +22,6 @@ Item {
   // restart the game at the end after a few seconds
   property int restartTime: 8000
 
-  // whether the user has already drawn cards this turn or not
-  property bool cardsDrawn: false
   property bool acted: false
   property bool gameOver: false
 
@@ -200,12 +198,12 @@ Item {
           syncPlayers()
           initTags()
           syncDeck(message.deck)
-          depot.syncDepot(message.depot, message.lastDepositIDs, message.lastDepositCardColors, message.skipped, message.clockwise, message.effect, message.drawAmount, message.lastPlayerUserID, message.finishedPlayers)
+          depot.syncDepot(message.depot, message.lastDepositIDs, message.lastDepositCardColors, message.skipped, message.clockwise, message.effect, message.drawAmount, message.lastPlayerUserID, message.finishedUserIDs)
           syncHands(message.playerHands)
 
           // join a game which is already over
           gameOver = message.gameOver
-          gameScene.gameOver.visible = gameOver
+          gameScene.gameOverWindow.visible = gameOver
           timerPlayerThinking.running = !gameOver
 
           console.debug("finished syncGameState, setting initialized to true now")
@@ -429,9 +427,10 @@ Item {
   }
 
 
-  function skipOrPlay() {
-      if (multiplayer.myTurn && !depot.skipped && !acted) {
-
+  function skipOrPlay()
+  {
+      if (multiplayer.myTurn && !depot.skipped && !acted)
+      {
           // get all selected cards into cardID array
           var cardIds = []
           var activeHand = getHand(multiplayer.localPlayer.userId).hand
@@ -454,14 +453,16 @@ Item {
               console.debug("Player " + multiplayer.localPlayer.userId + "skipped its turn")
           }
 
-          if (multiplayer.myTurn){
+          if (multiplayer.myTurn)
+          {
               endTurn()
           }
       }
   }
 
   // sync deck with leader and set up the game
-  function syncDeck(cardInfo){
+  function syncDeck(cardInfo)
+  {
       console.debug("GameLogic::syncDeck()")
       deck.syncDeck(cardInfo)
       depot.createDepot()
@@ -471,7 +472,7 @@ Item {
       timerPlayerThinking.start()
       scaleHand()
       markValid()
-      gameScene.gameOver.visible = false
+      gameScene.gameOverWindow.visible = false
       gameScene.leaveGameWindow.visible = false
       gameScene.switchName.visible = false
       playerInfoPopup.visible = false
@@ -559,7 +560,6 @@ Item {
 
       console.debug("playerId: " + playerId + ", multiplayer.activePlayer.userId: " + multiplayer.activePlayer.userId)
       console.debug("Last deposit: " + depot.lastDeposit + " by player " + depot.lastPlayerUserID)
-//      console.debug("players hand: " + (getHand(multiplayer.activePlayer.userId).hand))
 
       // Player can play a second time in a row, meaning all other players have passed.
       // Then we have to make sure that the depot is cleared
@@ -590,18 +590,18 @@ Item {
 
       // the player didn't act yet
       acted = false
-      cardsDrawn = false
       unmark()
       scaleHand(1.0)
 
       // All player except 1 have already finished
-      if (depot.finishedPlayers.length === playerHands.children.length - 1) {
+      if (depot.finishedUserIDs.length === playerHands.children.length - 1)
+      {
           plebFinish(getHand(multiplayer.activePlayer.userId))
           endTurn()
       }
 
       // This player has already finished (but is still called?)
-      if (depot.finishedPlayers.includes(multiplayer.activePlayer.userId))
+      if (depot.finishedUserIDs.includes(multiplayer.activePlayer.userId))
       {
           endTurn()
       }
@@ -659,7 +659,8 @@ Item {
 
 
   // schedule AI to take over after 10 seconds if the connected player is inactive
-  function turnTimedOut(){
+  function turnTimedOut()
+  {
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
       console.debug("[turnTimedOut] called. Active player UserID: " + userId)
 
@@ -729,14 +730,14 @@ Item {
       }
       console.debug("multiplayer.myTurn " + multiplayer.myTurn)
 
-      var lastGameOutcome = depot.finishedPlayers
+      var lastGameOutcome = depot.finishedUserIDs
 
       // reset all values at the start of the game
       gameOver = false
       timerPlayerThinking.start()
       scaleHand()
       markValid()
-      gameScene.gameOver.visible = false
+      gameScene.gameOverWindow.visible = false
       gameScene.leaveGameWindow.visible = false
       gameScene.switchName.visible = false
       playerInfoPopup.visible = false
@@ -845,7 +846,7 @@ Item {
     message.receiverPlayerId = playerId
 
     message.lastPlayerUserID = depot.lastPlayerUserID
-    message.finishedPlayers = depot.finishedPlayers
+    message.finishedUserIDs = depot.finishedUserIDs
 
     console.debug("Send Message: " + JSON.stringify(message))
     multiplayer.sendMessage(messageSyncGameState, message)
@@ -978,9 +979,8 @@ Item {
   }
 
   // draw the specified amount of cards
-  function getCards(cards, userId){
-    cardsDrawn = true
-
+  function getCards(cards, userId)
+  {
     // find the playerHand of the active player and pick up cards
     for (var i = 0; i < playerHands.children.length; i++) {
       if (playerHands.children[i].player.userId === userId){
@@ -1024,7 +1024,8 @@ Item {
 
 
   // end the turn of the active player
-  function endTurn(){
+  function endTurn()
+  {
       console.debug("ENDING TURN <===")
 
       // unmark all highlighted valid card options
@@ -1040,35 +1041,34 @@ Item {
       {
           if (playerHands.children[i].player === multiplayer.activePlayer)
           {
-              if (!depot.finishedPlayers.includes(userId))
+              if (!depot.finishedUserIDs.includes(userId))
               {
                   if (playerHands.children[i].checkWin())
                   {
                       console.debug("=================================================================================> " + multiplayer.activePlayer + " HAS FINISHED!!!")
-                      depot.finishedPlayers.push(userId)
+                      depot.finishedUserIDs.push(userId)
                   }
               }
           }
       }
 
-      if (depot.finishedPlayers.length >= playerHands.children.length) { // TODO FINISH how to finish game; opting for letting all players drop their cards, even the Pleb // - 1) {
-          //        for (var j = 0; depot.finishedPlayers.length < playerHands.children.length && j < playerHands.children.length; j++) {
-          //            if (!depot.finishedPlayers.includes(playerHands.children[j].player.userId)) {
-          //                depot.finishedPlayers.push(playerHands.children[j].player.userId)
-          //            }
-          //        }
+      if (depot.finishedUserIDs.length >= playerHands.children.length)
+      {
           console.debug("ENDING GAME <=======================================================================================")
           endGame()
           multiplayer.sendMessage(messageEndGame, {userId: userId})
       }
 
       // continue if the game is still going
-      if (!gameOver){
+      if (!gameOver)
+      {
           console.debug("trigger new turn in endTurn, clockwise: " + depot.clockwise)
-          if (multiplayer.amLeader){
+          if (multiplayer.amLeader)
+          {
               console.debug("Still Leader?")
               triggerNewTurn()
-          } else {
+          } else
+          {
               // send message to leader to trigger new turn
               multiplayer.sendMessage(messageTriggerTurn, userId)
           }
@@ -1084,132 +1084,80 @@ Item {
   }
 
   // calculate the points for each player
-  function calculatePoints(userId){
-    // calculate the winner's score by adding all card values
-    var score = 0
-    for (var i = 0; i < playerHands.children.length; i++) {
-      score += playerHands.children[i].points()
-    }
-    if (multiplayer.singlePlayer){
-      score = Math.round(score/3)
-    }
+  function calculateScores()
+  {
+      // Store the winnerPlayer
+      console.assert(depot.finishedUserIDs.length > 0)
 
-    // set the name of the winner
-    if (userId == undefined) {
-      // calculate the ranking of the other three players
-      var tmpPlayers = [playerHands.children[0], playerHands.children[1], playerHands.children[2], playerHands.children[3]]
-      var points = [score, 15, 10, 5]
-      tmpPlayers.sort(function(a, b) {
-        return a.hand.length - b.hand.length
-      })
+      for (var i = 0; i < depot.finishedUserIDs.length; i++)
+      {
+          var playerHand = getHand(depot.finishedUserIDs[i])
+          console.assert(playerHand)
 
-      var winnerHand = getHand(tmpPlayers[0].player.userId)
-      if (winnerHand) gameScene.gameOver.winner = winnerHand.player
+          // President = +2 ... Pleb = -2, Vice = +-1
+          var vScores = [2, 1, -1, -2]
+          playerHand.score = vScores[i]
+          playerHand.scoreAllGames+= vScores[i]
 
-      for (var i = 0; i < tmpPlayers.length; i++){
-        // get player by userId
-        var tmpPlayer = getHand(tmpPlayers[i].player.userId)
-        if (tmpPlayer) tmpPlayer.score = points[i]
-
-        // check if two players had the same amount of cards
-        if (i > 0){
-          var prevPlayer = getHand(tmpPlayers[i-1].player.userId)
-          if (prevPlayer && prevPlayer.hand.length == tmpPlayer.hand.length){
-            tmpPlayer.score = prevPlayer.score
-          }
-        }
+          // Store the overall winner - president
+          if (i === 0)
+              gameScene.gameOverWindow.winnerPlayer = playerHand.player
       }
-    } else {
-      // specific calculation for the "close round" desktop option
-      // make the player who pressed the button the winner and simply order the other 3 players
-      var tmpPlayers2 = []
-      for (i = 0; i < playerHands.children.length; i++){
-        if (playerHands.children[i].player.userId != userId){
-          tmpPlayers2[tmpPlayers2.length] = playerHands.children[i]
-        }
-      }
-      var points2 = [15, 10, 5]
-      tmpPlayers2.sort(function(a, b) {
-        return a.hand.length - b.hand.length
-      })
-
-      var winnerHand2 = getHand(userId)
-      if (winnerHand2) gameScene.gameOver.winner = winnerHand2.player
-      var winner = getHand(userId)
-      if (winner) winner.score = score
-
-      for (var j = 0; j < tmpPlayers2.length; j++){
-        // get player by userId
-        var tmpPlayer2 = getHand(tmpPlayers2[j].player.userId)
-        if (tmpPlayer2) tmpPlayer2.score = points2[j]
-
-        // check if two players had the same amount of cards
-        if (j > 0){
-          var prevPlayer2 = getHand(tmpPlayers2[j-1].player.userId)
-          if (prevPlayer2 && prevPlayer2.hand.length == tmpPlayer2.hand.length){
-            tmpPlayer2.score = prevPlayer2.score
-          }
-        }
-      }
-    }
   }
 
   // end the game and report the scores
-  /*
-    This is called by both the leader and the clients.
-    Each user calculates and displays the points of all players. The local user reports his score and updates his level.
-    If it differs from the previous level, the local user levelled up. In this case we display a message with the new level on the game over window.
-    If he doesn't have a nickname, we ask him to chose one. Then we reset all timers and values.
-    */
-  function endGame(userId){
-      console.debug("ENDGAME called: " + userId)
-    // calculate the points of each player and set the name of the winner
-    calculatePoints(userId)
+  //    This is called by both the leader and the clients.
+  //    Each user calculates and displays the points of all players. The local user reports his score and updates his level.
+  //    If it differs from the previous level, the local user levelled up. In this case we display a message with the new level on the game over window.
+  //    If he doesn't have a nickname, we ask him to chose one. Then we reset all timers and values.
+  function endGame(userId)
+  {
+      console.debug("ENDGAME called by user: " + userId)
 
-    // show the gameOver message with the winner and score
-    gameScene.gameOver.visible = true
+      // calculate the points of each player and set the name of the winner
+      calculateScores()
 
-    // add points to MultiplayerUser score of the winner
-    var currentHand = getHand(multiplayer.localPlayer.userId)
-    if (currentHand) gameNetwork.reportRelativeScore(currentHand.score)
+      // show the gameOver message with the winner and score
+      gameScene.gameOverWindow.visible = true
 
-    var currentTag
-    for (var i = 0; i < playerTags.children.length; i++){
-      if (playerTags.children[i].player.userId == multiplayer.localPlayer.userId){
-        currentTag = playerTags.children[i]
+      // add points to MultiplayerUser score of the winner
+      var currentHand = getHand(multiplayer.localPlayer.userId)
+      if (currentHand)
+          gameNetwork.reportRelativeScore(currentHand.score)
+
+      var currentTag
+      for (var i = 0; i < playerTags.children.length; i++){
+          if (playerTags.children[i].player.userId == multiplayer.localPlayer.userId){
+              currentTag = playerTags.children[i]
+          }
       }
-    }
 
-    // calculate level with new points and check if there was a level up
-    var oldLevel = currentTag.level
-    currentTag.getPlayerData(false)
-    if (oldLevel != currentTag.level){
-      gameScene.gameOver.level = currentTag.level
-      gameScene.gameOver.levelText.visible = true
-    } else {
-      gameScene.gameOver.levelText.visible = false
-    }
+      // calculate level with new points and check if there was a level up
+      var oldLevel = currentTag.level
+      currentTag.getPlayerData(false)
+      if (oldLevel != currentTag.level){
+          gameScene.gameOverWindow.level = currentTag.level
+          gameScene.gameOverWindow.levelText.visible = true
+      } else {
+          gameScene.gameOverWindow.levelText.visible = false
+      }
 
-    // show window with text input to switch username
-    if (!multiplayer.singlePlayer && !gameNetwork.user.hasCustomNickName()) {
-      gameScene.switchName.visible = true
-    }
+      // show window with text input to switch username
+      if (!multiplayer.singlePlayer && !gameNetwork.user.hasCustomNickName()) {
+          gameScene.switchName.visible = true
+      }
 
-    // stop all timers and end the game
-    scaleHand(1.0)
-    gameOver = true
-    hintTimer.stop()
-    aiTimeOutTimer.stop()
-    timerPlayerThinking.running = false
-    depot.effectTimer.stop()
+      // stop all timers and end the game
+      scaleHand(1.0)
+      gameOver = true
+      hintTimer.stop()
+      aiTimeOutTimer.stop()
+      timerPlayerThinking.running = false
+      depot.effectTimer.stop()
 
-    multiplayer.leaderCode(function () {
-      restartGameTimer.start()
-    })
-
-//    ga.logEvent("System", "End Game", "singlePlayer", multiplayer.singlePlayer)
-//    flurry.logEvent("System.EndGame", "singlePlayer", multiplayer.singlePlayer)
-//    flurry.endTimedEvent("Game.TimeInGameSingleMatch", {"singlePlayer": multiplayer.singlePlayer})
+      multiplayer.leaderCode(function () {
+          restartGameTimer.start()
+      })
   }
 
   function startNewGame(){

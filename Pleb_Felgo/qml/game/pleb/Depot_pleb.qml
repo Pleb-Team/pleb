@@ -11,8 +11,6 @@ Item {
 
   // block the player for a short period of time when he gets skipped
   property alias effectTimer: effectTimer
-  // the current depot card effect for the next player
-//  property bool effect: false
 
   // whether the active player is skipped or not
   property bool skipped: false
@@ -21,7 +19,7 @@ Item {
   property bool clockwise: true
 
   property var lastPlayerUserID: null
-  property var finishedPlayers: []
+  property var finishedUserIDs: []
 
 
   // sound effect plays when a player gets skipped
@@ -31,12 +29,6 @@ Item {
     source: "../../../assets/snd/skip.wav"
   }
 
-//  // sound effect plays when a player gets skipped
-//  SoundEffect {
-//    volume: 0.5
-//    id: reverseSound
-//    source: "../../../assets/snd/reverse.wav"
-//  }
 
   // blocks the player for a short period of time and trigger a new turn when he gets skipped
   Timer {
@@ -182,11 +174,11 @@ Item {
       effectTimer.stop()
       lastDeposit = []
       lastPlayerUserID = null
-      finishedPlayers = []
+      finishedUserIDs = []
   }
 
   // sync the depot with the leader
-  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, clockwise, effect, drawAmount, lastPlayerUserID, finishedPlayers)
+  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, clockwise, effect, drawAmount, lastPlayerUserID, finishedUserIDs)
   {
     for (var i = 0; i < depotCardIDs.length; i++){
       depositCards([depotCardIDs[i]])
@@ -201,6 +193,6 @@ Item {
     depot.skipped = skipped
     depot.clockwise = clockwise
     depot.lastPlayerUserID = lastPlayerUserID
-    depot.finishedPlayers = finishedPlayers
+    depot.finishedUserIDs = finishedUserIDs
   }
 }

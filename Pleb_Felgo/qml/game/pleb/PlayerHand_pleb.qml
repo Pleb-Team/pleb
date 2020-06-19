@@ -13,12 +13,17 @@ Item {
 
   // amount of cards in hand in the beginning of the game
   property int numberCardsAtBeginningOfGame: 8
+
   // array with all cards in hand
   property var hand: []
+
   // the owner of the cards
   property var player: MultiplayerUser{}
+
   // the score at the end of the game
   property int score: 0
+  property int scoreAllGames: 0
+
   // value used to spread the cards in hand
   property double offset: width/10
 
@@ -272,7 +277,7 @@ Item {
                     )
                 )
               {
-                  // TODO LASTCARD || depot.finishedPlayers.includes(depot.lastPlayer)))) {
+                  // TODO LASTCARD || depot.finishedUserIDs.includes(depot.lastPlayer)))) {
                   hand[i].glowImage.visible = !hand[i].selected
               } else {
                   hand[i].glowImage.visible = false
@@ -319,24 +324,19 @@ Item {
 
 
   // check if the player has finished with zero cards left
-  function checkWin(){
-    if (hand.length == 0){
-      winSound.play()
-      return true
-    }else{
-      return false
-    }
+  function checkWin()
+  {
+      if (hand.length == 0)
+      {
+          winSound.play()
+          return true
+      }
+      else
+      {
+          return false
+      }
   }
 
-
-  // calculate all card points in hand
-  function points(){
-    var points = 0
-    for (var i = 0; i < hand.length; i++) {
-      points += hand[i].points
-    }
-    return points
-  }
 
   // animate the playerHand width and height
   Behavior on width {

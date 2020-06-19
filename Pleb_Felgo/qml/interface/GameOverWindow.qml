@@ -1,18 +1,16 @@
 import QtQuick 2.0
 import "../common"
 
-// gameOver message with winner and score
+// gameOver window with winner and score
 Item {
-  id: gameOver
+  id: gameOverWindow
   width: 400
   height: content.height + content.anchors.topMargin * 2
   z: 110
 
   property int level: 99
-  property var winner
-  property string winnerName: winner? winner.name : "Someone"
-  property int score
-
+  property var winnerPlayer
+  property string winnerName: winnerPlayer? winnerPlayer.name : "Someone"
   property alias levelText: levelText
 
   // don't send the black bg here because we want to encourage adding friends and chatting after a match
@@ -55,10 +53,10 @@ Item {
       id: scoreText
       horizontalAlignment: Text.AlignHCenter
       anchors.horizontalCenter: parent.horizontalCenter
-      text: gameOver.visible ? playerHands.children[0].player.name + ": " + getScore(0) + "<br>"
-                               + playerHands.children[1].player.name + ": " + getScore(1) + "<br>"
-                               + playerHands.children[2].player.name + ": " + getScore(2) + "<br>"
-                               + playerHands.children[3].player.name + ": " + getScore(3) : ""
+      text: gameOverWindow.visible ? playerHands.children[0].player.name + ": " + getScore(0) + "<br>"
+                                   + playerHands.children[1].player.name + ": " + getScore(1) + "<br>"
+                                   + playerHands.children[2].player.name + ": " + getScore(2) + "<br>"
+                                   + playerHands.children[3].player.name + ": " + getScore(3) : ""
       font.family: standardFont.name
       color: "black"
       font.pixelSize: 20
