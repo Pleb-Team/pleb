@@ -4,7 +4,7 @@ import io.qt.examples.backend 1.0
 Item {
     id: legacyPlebCodeBridge
 
-    property var idMap: []
+//    property var idMap: []
     property alias arschlochGameLogic: arschlochGameLogic
 
     BackEnd  {
@@ -12,7 +12,7 @@ Item {
     }
 
 
-    function getMove(userId)
+    function getMove(userId, playerIndex)
     {
         var result = []
         var userHand
@@ -23,7 +23,9 @@ Item {
 		
 		// Set players cards
         for (var nPlayer = 0; nPlayer < playerHands.children.length; nPlayer++) {
-            legacyPlayerId = retrieveLegacyPlayerId(playerHands.children[nPlayer].player.userId)
+//            legacyPlayerId = retrieveLegacyPlayerId(playerHands.children[nPlayer].player.userId)
+            legacyPlayerId = nPlayer
+
             for (var nCard = 0; nCard < playerHands.children[nPlayer].hand.length; nCard++) {
 			
 			  // PlayerID: 0...3
@@ -44,7 +46,9 @@ Item {
         // Example: Player 3 has played one card of value 8
         if (depot.lastPlayerUserID && depot.lastDeposit && depot.lastDeposit.length > 0)
         {
-            arschlochGameLogic.setLastMoveSimple(retrieveLegacyPlayerId(depot.lastPlayerUserID), depot.lastDeposit.length, depot.lastDeposit[0].points - 7)
+            var lastPlayerIndex = gameLogic.getHandIndex(depot.lastPlayerUserID)
+//            arschlochGameLogic.setLastMoveSimple(retrieveLegacyPlayerId(depot.lastPlayerUserID), depot.lastDeposit.length, depot.lastDeposit[0].points - 7)
+            arschlochGameLogic.setLastMoveSimple(lastPlayerIndex, depot.lastDeposit.length, depot.lastDeposit[0].points - 7)
         }
         else
         {
@@ -52,8 +56,8 @@ Item {
         }
 		
         // Whos turn is it? AI will compute a move for this playerS
-        // arschlochGameLogic.setActualPlayer(nActualPlayerID)
-        arschlochGameLogic.setActualPlayerID(retrieveLegacyPlayerId(userId))
+        arschlochGameLogic.setActualPlayerID(playerIndex)
+//        arschlochGameLogic.setActualPlayerID(retrieveLegacyPlayerId(userId))
 		
         // Verify correct transport of card information via console text output
         s = arschlochGameLogic.getPlayerCardsText()
@@ -62,6 +66,7 @@ Item {
 
 		// Now let the AI think
         arschlochGameLogic.think()
+        console.debug("[thinkAIWrapper] userId: " + userId + ", retrieveLegacyPlayerId: " + arschlochGameLogic.getActualPlayerID() + ", playerIndex: " + playerIndex)
         console.debug("[thinkAIWrapper] AI computed move for Player " + arschlochGameLogic.getActualPlayerID() + ": " + arschlochGameLogic.getMoveSimpleAIText())
 
         // Decode legacy card meanings (Number, Value) to Pleb coding
@@ -79,13 +84,13 @@ Item {
     // Creates a legacy player ID (0..3) from the player hashs as used by the Felgo Framework
 	// \todo make sure the legacy player IDs correspond to the order of the game! i.e. the players
 	// should play in this order 0 -> 1 -> 2 -> 3 -> 0 -> ... 
-    function retrieveLegacyPlayerId(userId) {
+//    function retrieveLegacyPlayerId(userId) {
 
-        if (!idMap.includes(userId))
-            idMap.push(userId)
+//        if (!idMap.includes(userId))
+//            idMap.push(userId)
 
-        var legacyId = idMap.indexOf(userId)
-        return legacyId
-    }
+//        var legacyId = idMap.indexOf(userId)
+//        return legacyId
+//    }
 
 }

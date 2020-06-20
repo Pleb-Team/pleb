@@ -524,16 +524,20 @@ Item {
       id: legacyBridge
   }
 
-  function playPlebCustom() {
-
+  function playPlebCustom()
+  {
       // Compute AI move and play it
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
       if (!userId)
           return
 
-      var cardIds = legacyBridge.getMove(userId)
+      var playerIndex = getHandIndex(userId)
+
+      var cardIds = legacyBridge.getMove(userId, playerIndex)
+
       // Play card animation or skip sound
-      if (cardIds.length > 0) {
+      if (cardIds.length > 0)
+      {
           multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
           depositCards(cardIds, userId)
       }
@@ -584,7 +588,8 @@ Item {
 
 
       // let the AI compute a move recommendation (it is not being played here)
-      legacyBridge.getMove(multiplayer.activePlayer.userId);
+      var playerIndex = getHandIndex(multiplayer.activePlayer.userId)
+      legacyBridge.getMove(multiplayer.activePlayer.userId, playerIndex);
       var s = legacyBridge.arschlochGameLogic.getPlayerCardsText()
 
 
@@ -930,16 +935,17 @@ Item {
 
 
   // the other players position the players at the borders of the game field
-  function syncPlayers(){
-    console.debug("syncPlayers()")
-    // it can happen that the multiplayer.players array is different than the one from the local user
-    // possible reasons are, that a player meanwhile joined the game but this did not get forwarded to the room, or not forwarded to the leader yet
+  function syncPlayers()
+  {
+      console.debug("syncPlayers()")
+      // it can happen that the multiplayer.players array is different than the one from the local user
+      // possible reasons are, that a player meanwhile joined the game but this did not get forwarded to the room, or not forwarded to the leader yet
 
-    // assign the players to the positions at the borders of the game field
-    for (var j = 0; j < multiplayer.players.length; j++) {
-      playerTags.children[j].player = multiplayer.players[j]
-      playerHands.children[j].player = multiplayer.players[j]
-    }
+      // assign the players to the positions at the borders of the game field
+      for (var j = 0; j < multiplayer.players.length; j++) {
+          playerTags.children[j].player = multiplayer.players[j]
+          playerHands.children[j].player = multiplayer.players[j]
+      }
   }
 
   // the leader creates the deck and depot
@@ -975,14 +981,16 @@ Item {
   }
 
   // reset all tags and init the tag for the local player
-  function initTags(){
-    console.debug("initTags()")
-    for (var i = 0; i < playerTags.children.length; i++){
-      playerTags.children[i].initTag()
-      if (playerHands.children[i].player && playerHands.children[i].player.userId == multiplayer.localPlayer.userId){
-        playerTags.children[i].getPlayerData(true)
+  function initTags()
+  {
+      console.debug("initTags()")
+      for (var i = 0; i < playerTags.children.length; i++)
+      {
+          playerTags.children[i].initTag()
+          if (playerHands.children[i].player && playerHands.children[i].player.userId == multiplayer.localPlayer.userId){
+              playerTags.children[i].getPlayerData(true)
+          }
       }
-    }
   }
 
   // draw the specified amount of cards
