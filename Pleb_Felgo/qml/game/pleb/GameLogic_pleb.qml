@@ -722,8 +722,8 @@ Item {
           createGame()
       }
 
-      console.debug("multiplayer.localPlayer " + multiplayer.localPlayer)
-      //console.debug("multiplayer.localPlayer.userId " + multiplayer.localPlayer.userId)
+      console.debug("multiplayer.localPlayer: " + multiplayer.localPlayer)
+      console.debug("multiplayer.localPlayer.userId: " + multiplayer.localPlayer.userId)
       console.debug("multiplayer.players.length " + multiplayer.players.length)
       for (var i = 0; i < multiplayer.players.length; i++){
           console.debug("multiplayer.players[" + i +"].userId " + multiplayer.players[i].userId)
@@ -873,54 +873,61 @@ Item {
   }
 
   // the leader initializes all players and positions them at the borders of the game
-  function initPlayers(){
-    multiplayer.leaderCode(function () {
-      console.debug("Leader Init Players")
-      var clientPlayers = multiplayer.players
-      var playerInfo = []
-      for (var i = 0; i < clientPlayers.length; i++) {
-        playerTags.children[i].player = clientPlayers[i]
-        playerHands.children[i].player = clientPlayers[i]
-        playerInfo[i] = clientPlayers[i].userId
-      }
-    })
+  function initPlayers()
+  {
+      multiplayer.leaderCode(function () {
+          console.debug("Leader Init Players")
+          var clientPlayers = multiplayer.players
+          var playerInfo = []
+          for (var i = 0; i < clientPlayers.length; i++)
+          {
+              playerTags.children[i].player = clientPlayers[i]
+              playerHands.children[i].player = clientPlayers[i]
+              playerInfo[i] = clientPlayers[i].userId
+          }
+      })
   }
 
-  // find player by userId
-  function getPlayer(userId){
-    for (var i = 0; i < multiplayer.players.length; i++){
-      console.debug("All UserIDs: " + multiplayer.players[i].userId + ", Looking for: " + userId)
-      if (multiplayer.players[i].userId == userId){
-        return multiplayer.players[i]
-      }
-    }
-    console.debug("ERROR: could not find player with id", userId, "in the multiplayer.players list!")
-    return undefined
-  }
+//  // find player by userId
+//  function getPlayer(userId){
+//    for (var i = 0; i < multiplayer.players.length; i++){
+//      console.debug("All UserIDs: " + multiplayer.players[i].userId + ", Looking for: " + userId)
+//      if (multiplayer.players[i].userId == userId){
+//        return multiplayer.players[i]
+//      }
+//    }
+//    console.debug("ERROR: could not find player with id", userId, "in the multiplayer.players list!")
+//    return undefined
+//  }
 
   // find hand by userId
   function getHand(userId)
   {
-      for (var i = 0; i < playerHands.children.length; i++){
-          if (playerHands.children[i].player.userId === userId){
-              return playerHands.children[i]
-          }
-      }
+      return playerHands.children[getHandIndex(userId)]
+  }
+
+
+  // find player hand index 0...3 by userId
+  function getHandIndex(userId)
+  {
+      for (var i = 0; i < playerHands.children.length; i++)
+          if (playerHands.children[i].player.userId === userId)
+              return i
 
       console.debug("ERROR: could not find player with id", userId, "in the multiplayer.players list!")
       return undefined
   }
 
+
   // update tag by player userId
-  function updateTag(userId, level, highscore, rank){
-    for (var i = 0; i < playerTags.children.length; i++){
-      if (playerHands.children[i].player.userId == userId){
-        playerTags.children[i].level = level
-        playerTags.children[i].highscore = highscore
-        playerTags.children[i].rank = rank
-      }
-    }
+  function updateTag(userId, level, highscore, rank)
+  {
+      var i = getHandIndex(userId)
+      playerTags.children[i].level = level
+      playerTags.children[i].highscore = highscore
+      playerTags.children[i].rank = rank
   }
+
 
   // the other players position the players at the borders of the game field
   function syncPlayers(){
@@ -1004,12 +1011,10 @@ Item {
   }
 
   // unmark all valid card options of all players
-  function unmark(){
-      for (var i = 0; i < playerHands.children.length; i++) {
+  function unmark()
+  {
+      for (var i = 0; i < playerHands.children.length; i++)
           playerHands.children[i].unmark()
-      }
-      // unmark the highlighted deck card
-//      deck.unmark()
   }
 
   // scale the playerHand of the active localPlayer
@@ -1075,7 +1080,8 @@ Item {
       }
   }
 
-  function triggerNewTurn(userId){
+  function triggerNewTurn(userId)
+  {
       if (depot.clockwise){
           multiplayer.triggerNextTurn(userId)
       } else {
@@ -1161,8 +1167,8 @@ Item {
   }
 
   function startNewGame(){
-    restartGameTimer.stop()
-    // the true causes a gameStarted to be emitted
-    gameLogic.initGame(true)
+      restartGameTimer.stop()
+      // the true causes a gameStarted to be emitted
+      gameLogic.initGame(true)
   }
 }

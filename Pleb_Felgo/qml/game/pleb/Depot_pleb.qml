@@ -138,32 +138,23 @@ Item {
 
   function skipTurn(skipMove) {
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-      if (skipMove) {
-//          effect = true
-          skip()
+      if (skipMove)
+      {
+          skipSound.play()
+          skipped = true
+
+          if (multiplayer.activePlayer && multiplayer.activePlayer.connected){
+              multiplayer.leaderCode(function() {
+                  effectTimer.start()
+              })
+          }
+
           console.debug("player " + userId + " MISSED TURN!")
-      } else {
+      } else
+      {
           skipped = false
-//          depot.drawAmount = 1
-//          multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: 1, userId: userId})
       }
   }
-
-  // skip the current player by playing a sound, setting the skipped variable and starting the skip timer
-  function skip(){
-      skipSound.play()
-//      effect = false
-      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-      multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
-      skipped = true
-
-      if (multiplayer.activePlayer && multiplayer.activePlayer.connected){
-          multiplayer.leaderCode(function() {
-              effectTimer.start()
-          })
-      }
-  }
-
 
 
   // reset the depot
@@ -182,7 +173,7 @@ Item {
   {
     for (var i = 0; i < depotCardIDs.length; i++){
       depositCards([depotCardIDs[i]])
-      deck.cardsInStack --
+      deck.numberCardsInStack --
     }
 
     depositCards(lastDepositIDs)

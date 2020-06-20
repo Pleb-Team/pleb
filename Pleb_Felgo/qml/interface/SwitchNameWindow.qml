@@ -3,7 +3,6 @@ import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import "../common"
 
-// gameOver message with winner and score
 Item {
   id: switchName
   width: 400

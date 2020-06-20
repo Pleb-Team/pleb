@@ -159,7 +159,7 @@ Item {
       var tmpCard = entityManager.getEntityById(cardIDs[i])
       hand.push(tmpCard)
       changeParent(tmpCard)
-      deck.cardsInStack --
+      deck.numberCardsInStack --
       if (multiplayer.localPlayer == player){
         tmpCard.hidden = false
       }
@@ -277,11 +277,13 @@ Item {
                     )
                 )
               {
-                  // TODO LASTCARD || depot.finishedUserIDs.includes(depot.lastPlayer)))) {
                   hand[i].glowImage.visible = !hand[i].selected
-              } else {
+              }
+              else
+              {
                   hand[i].glowImage.visible = false
               }
+
               hand[i].updateCardImage()
           }
       }
