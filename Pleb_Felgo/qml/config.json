@@ -2,7 +2,7 @@
     "title": "Pleb",
     "identifier": "de.stuggi.hackaton.pleb",
     "orientation": "landscape",
-    "versioncode": 12,
-    "versionname": "0.912",
-    "stage": "publish"
+    "versioncode": 13,
+    "versionname": "0.913",
+    "stage": "test"
 }
