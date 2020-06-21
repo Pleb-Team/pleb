@@ -302,7 +302,8 @@ Item {
 
 
       // game ends
-      else if (code == messageEndGame){
+      else if (code == messageEndGame)
+      {
         // if the message wasn't sent by the leader and
         // if it wasn't a desktop test and
         // if it wasn't sent by the active player, the message is invalid
@@ -314,8 +315,10 @@ Item {
 
         endGame(message.userId)
       }
+
       // chat message
-      else if (code == messagePrintChat){
+      else if (code == messagePrintChat)
+      {
         if (!chat.gConsole.visible){
           chat.chatButton.buttonImage.source = "../../../assets/img/Chat2.png"
         }
@@ -323,24 +326,28 @@ Item {
       }
 
       // set highscore and level from other players
-      else if (code == messageSetPlayerInfo){
-        updateTag(message.userId, message.level, message.highscore, message.rank)
-      }      
+      else if (code == messageSetPlayerInfo)
+      {
+          updateTag(message.userId, message.level, message.highscore, message.rank)
+      }
 
       // let the leader trigger a new turn
-      else if (code == messageTriggerTurn){
-        multiplayer.leaderCode(function() {
-          // the leader only stops the turn early if the requesting user is still the active player
-          if (multiplayer.activePlayer && multiplayer.activePlayer.userId == message){
-            triggerNewTurn()
-          }
-          // if the requesting user is no longer active, it means that he timed out according to the leader
-          // his last action happened after his turn and is therefore invalid
-          // the leader has to send the user a new game state
-          else {
-            sendGameStateToPlayer(message)
-          }
-        })
+      else if (code == messageTriggerTurn)
+      {
+          multiplayer.leaderCode(function()
+          {
+              // the leader only triggers the turn if the requesting user is still the active player
+              if (multiplayer.activePlayer && multiplayer.activePlayer.userId == message){
+                  triggerNewTurn()
+              }
+
+              // if the requesting user is no longer active, it means that he timed out according to the leader
+              // his last action happened after his turn and is therefore invalid
+              // the leader has to send the user a new game state
+              else {
+                  sendGameStateToPlayer(message)
+              }
+          })
       }
 
       // reset player tag info and send it to other player because it was requested
@@ -590,8 +597,6 @@ Item {
       // let the AI compute a move recommendation (it is not being played here)
       var playerIndex = getHandIndex(multiplayer.activePlayer.userId)
       legacyBridge.getMove(multiplayer.activePlayer.userId, playerIndex);
-      var s = legacyBridge.arschlochGameLogic.getPlayerCardsText()
-
 
       // the player didn't act yet
       acted = false
@@ -748,6 +753,7 @@ Item {
       playerInfoPopup.visible = false
       chat.reset()
       depot.reset()
+      legacyBridge.reset()
 
       // initialize the players, the deck and the individual hands
       initPlayers()
@@ -1078,7 +1084,6 @@ Item {
           console.debug("trigger new turn in endTurn, clockwise: " + depot.clockwise)
           if (multiplayer.amLeader)
           {
-              console.debug("Still Leader?")
               triggerNewTurn()
           } else
           {

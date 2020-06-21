@@ -11,6 +11,11 @@ Item {
         id: arschlochGameLogic
     }
 
+    function reset()
+    {
+        arschlochGameLogic.resetGameState()
+    }
+
 
     function getMove(userId, playerIndex)
     {
@@ -26,21 +31,21 @@ Item {
 //            legacyPlayerId = retrieveLegacyPlayerId(playerHands.children[nPlayer].player.userId)
             legacyPlayerId = nPlayer
 
-            for (var nCard = 0; nCard < playerHands.children[nPlayer].hand.length; nCard++) {
-			
+            for (var nCard = 0; nCard < playerHands.children[nPlayer].hand.length; nCard++)
+            {
 			  // PlayerID: 0...3
               // nNumberCards: Anzahl (0...3 Anzahl der Karten) sollte erstmal 1 sein
               // Wert (0...7 entspricht 7...As) der Zug Empfehlung
               // arschlochGameLogic.addPlayerCards(nPlayerID, nNumberCards,  nValueCards);
               arschlochGameLogic.addPlayerCards(legacyPlayerId, 1, playerHands.children[nPlayer].hand[nCard].points - 7)
             }
-			
-			// \todo Joachim: What's this for?
-            if (playerHands.children[nPlayer].player.userId === userId) {
-                userHand = playerHands.children[nPlayer].hand
-            }
         }
-		
+
+        userHand = getHand(userId).hand
+        console.debug("[thinkAIWrapper] SpielZustand Nix: " + arschlochGameLogic.getConstant_Jojo_SpielZustandNix())
+        console.debug("[thinkAIWrapper] SpielZustand Tauschen: " + arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
+        console.debug("[thinkAIWrapper] SpielZustand Spielen: " + arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+
         // Last player move, i.e. what do we see in the middle of the table right now?
         // arschlochGameLogic.setLastMoveSimple(int nLastPlayerID, nNumberCards,  nValueCards);
         // Example: Player 3 has played one card of value 8

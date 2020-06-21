@@ -29,8 +29,9 @@ class BackEnd : public QObject
 
     Q_PROPERTY(int actualPlayerID READ getActualPlayerID WRITE setActualPlayerID NOTIFY actualPlayerIDChanged)
     Q_PROPERTY(int lastPlayerID READ getLastPlayerID WRITE setLastPlayerID NOTIFY lastPlayerIDChanged)
-//    Q_PROPERTY(int numberPlayersMax READ getNumberPlayersMax)
     Q_PROPERTY(int numberPlayersInGame READ getNumberPlayersInGame)
+    Q_PROPERTY(int State READ getState WRITE setState)
+
 
     Q_PROPERTY(QString playerCardsText READ getPlayerCardsText NOTIFY playerCardsTextChanged)
     Q_PROPERTY(QString lastMoveSimpleText READ getLastMoveSimpleText NOTIFY lastMoveSimpleTextChanged)
@@ -45,6 +46,12 @@ private:
 
 public:
     explicit BackEnd(QObject *parent = nullptr);
+
+    // Wrap some constants to the outside world. There is a more generic way using Q_ENUM or Q_ENUM_NS, which would however require
+    // to change the original c++ sources. For this small amount of wrapped constants, below is the easier and faster way.
+    Q_INVOKABLE int getConstant_Jojo_SpielZustandNix() { return Jojo_Zustand_Nix; }
+    Q_INVOKABLE int getConstant_Jojo_SpielZustandKartenTauschen() { return Jojo_SpielZustandKartenTauschen; }
+    Q_INVOKABLE int getConstant_Jojo_SpielZustandSpielen() { return Jojo_SpielZustandSpielen; }
 
 
     // Manipulate internal MoveSimple just as GUI helper
@@ -90,6 +97,12 @@ public:
     Q_INVOKABLE void setLastMoveSimple(int nLastPlayerID, int nNumberCards, int nValueCards) {
         m_GameState.m_nLastPlayer = nLastPlayerID;
         m_GameState.m_LastMoveSimple = TMoveSimple(nNumberCards, nValueCards); }
+
+    // Access to the current Player, i.e. the one who is next to play
+    // \todo Integrate as a parameter into the rountine think()
+    Q_INVOKABLE int getState() { return m_GameState.m_nZustand; }
+    Q_INVOKABLE void setState(int n) { m_GameState.m_nZustand = (Jojo_Zustand) n; }
+
 
     // Access to the current Player, i.e. the one who is next to play
     // \todo Integrate as a parameter into the rountine think()
