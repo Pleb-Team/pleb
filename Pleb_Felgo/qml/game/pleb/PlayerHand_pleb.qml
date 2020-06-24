@@ -185,6 +185,24 @@ Item {
     return false
   }
 
+
+  function findCards(nNumber, nPoints)
+  {
+      var result = []
+
+      // Find the cards in the player's hand.
+      for (var k = 0; (result.length < nNumber) && (k < hand.length); k++)
+          if (hand[k].points === nPoints)
+              result.push(hand[k].entityId)
+
+      // Make sure we found all needed cards
+      console.assert(result.length === nNumber, "findCards() failed, cards not found! nNumber, nPoints: " + nNumber + ", " + nPoints)
+      if (result.length !== nNumber)
+          result = [
+                  ]
+      return result
+  }
+
   // counts how many cards with the supplied points are in hand
   function countCards(points) {
       var result = 0

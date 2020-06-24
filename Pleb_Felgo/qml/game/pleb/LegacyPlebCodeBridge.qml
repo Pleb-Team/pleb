@@ -5,97 +5,71 @@ Item {
     id: legacyPlebCodeBridge
 
 //    property var idMap: []
-    property alias arschlochGameLogic: arschlochGameLogic
+//    property alias arschlochGameLogicLocal: arschlochGameLogicLocal
 
+    // A local Backend thats used only for computing the AI move. Note that this one is regularly reset in order to update the cards
+    // from the QML logic, whereas the "global" arschlochGameLogicLocal acts like a continuous state throughout all the game
     BackEnd  {
-        id: arschlochGameLogic
-    }
-
-    function reset()
-    {
-        arschlochGameLogic.resetGameState()
+        id: arschlochGameLogicLocal
     }
 
 
-    function getMove(userId, playerIndex)
+    // Important: Completele resets arschlochGameLogicLocal!
+    function syncStateQML2Legacy(nActualPlayerLegacy)
     {
-        var result = []
-        var userHand
-        var legacyPlayerId
-        var s = ""
-		
-        arschlochGameLogic.resetGameState()
-		
-		// Set players cards
+        arschlochGameLogicLocal.resetGameState()
+
+        // Set players cards
         for (var nPlayer = 0; nPlayer < playerHands.children.length; nPlayer++) {
-//            legacyPlayerId = retrieveLegacyPlayerId(playerHands.children[nPlayer].player.userId)
-            legacyPlayerId = nPlayer
 
             for (var nCard = 0; nCard < playerHands.children[nPlayer].hand.length; nCard++)
             {
-			  // PlayerID: 0...3
+              // PlayerID: 0...3
               // nNumberCards: Anzahl (0...3 Anzahl der Karten) sollte erstmal 1 sein
               // Wert (0...7 entspricht 7...As) der Zug Empfehlung
-              // arschlochGameLogic.addPlayerCards(nPlayerID, nNumberCards,  nValueCards);
-              arschlochGameLogic.addPlayerCards(legacyPlayerId, 1, playerHands.children[nPlayer].hand[nCard].points - 7)
+              // arschlochGameLogicLocal.addPlayerCards(nPlayerID, nNumberCards,  nValueCards);
+              arschlochGameLogicLocal.addPlayerCards(nPlayer, 1, playerHands.children[nPlayer].hand[nCard].points - 7)
             }
         }
 
-        userHand = getHand(userId).hand
-        console.debug("[thinkAIWrapper] SpielZustand Nix: " + arschlochGameLogic.getConstant_Jojo_SpielZustandNix())
-        console.debug("[thinkAIWrapper] SpielZustand Tauschen: " + arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
-        console.debug("[thinkAIWrapper] SpielZustand Spielen: " + arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
-
         // Last player move, i.e. what do we see in the middle of the table right now?
-        // arschlochGameLogic.setLastMoveSimple(int nLastPlayerID, nNumberCards,  nValueCards);
+        // arschlochGameLogicLocal.setLastMoveSimple(int nLastPlayerID, nNumberCards,  nValueCards);
         // Example: Player 3 has played one card of value 8
         if (depot.lastPlayerUserID && depot.lastDeposit && depot.lastDeposit.length > 0)
         {
             var lastPlayerIndex = gameLogic.getHandIndex(depot.lastPlayerUserID)
-//            arschlochGameLogic.setLastMoveSimple(retrieveLegacyPlayerId(depot.lastPlayerUserID), depot.lastDeposit.length, depot.lastDeposit[0].points - 7)
-            arschlochGameLogic.setLastMoveSimple(lastPlayerIndex, depot.lastDeposit.length, depot.lastDeposit[0].points - 7)
+            arschlochGameLogicLocal.setLastMoveSimple(lastPlayerIndex, depot.lastDeposit.length, depot.lastDeposit[0].points - 7)
         }
         else
         {
             // do nothing: last Move is empty, i.e. this player can play freely
         }
-		
+
         // Whos turn is it? AI will compute a move for this playerS
-        arschlochGameLogic.setActualPlayerID(playerIndex)
-//        arschlochGameLogic.setActualPlayerID(retrieveLegacyPlayerId(userId))
-		
+        arschlochGameLogicLocal.setActualPlayerID(nActualPlayerLegacy)
+
         // Verify correct transport of card information via console text output
-        s = arschlochGameLogic.getPlayerCardsText()
+        var s = arschlochGameLogicLocal.getPlayerCardsText()
         console.debug("[thinkAIWrapper] GameState: \n" +  s)
-
-
-		// Now let the AI think
-        arschlochGameLogic.think()
-        console.debug("[thinkAIWrapper] userId: " + userId + ", retrieveLegacyPlayerId: " + arschlochGameLogic.getActualPlayerID() + ", playerIndex: " + playerIndex)
-        console.debug("[thinkAIWrapper] AI computed move for Player " + arschlochGameLogic.getActualPlayerID() + ": " + arschlochGameLogic.getMoveSimpleAIText())
-
-        // Decode legacy card meanings (Number, Value) to Pleb coding
-        var movePoints = arschlochGameLogic.getMoveSimpleAIValue() + 7
-        var groupSize = arschlochGameLogic.getMoveSimpleAINumber()
-        for (var k = 0; (result.length < groupSize) && (k < userHand.length); k++) {
-            if (userHand[k].points === movePoints) {
-                result.push(userHand[k].entityId)
-            }
-        }
-		
-        return result
     }
 
-    // Creates a legacy player ID (0..3) from the player hashs as used by the Felgo Framework
-	// \todo make sure the legacy player IDs correspond to the order of the game! i.e. the players
-	// should play in this order 0 -> 1 -> 2 -> 3 -> 0 -> ... 
-//    function retrieveLegacyPlayerId(userId) {
 
-//        if (!idMap.includes(userId))
-//            idMap.push(userId)
+    function calcMove(userId, nActualPlayerLegacy)
+    {
+        var playerHand = getHand(userId)
 
-//        var legacyId = idMap.indexOf(userId)
-//        return legacyId
-//    }
+        syncStateQML2Legacy(nActualPlayerLegacy)
 
+		// Now let the AI think
+        arschlochGameLogicLocal.think()
+        console.debug("[thinkAIWrapper] userId: " + userId + ", retrieveLegacyPlayerId: " + arschlochGameLogicLocal.getActualPlayerID() + ", nActualPlayerLegacy: " + nActualPlayerLegacy)
+        console.debug("[thinkAIWrapper] AI computed move for Player " + arschlochGameLogicLocal.getActualPlayerID() + ": " + arschlochGameLogicLocal.getMoveSimpleAIText())
+
+        // Decode legacy card meanings (Number, Value) to Pleb coding
+        var nValueCardsLegacy = arschlochGameLogicLocal.getMoveSimpleAIValue()
+        var nNumberCardsLegacy = arschlochGameLogicLocal.getMoveSimpleAINumber()
+
+        // Note: Card_7 in legacy has value = 0, but points = 7 in QML
+        return playerHand.findCards(nNumberCardsLegacy, nValueCardsLegacy + 7)
+    }
 }

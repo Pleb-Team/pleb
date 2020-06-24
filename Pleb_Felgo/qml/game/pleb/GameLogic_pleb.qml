@@ -1,5 +1,7 @@
 import QtQuick 2.12
 import Felgo 3.0
+import "../../common"
+import io.qt.examples.backend 1.0
 
 Item {
   id: gameLogicPleb
@@ -43,6 +45,17 @@ Item {
 
   // gets set to true when a message is received before the game state got synced. in that case, request a new game state
   property bool receivedMessageBeforeGameStateInSync: false
+
+
+  LegacyPlebCodeBridge {
+      id: legacyPlebCodeBridge
+  }
+
+  BackEnd  {
+      id: arschlochGameLogic
+  }
+
+
 
   // bling sound effect when selecting a color for wild or wild4 cards
   SoundEffect {
@@ -495,15 +508,20 @@ Item {
 
       // scale down the active localPlayer playerHand
       scaleHand(1.0)
-      for (var i = 0; i < playerHands.children.length; i++) {
+      for (var i = 0; i < playerHands.children.length; i++)
+      {
           activeHand = playerHands.children[i]
 
           // find the playerHand for the active player
           // if the selected card is in the playerHand of the active player
-          if (activeHand.inHand(cardIds[0])){
+          if (activeHand.inHand(cardIds[0]))
+          {
               for (var l = 0; l < cardIds.length; l++) {
                   activeHand.removeFromHand(cardIds[l])
               }
+
+              // Joachim: We know which player has played the card, why this ugly lookup again? Replace above LOC by getHand()
+              console.assert(getHand(userId) === activeHand)
 
               // deposit the cards
               depot.depositCards(cardIds)
@@ -527,10 +545,6 @@ Item {
   }
 
 
-  LegacyPlebCodeBridge {
-      id: legacyBridge
-  }
-
   function playPlebCustom()
   {
       // Compute AI move and play it
@@ -538,9 +552,9 @@ Item {
       if (!userId)
           return
 
-      var playerIndex = getHandIndex(userId)
+      var nActualPlayerLegacy = getHandIndex(userId)
 
-      var cardIds = legacyBridge.getMove(userId, playerIndex)
+      var cardIds = legacyPlebCodeBridge.calcMove(userId, nActualPlayerLegacy)
 
       // Play card animation or skip sound
       if (cardIds.length > 0)
@@ -559,8 +573,8 @@ Item {
 
 
   // start the turn for the active player
-  function turnStarted(playerId) {
-
+  function turnStarted(playerId)
+  {
       console.debug("#######################################################################################################################################")
       console.debug("turnStarted() called")
 
@@ -568,6 +582,9 @@ Item {
           console.debug("ERROR: activePlayer not valid in turnStarted!")
           return
       }
+
+      var nPlayerIndexLegacy = getHandIndex(multiplayer.activePlayer.userId)
+
 
       console.debug("playerId: " + playerId + ", multiplayer.activePlayer.userId: " + multiplayer.activePlayer.userId)
       console.debug("Last deposit: " + depot.lastDeposit + " by player " + depot.lastPlayerUserID)
@@ -593,28 +610,28 @@ Item {
       elapsedHintTime = 0;
       hintTimer.start();
 
-
-      // let the AI compute a move recommendation (it is not being played here)
-      var playerIndex = getHandIndex(multiplayer.activePlayer.userId)
-      legacyBridge.getMove(multiplayer.activePlayer.userId, playerIndex);
-
       // the player didn't act yet
       acted = false
       unmark()
       scaleHand(1.0)
 
       // All player except 1 have already finished
-      if (depot.finishedUserIDs.length === playerHands.children.length - 1)
+//      if (depot.finishedUserIDs.length === playerHands.children.length - 1)
+      if (arschlochGameLogic.getNumberPlayers() <= 1)
       {
+          // Make sure that only the remaining player indeed is called to move
+//          console.assert(legacyPlebCodeBridge.arschlochGameLogic.getPlayerGameResult(nPlayerIndex) == constants.nGameResultUndefined)
+
           plebFinish(getHand(multiplayer.activePlayer.userId))
           endTurn()
       }
 
       // This player has already finished (but is still called?)
-      if (depot.finishedUserIDs.includes(multiplayer.activePlayer.userId))
+      if (arschlochGameLogic.getPlayerGameResult(nPlayerIndexLegacy) !== Constants.nGameResultUndefined)
       {
           endTurn()
       }
+
       else
       {
           var canPlay = hasValidCards(multiplayer.activePlayer)
@@ -740,8 +757,6 @@ Item {
       }
       console.debug("multiplayer.myTurn " + multiplayer.myTurn)
 
-      var lastGameOutcome = depot.finishedUserIDs
-
       // reset all values at the start of the game
       gameOver = false
       timerPlayerThinking.start()
@@ -753,7 +768,7 @@ Item {
       playerInfoPopup.visible = false
       chat.reset()
       depot.reset()
-      legacyBridge.reset()
+      arschlochGameLogic.resetGameState()
 
       // initialize the players, the deck and the individual hands
       initPlayers()
@@ -784,11 +799,11 @@ Item {
 
           // only the leader needs to call this
           // lets always the leader take the first turn on the first game
-          if (lastGameOutcome.length < 1) {
+//          if (depot.finishedUserIDs.length < 1) {
               gameLogic.triggerNewTurn(multiplayer.leaderPlayer.userId)
-          } else {
-              gameLogic.triggerNewTurn(lastGameOutcome[lastGameOutcome.length - 1])
-          }
+//          } else {
+//              gameLogic.triggerNewTurn(depot.finishedUserIDs[depot.finishedUserIDs.length - 1])
+//          }
       })
 
       // start by scaling the playerHand of the active localPlayer
@@ -857,7 +872,7 @@ Item {
     message.receiverPlayerId = playerId
 
     message.lastPlayerUserID = depot.lastPlayerUserID
-    message.finishedUserIDs = depot.finishedUserIDs
+    message.finishedUserIDs = undefined // depot.finishedUserIDs
 
     console.debug("Send Message: " + JSON.stringify(message))
     multiplayer.sendMessage(messageSyncGameState, message)
@@ -1054,29 +1069,41 @@ Item {
       scaleHand(1.0)
 
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+      var nActualPlayerLegacy = getHandIndex(userId)
+      var playerHand = getHand(userId)
 
       // check if the active player has just won the game and end it in that case
-      for (var i = 0; i < playerHands.children.length; i++)
-      {
-          if (playerHands.children[i].player === multiplayer.activePlayer)
-          {
-              if (!depot.finishedUserIDs.includes(userId))
+//      for (var i = 0; i < playerHands.children.length; i++)
+//      {
+//          if (playerHands.children[i].player === multiplayer.activePlayer)
+//          {
+      //              if (!depot.finishedUserIDs.includes(userId))
+//      todo hie rarbeiten, die ug abfrage ist immer true
+              if (arschlochGameLogic.getPlayerGameResult(nActualPlayerLegacy) === Constants.nGameResultUndefined)
               {
-                  if (playerHands.children[i].checkWin())
+                  if (playerHand.checkWin())
                   {
                       console.debug("=================================================================================> " + multiplayer.activePlayer + " HAS FINISHED!!!")
-                      depot.finishedUserIDs.push(userId)
+
+                      // Spielergebnis: 3 = Präsi, 0 = Arschloch
+                      var nNumberPlayers = arschlochGameLogic.getNumberPlayers()
+                      arschlochGameLogic.setPlayerGameResult(nActualPlayerLegacy, nNumberPlayers)
+                      arschlochGameLogic.setNumberPlayers(nNumberPlayers - 1)
+//                      depot.finishedUserIDs.push(userId)
                   }
               }
-          }
-      }
+//          }
+//      }
 
-      if (depot.finishedUserIDs.length >= playerHands.children.length)
+      // Everybody has finished
+//      if (depot.finishedUserIDs.length >= playerHands.children.length)
+      if (arschlochGameLogic.getNumberPlayers() == 0)
       {
           console.debug("ENDING GAME <=======================================================================================")
           endGame()
           multiplayer.sendMessage(messageEndGame, {userId: userId})
       }
+
 
       // continue if the game is still going
       if (!gameOver)
@@ -1106,17 +1133,20 @@ Item {
   function calculateScores()
   {
       // Store the winnerPlayer
-      console.assert(depot.finishedUserIDs.length > 0)
+//      console.assert(depot.finishedUserIDs.length > 0)
 
-      for (var i = 0; i < depot.finishedUserIDs.length; i++)
+      for (var i = 0; i < arschlochGameLogic.getNumberPlayersMax(); i++)
       {
-          var playerHand = getHand(depot.finishedUserIDs[i])
-          console.assert(playerHand)
+//          var playerHand = getHand(depot.finishedUserIDs[i])
+          var playerHand = playerHands.children[i]
+//          console.assert(playerHand)
 
           // President = +2 ... Pleb = -2, Vice = +-1
-          var vScores = [2, 1, -1, -2]
-          playerHand.score = vScores[i]
-          playerHand.scoreAllGames+= vScores[i]
+//          var vScores = [2, 1, -1, -2]
+//          playerHand.score = vScores[i]
+//          playerHand.scoreAllGames+= vScores[i]
+          playerHand.score = arschlochGameLogic.getPlayerGameResult(i)
+          playerHand.scoreAllGames+= playerHand.score
 
           // Store the overall winner - president
           if (i === 0)

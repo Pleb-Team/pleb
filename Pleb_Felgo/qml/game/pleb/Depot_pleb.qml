@@ -19,7 +19,7 @@ Item {
   property bool clockwise: true
 
   property var lastPlayerUserID: null
-  property var finishedUserIDs: []
+//  property var finishedUserIDs: []
 
 
   // sound effect plays when a player gets skipped
@@ -165,7 +165,7 @@ Item {
       effectTimer.stop()
       lastDeposit = []
       lastPlayerUserID = null
-      finishedUserIDs = []
+//      finishedUserIDs = []
   }
 
   // sync the depot with the leader
@@ -184,6 +184,6 @@ Item {
     depot.skipped = skipped
     depot.clockwise = clockwise
     depot.lastPlayerUserID = lastPlayerUserID
-    depot.finishedUserIDs = finishedUserIDs
+//    depot.finishedUserIDs = finishedUserIDs
   }
 }

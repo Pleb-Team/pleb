@@ -29,7 +29,7 @@ class BackEnd : public QObject
 
     Q_PROPERTY(int actualPlayerID READ getActualPlayerID WRITE setActualPlayerID NOTIFY actualPlayerIDChanged)
     Q_PROPERTY(int lastPlayerID READ getLastPlayerID WRITE setLastPlayerID NOTIFY lastPlayerIDChanged)
-    Q_PROPERTY(int numberPlayersInGame READ getNumberPlayersInGame)
+    Q_PROPERTY(int numberPlayersInGame READ getNumberPlayers)
     Q_PROPERTY(int State READ getState WRITE setState)
 
 
@@ -60,9 +60,6 @@ public:
     Q_INVOKABLE void setMoveSimpleValue(const int MoveSimpleValue);
     Q_INVOKABLE int getMoveSimpleNumber() { return m_MoveSimple.NumberCards; }
     Q_INVOKABLE void setMoveSimpleNumber(const int MoveSimpleNumber);
-
-    // How many players still have > 0 cards
-    Q_INVOKABLE int getNumberPlayersInGame() { return m_GameState.GetNumberPlayers(); }
 
     // Maximum number of players possible, e.g. at beginning of game
     Q_INVOKABLE int getNumberPlayersMax() { return NUMBER_PLAYER; }
@@ -120,6 +117,15 @@ public:
     Q_INVOKABLE int getMoveSimpleAIValue() { return m_MoveSimpleAI.ValueCards; }
     Q_INVOKABLE int getMoveSimpleAINumber() { return m_MoveSimpleAI.NumberCards; }
     Q_INVOKABLE QString getMoveSimpleAIText() { return QString::fromStdString(m_MoveSimpleAI.GetText()); }
+
+    // Access the C++ state variables . Note, this is NOT their intended use, as they should be manipulated within the C++
+    // GameLogic ONLY. however, during the transition phase vom QML GameLogic towards full C++ GameLogic, we go step by step
+    // by first using the c++ state variables at least, and later using c++ logic to manipulate them
+    Q_INVOKABLE void setPlayerGameResult(int nActualPlayer, float fResult) { m_GameState.m_GameResult.Value[nActualPlayer] = fResult; }
+    Q_INVOKABLE float getPlayerGameResult(int nActualPlayer) { return m_GameState.m_GameResult.Value[nActualPlayer]; }
+
+    Q_INVOKABLE void setNumberPlayers(int n) { m_GameState.SetNumberPlayers(n); }
+    Q_INVOKABLE int getNumberPlayers() { return m_GameState.GetNumberPlayers(); }
 
 
 

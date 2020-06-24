@@ -12,6 +12,7 @@ BackEnd::BackEnd(QObject *parent) :
     int nActualPlayer = 0;
     CMove Move;
 
+    // Direkt loslegen
     m_GameState.m_nActualPlayer = 0;
     m_GameState.m_nLastPlayer = 0;
     m_GameState.m_nZustand = Jojo_SpielZustandSpielen;
