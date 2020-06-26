@@ -159,7 +159,7 @@ Item {
       var tmpCard = entityManager.getEntityById(cardIDs[i])
       hand.push(tmpCard)
       changeParent(tmpCard)
-      deck.cardsInStack --
+      deck.numberCardsInStack --
       if (multiplayer.localPlayer == player){
         tmpCard.hidden = false
       }
@@ -183,6 +183,24 @@ Item {
       }
     }
     return false
+  }
+
+
+  function findCards(nNumber, nPoints)
+  {
+      var result = []
+
+      // Find the cards in the player's hand.
+      for (var k = 0; (result.length < nNumber) && (k < hand.length); k++)
+          if (hand[k].points === nPoints)
+              result.push(hand[k].entityId)
+
+      // Make sure we found all needed cards
+      console.assert(result.length === nNumber, "findCards() failed, cards not found! nNumber, nPoints: " + nNumber + ", " + nPoints)
+      if (result.length !== nNumber)
+          result = [
+                  ]
+      return result
   }
 
   // counts how many cards with the supplied points are in hand
@@ -277,11 +295,13 @@ Item {
                     )
                 )
               {
-                  // TODO LASTCARD || depot.finishedUserIDs.includes(depot.lastPlayer)))) {
                   hand[i].glowImage.visible = !hand[i].selected
-              } else {
+              }
+              else
+              {
                   hand[i].glowImage.visible = false
               }
+
               hand[i].updateCardImage()
           }
       }

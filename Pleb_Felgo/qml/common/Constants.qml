@@ -20,4 +20,7 @@ Item {
     readonly property bool bShowBetaFeatures: false
     readonly property int nBorderWidth: 1
     readonly property string sBorderColor: "#28a3c1"
+
+    // From C++ GameLogic GlobalConstants.h
+    readonly property int nGameResultUndefined: -42
 }

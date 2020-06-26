@@ -86,10 +86,13 @@ public:
 	inline int IsMoveLegal( const TMoveSimple & MoveSimple ) const;
 
 	/// \return true if some opponent != Player is able to play higher than Move
-	inline bool HigherCardsInGame( int Player, const TMoveSimple & Move) ;
+    inline bool HigherCardsInGame( int Player, const TMoveSimple & Move);
 
 	/// \return Total number of players who are still holding cards
     inline int GetNumberPlayers() const { return m_nNumberPlayers; }
+
+    /// \todo Nur für Testzwecke, m_nNumberPlayers sollte ausschließlich über PlayCards() manipuliert werden
+    inline void SetNumberPlayers(int n) { m_nNumberPlayers = n; }
 
     /// Returns a textual description of the game state for debugging
     inline std::string GetDescription();

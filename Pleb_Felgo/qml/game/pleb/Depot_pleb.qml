@@ -16,10 +16,10 @@ Item {
   property bool skipped: false
 
   // the current turn direction
-  property bool clockwise: true
+//  property bool clockwise: true
 
   property var lastPlayerUserID: null
-  property var finishedUserIDs: []
+//  property var finishedUserIDs: []
 
 
   // sound effect plays when a player gets skipped
@@ -40,8 +40,8 @@ Item {
       skipped = false
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
       multiplayer.sendMessage(gameLogic.messageSetSkipped, {skipped: false, userId: userId})
-      console.debug("<<<< Trigger new turn after effect, clockwise: " + clockwise)
-      gameLogic.triggerNewTurn()
+      console.debug("<<<< Trigger new turn after effect")
+      multiplayer.triggerNextTurn()
     }
   }
 
@@ -138,51 +138,41 @@ Item {
 
   function skipTurn(skipMove) {
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-      if (skipMove) {
-//          effect = true
-          skip()
+      if (skipMove)
+      {
+          skipSound.play()
+          skipped = true
+
+          if (multiplayer.activePlayer && multiplayer.activePlayer.connected){
+              multiplayer.leaderCode(function() {
+                  effectTimer.start()
+              })
+          }
+
           console.debug("player " + userId + " MISSED TURN!")
-      } else {
+      } else
+      {
           skipped = false
-//          depot.drawAmount = 1
-//          multiplayer.sendMessage(gameLogic.messageSetDrawAmount, {amount: 1, userId: userId})
       }
   }
-
-  // skip the current player by playing a sound, setting the skipped variable and starting the skip timer
-  function skip(){
-      skipSound.play()
-//      effect = false
-      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-      multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
-      skipped = true
-
-      if (multiplayer.activePlayer && multiplayer.activePlayer.connected){
-          multiplayer.leaderCode(function() {
-              effectTimer.start()
-          })
-      }
-  }
-
 
 
   // reset the depot
   function reset()
   {
       skipped = false
-      clockwise = true
       effectTimer.stop()
       lastDeposit = []
       lastPlayerUserID = null
-      finishedUserIDs = []
+//      finishedUserIDs = []
   }
 
   // sync the depot with the leader
-  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, clockwise, effect, drawAmount, lastPlayerUserID, finishedUserIDs)
+  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, effect, drawAmount, lastPlayerUserID, finishedUserIDs)
   {
     for (var i = 0; i < depotCardIDs.length; i++){
       depositCards([depotCardIDs[i]])
-      deck.cardsInStack --
+      deck.numberCardsInStack --
     }
 
     depositCards(lastDepositIDs)
@@ -191,8 +181,7 @@ Item {
     }
 
     depot.skipped = skipped
-    depot.clockwise = clockwise
     depot.lastPlayerUserID = lastPlayerUserID
-    depot.finishedUserIDs = finishedUserIDs
+//    depot.finishedUserIDs = finishedUserIDs
   }
 }

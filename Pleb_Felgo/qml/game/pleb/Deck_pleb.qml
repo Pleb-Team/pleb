@@ -8,18 +8,18 @@ Item {
   height: 134
 
   // amount of cards in the game
-  property int cardsInDeck: 32
+  property int numberCardsInDeck: 32
   // amount of cards in the stack left to draw
-  property int cardsInStack: 32
+  property int numberCardsInStack: 32
+
   // array with the information of all cards in the game
   property var cardInfo: []
   // array with all card entities in the game
   property var cardDeck: []
+
   // all card types and colors
   property var types: ["two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "jack", "queen", "king", "ace"]
   property var cardColor: ["clubs", "diamonds", "hearts", "spades"]
-
-//  property bool allowRestack: false
 
 
   // shuffle sound in the beginning of the game
@@ -32,76 +32,73 @@ Item {
   // the leader creates the deck in the beginning of the game
   function createDeck(){
     reset()
-    fillDeck()
+    createCardInfos()
     shuffleDeck()
-    printDeck()
+    createCards()
   }
 
   // the other players sync their deck with the leader in the beginning of the game
   function syncDeck(deckInfo){
     reset()
-    for (var i = 0; i < cardsInDeck; i ++){
+    for (var i = 0; i < numberCardsInDeck; i ++){
       cardInfo[i] = deckInfo[i]
     }
-    printDeck()
+    createCards()
   }
 
   // create the information for all cards
-  function fillDeck(){
-    var card
-    var order = 0
-    // create one clubs, diamonds, hearts and spades card for each type
-    for (var i = 5; i < types.length; i++) {
-        for (var j = 0; j < cardColor.length; j++) {
-            card = {variationType: types[i], cardColor: cardColor[j], points: i+2, hidden: true, order: order}
-            cardInfo.push(card)
-            order++
-        }
-    }
+  function createCardInfos(){
+      var card
+      var order = 0
+      // create one clubs, diamonds, hearts and spades card for each type
+      for (var i = 5; i < types.length; i++) {
+          for (var j = 0; j < cardColor.length; j++) {
+              card = {variationType: types[i], cardColor: cardColor[j], points: i+2, hidden: true, order: order}
+              cardInfo.push(card)
+              order++
+          }
+      }
   }
 
   // create the card entities with the cardInfo array
-  function printDeck(){
-    shuffleSound.play()
-    var id
-    for (var i = 0; i < cardInfo.length; i ++){
-      id = entityManager.createEntityFromUrlWithProperties(
-            Qt.resolvedUrl("Card_pleb.qml"), {
-              "variationType": cardInfo[i].variationType,
-              "cardColor": cardInfo[i].cardColor,
-              "points": cardInfo[i].points,
-              "order": cardInfo[i].order,
-              "hidden": cardInfo[i].hidden,
-              "z": i,
-              "state": "stack",
-              "parent": deck,
-              "newParent": deck})
-      cardDeck.push(entityManager.getEntityById(id))
-//        console.debug("id: " + id + " card: " + entityManager.getEntityById(id))
-    }
-    offsetStack()
+  function createCards()
+  {
+      shuffleSound.play()
+      var id
+      for (var i = 0; i < cardInfo.length; i ++){
+          id = entityManager.createEntityFromUrlWithProperties(
+                      Qt.resolvedUrl("Card_pleb.qml"), {
+                          "variationType": cardInfo[i].variationType,
+                          "cardColor": cardInfo[i].cardColor,
+                          "points": cardInfo[i].points,
+                          "order": cardInfo[i].order,
+                          "hidden": cardInfo[i].hidden,
+                          "z": i,
+                          "state": "stack",
+                          "parent": deck,
+                          "newParent": deck})
+          cardDeck.push(entityManager.getEntityById(id))
+      }
+      offsetStack()
   }
 
-  // hand out cards
-  function handOutCards(amount){
+
+  // hand out cards from cardDeck
+  function handOutCards(amount)
+  {
       var handOut = []
-      for (var i = 0; i < (cardsInStack + i) && i < amount; i ++){
+      for (var i = 0; i < (numberCardsInStack + i) && i < amount; i ++){
           // highest index for the last card on top of the others
-          var index = deck.cardDeck.length - (deck.cardDeck.length - deck.cardsInStack) - 1
+          var index = deck.cardDeck.length - (deck.cardDeck.length - deck.numberCardsInStack) - 1
           handOut.push(cardDeck[index])
-          cardsInStack --
+          numberCardsInStack --
       }
 
-      // deactivate card effects after drawing a card
-//      depot.effect = false
-//      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-//      multiplayer.sendMessage(gameLogic.messageSetEffect, {effect: false, userId: userId})
-
-      if (cardsInStack < playerHands.children.length) {
-          for (; cardsInStack > 0; cardsInStack--) {
-              cardDeck[cardsInStack - 1].newParent = null
-              cardDeck[cardsInStack - 1].state = "void"
-              console.debug("voided " + cardDeck[cardsInStack - 1])
+      if (numberCardsInStack < playerHands.children.length) {
+          for (; numberCardsInStack > 0; numberCardsInStack--) {
+              cardDeck[numberCardsInStack - 1].newParent = null
+              cardDeck[numberCardsInStack - 1].state = "void"
+              console.debug("voided " + cardDeck[numberCardsInStack - 1])
           }
       }
 
@@ -111,61 +108,42 @@ Item {
 
 
   // the leader shuffles the cardInfo array in the beginning of the game
-  function shuffleDeck(){
-    // randomize array element order in-place using Durstenfeld shuffle algorithm
-    for (var i = cardInfo.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1))
-      var temp = cardInfo[i]
-      cardInfo[i] = cardInfo[j]
-      cardInfo[j] = temp
-    }
-    cardsInStack = cardsInDeck
+  function shuffleDeck()
+  {
+      // randomize array element order in-place using Durstenfeld shuffle algorithm
+      for (var i = cardInfo.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1))
+          var temp = cardInfo[i]
+          cardInfo[i] = cardInfo[j]
+          cardInfo[j] = temp
+      }
+      numberCardsInStack = numberCardsInDeck
   }
 
   // remove all cards and playerHands between games
-  function reset(){
-    var toRemoveEntityTypes = ["card"]
-    entityManager.removeEntitiesByFilter(toRemoveEntityTypes)
-    while(cardDeck.length) {
-      cardDeck.pop()
-      cardInfo.pop()
-    }
-    cardsInStack = cardsInDeck
-    for (var i = 0; i < playerHands.children.length; i++) {
-      playerHands.children[i].reset()
-    }
+  function reset()
+  {
+      var toRemoveEntityTypes = ["card"]
+      entityManager.removeEntitiesByFilter(toRemoveEntityTypes)
+      while(cardDeck.length) {
+          cardDeck.pop()
+          cardInfo.pop()
+      }
+      numberCardsInStack = numberCardsInDeck
+      for (var i = 0; i < playerHands.children.length; i++) {
+          playerHands.children[i].reset()
+      }
   }
 
 
   // reposition the remaining cards to create a stack
   function offsetStack(){
     for (var i = 0; i < cardDeck.length; i++){
-//        console.debug("i: " + i + " = " + cardDeck[i])
       if (cardDeck[i].state == "stack"){
         cardDeck[i].y = i * (-0.1)
       }
     }
   }
-
-
-
-//  // get the id of the card on top of the stack
-//  function getTopCardId()
-//  {
-//      var index = Math.max(cardDeck.length - (cardDeck.length - cardsInStack) - 1, 0)
-//      return deck.cardDeck[index].entityId
-//  }
-
-  // unmark the stack and the recently dropped cards
-//  function unmark()
-//  {
-//      if (cardDeck.length > 0)
-//      {
-//          var card = entityManager.getEntityById(getTopCardId())
-//          card.glowImage.visible = false
-//          card.selected = false
-//      }
-//  }
 
 
   // move the stack cards to the beginning of the cardDeck array

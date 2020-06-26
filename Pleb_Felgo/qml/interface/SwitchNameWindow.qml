@@ -3,9 +3,8 @@ import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import "../common"
 
-// gameOver message with winner and score
 Item {
-  id: switchName
+  id: switchNameWindow
   width: 400
   height: content.height + content.anchors.topMargin * 2
   z: 110
@@ -106,7 +105,7 @@ Item {
           playerTags.children[0].player.nickName = text
 
           if (set) {
-            switchName.visible = false
+            switchNameWindow.visible = false
           } else {
             hintText.text = "Invalid username"
           }
@@ -127,6 +126,6 @@ Item {
     box.radius: 30
     textSize: 28
     text: "Do not set a name now"
-    onClicked: switchName.visible = false
+    onClicked: switchNameWindow.visible = false
   }
 }

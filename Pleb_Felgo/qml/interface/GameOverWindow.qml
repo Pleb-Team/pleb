@@ -53,10 +53,10 @@ Item {
       id: scoreText
       horizontalAlignment: Text.AlignHCenter
       anchors.horizontalCenter: parent.horizontalCenter
-      text: gameOverWindow.visible ? playerHands.children[0].player.name + ": " + getScore(0) + "<br>"
-                                   + playerHands.children[1].player.name + ": " + getScore(1) + "<br>"
-                                   + playerHands.children[2].player.name + ": " + getScore(2) + "<br>"
-                                   + playerHands.children[3].player.name + ": " + getScore(3) : ""
+      text: gameOverWindow.visible ? playerHands.children[0].player.name + " " + getScoreText(0) + "<br>"
+                                   + playerHands.children[1].player.name + " " + getScoreText(1) + "<br>"
+                                   + playerHands.children[2].player.name + " " + getScoreText(2) + "<br>"
+                                   + playerHands.children[3].player.name + " " + getScoreText(3) : ""
       font.family: standardFont.name
       color: "black"
       font.pixelSize: 20
@@ -93,24 +93,24 @@ Item {
 
   // lets the leader restart the game
   ButtonBase {
-    anchors.horizontalCenter: parent.horizontalCenter
-    anchors.top: parent.bottom
-    anchors.topMargin: 10
-    height: (20 + buttonText.height + paddingVertical * 2)
-    paddingHorizontal: 8
-    paddingVertical: 4
-    box.border.width: Constants.nBorderWidth
-    box.radius: 30
-    textSize: 28
-    text: "New Game"
-    visible: multiplayer.amLeader
-    onClicked: {
-      gameLogic.startNewGame()
-    }
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.bottom
+      anchors.topMargin: 10
+      height: (20 + buttonText.height + paddingVertical * 2)
+      paddingHorizontal: 8
+      paddingVertical: 4
+      box.border.width: Constants.nBorderWidth
+      box.radius: 30
+      textSize: 28
+      text: "New Game"
+      visible: multiplayer.amLeader
+      onClicked: {
+          gameLogic.initGame(true)
+      }
   }
 
   // get the score of a player with their array index
-  function getScore(index){
-    return playerHands.children[index].score
+  function getScoreText(index){
+    return "Score: " + playerHands.children[index].score + ", Total: " + playerHands.children[index].scoreAllGames
   }
 }

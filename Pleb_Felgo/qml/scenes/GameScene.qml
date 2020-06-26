@@ -20,7 +20,7 @@ SceneBase {
   property alias gameLogic: gameLogic
   property alias gameOverWindow: gameOverWindow
   property alias leaveGameWindow: leaveGameWindow
-  property alias switchName: switchName
+  property alias switchNameWindow: switchNameWindow
   property alias bottomHand: bottomHand
   property alias playerInfoPopup: playerInfoPopup
   property alias hintRectangle: hintRectangle
@@ -160,7 +160,7 @@ SceneBase {
     anchors.topMargin: 10
     z: 1
     onClicked: {
-      switchName.visible = true
+      switchNameWindow.visible = true
     }
   }
 
@@ -304,7 +304,7 @@ SceneBase {
 
   SwitchNameWindow {
     anchors.centerIn: gameWindowAnchorItem
-    id: switchName
+    id: switchNameWindow
     visible: false
   }
 
