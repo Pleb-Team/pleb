@@ -712,9 +712,6 @@ Item {
       })
   }
 
-  function createGame(){
-      multiplayer.createGame()
-  }
 
   // stop the timers and reset the deck at the end of the game
   function leaveGame()
@@ -750,7 +747,7 @@ Item {
       }
 
       if(!multiplayer.initialized && !multiplayer.singlePlayer){
-          createGame()
+          multiplayer.createGame()
       }
 
       console.debug("multiplayer.localPlayer: " + multiplayer.localPlayer)
@@ -772,6 +769,13 @@ Item {
       playerInfoPopup.visible = false
       chat.reset()
       depot.reset()
+
+      // Check who was Pleb, BEFORE we reset the gamestate and thus the game result
+      var nPlayerIndexArschloch = undefined
+      for (var n = 0; n < arschlochGameLogic.getNumberPlayersMax(); n++)
+          if (arschlochGameLogic.getPlayerGameResult(n) == 0)
+              nPlayerIndexArschloch = n
+
       arschlochGameLogic.resetGameState()
 
       // initialize the players, the deck and the individual hands
@@ -801,17 +805,14 @@ Item {
               sendGameStateToPlayer(undefined)
           }
 
-          // only the leader needs to call this
-          // lets always the leader take the first turn on the first game
-//          if (depot.finishedUserIDs.length < 1) {
+
+          // Leader starts, if there is no Pleb yet. Otherwise, the Pleb starts
+          if (nPlayerIndexArschloch === undefined)
               multiplayer.triggerNextTurn(multiplayer.leaderPlayer.userId)
-//          } else {
-//              gameLogic.triggerNewTurn(depot.finishedUserIDs[depot.finishedUserIDs.length - 1])
-//          }
+          else
+              multiplayer.triggerNextTurn(playerHands.children[nPlayerIndexArschloch].player.userId)
       })
 
-      // start by scaling the playerHand of the active localPlayer
-      scaleHand()
 
       console.debug("InitGame finished!")
   }
@@ -973,21 +974,23 @@ Item {
   }
 
   // the leader creates the deck and depot
-  function initDeck(){
-    multiplayer.leaderCode(function () {
-      deck.createDeck()
-      depot.createDepot()
-    })
+  function initDeck()
+  {
+      multiplayer.leaderCode(function () {
+          deck.createDeck()
+          depot.createDepot()
+      })
   }
 
   // the leader hands out the cards to the other players
-  function initHands(){
-    multiplayer.leaderCode(function () {
-      for (var i = 0; i < playerHands.children.length; i++) {
-        // start the hand for each player
-        playerHands.children[i].startHand()
-      }
-    })
+  function initHands()
+  {
+      multiplayer.leaderCode(function () {
+          for (var i = 0; i < playerHands.children.length; i++) {
+              // start the hand for each player
+              playerHands.children[i].startHand()
+          }
+      })
   }
 
   // sync all hands according to the leader
@@ -1090,7 +1093,7 @@ Item {
 
                       // Spielergebnis: 3 = Präsi, 0 = Arschloch
                       var nNumberPlayers = arschlochGameLogic.getNumberPlayers()
-                      arschlochGameLogic.setPlayerGameResult(nActualPlayerLegacy, nNumberPlayers)
+                      arschlochGameLogic.setPlayerGameResult(nActualPlayerLegacy, nNumberPlayers - 1)
                       arschlochGameLogic.setNumberPlayers(nNumberPlayers - 1)
 //                      depot.finishedUserIDs.push(userId)
                   }
