@@ -33,7 +33,7 @@ Item {
   property int messageMoveCardsDepot: 3
   property int messageSetEffect: 4
   property int messageSetSkipped: 5
-  property int messageSetReverse: 6
+//  property int messageSetReverse: 6
 //  property int messageSetDrawAmount: 7
 //  property int messagePickColor: 8
 //  property int messagePressONU: 9
@@ -139,15 +139,15 @@ Item {
   }
 
   // start a new match after a few seconds
-  Timer {
-      id: restartGameTimer
-      interval: restartTime
-      onTriggered:
-      {
-          restartGameTimer.stop()
-          startNewGame()
-      }
-  }
+//  Timer {
+//      id: restartGameTimer
+//      interval: restartTime
+//      onTriggered:
+//      {
+//          restartGameTimer.stop()
+//          startNewGame()
+//      }
+//  }
 
   // connect to the FelgoMultiplayer object and handle all messages
   Connections {
@@ -171,19 +171,23 @@ Item {
     }
 
     onAmLeaderChanged: {
-      if (multiplayer.leaderPlayer){
-        console.debug("Current Leader is: " + multiplayer.leaderPlayer.userId)
-      }
-      if(multiplayer.amLeader) {
-        console.debug("this player just became the new leader")
-        if(!timerPlayerThinking.running && !gameOver) {
-          console.debug("New leader selected, but the timer is currently not running, thus trigger a new turn now")
-          // even when we comment this, the game does not stall 100%, thus it is likely that we would skip a player here. but better to skip a player once and make sure the game is continued than stalling the game. hard to reproduce, as it does not happen every time the leader changes!
-          triggerNewTurn()
-        } else if (!timerPlayerThinking.running){
-          restartGameTimer.start()
+        if (multiplayer.leaderPlayer)
+            console.debug("Current Leader is: " + multiplayer.leaderPlayer.userId)
+
+        if(multiplayer.amLeader)
+        {
+            console.debug("this player just became the new leader")
+            if(!timerPlayerThinking.running && !gameOver)
+            {
+                console.debug("New leader selected, but the timer is currently not running, thus trigger a new turn now")
+                // even when we comment this, the game does not stall 100%, thus it is likely that we would skip a player here. but better to skip a player once and make sure the game is continued than stalling the game. hard to reproduce, as it does not happen every time the leader changes!
+                multiplayer.triggerNextTurn()
+            }
+//            else if (!timerPlayerThinking.running)
+//            {
+//                restartGameTimer.start()
+//            }
         }
-      }
     }
 
     onMessageReceived: {
@@ -211,7 +215,7 @@ Item {
           syncPlayers()
           initTags()
           syncDeck(message.deck)
-          depot.syncDepot(message.depot, message.lastDepositIDs, message.lastDepositCardColors, message.skipped, message.clockwise, message.effect, message.drawAmount, message.lastPlayerUserID, message.finishedUserIDs)
+          depot.syncDepot(message.depot, message.lastDepositIDs, message.lastDepositCardColors, message.skipped, message.effect, message.drawAmount, message.lastPlayerUserID, message.finishedUserIDs)
           syncHands(message.playerHands)
 
           // join a game which is already over
@@ -300,18 +304,18 @@ Item {
 
         depot.skipped = message.skipped
       }
-      // sync turn direction
-      else if (code == messageSetReverse){
-        // if the message wasn't sent by the leader and
-        // if it wasn't sent by the active player, the message is invalid
-        // the message was probably sent after the leader triggered the next turn
-        if (multiplayer.leaderPlayer.userId != message.userId &&
-            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
-          return
-        }
+//      // sync turn direction
+//      else if (code == messageSetReverse){
+//        // if the message wasn't sent by the leader and
+//        // if it wasn't sent by the active player, the message is invalid
+//        // the message was probably sent after the leader triggered the next turn
+//        if (multiplayer.leaderPlayer.userId != message.userId &&
+//            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
+//          return
+//        }
 
-        depot.clockwise = message.clockwise
-      }
+//        depot.clockwise = message.clockwise
+//      }
 
 
       // game ends
@@ -351,7 +355,7 @@ Item {
           {
               // the leader only triggers the turn if the requesting user is still the active player
               if (multiplayer.activePlayer && multiplayer.activePlayer.userId == message){
-                  triggerNewTurn()
+                  multiplayer.triggerNextTurn()
               }
 
               // if the requesting user is no longer active, it means that he timed out according to the leader
@@ -494,7 +498,7 @@ Item {
       markValid()
       gameScene.gameOverWindow.visible = false
       gameScene.leaveGameWindow.visible = false
-      gameScene.switchName.visible = false
+      gameScene.switchNameWindow.visible = false
       playerInfoPopup.visible = false
       chat.reset()
   }
@@ -719,7 +723,7 @@ Item {
 
       aiTimeOutTimer.stop()
       hintTimer.stop()
-      restartGameTimer.stop()
+//      restartGameTimer.stop()
       timerPlayerThinking.running = false
       depot.effectTimer.stop()
       deck.reset()
@@ -764,7 +768,7 @@ Item {
       markValid()
       gameScene.gameOverWindow.visible = false
       gameScene.leaveGameWindow.visible = false
-      gameScene.switchName.visible = false
+      gameScene.switchNameWindow.visible = false
       playerInfoPopup.visible = false
       chat.reset()
       depot.reset()
@@ -800,7 +804,7 @@ Item {
           // only the leader needs to call this
           // lets always the leader take the first turn on the first game
 //          if (depot.finishedUserIDs.length < 1) {
-              gameLogic.triggerNewTurn(multiplayer.leaderPlayer.userId)
+              multiplayer.triggerNextTurn(multiplayer.leaderPlayer.userId)
 //          } else {
 //              gameLogic.triggerNewTurn(depot.finishedUserIDs[depot.finishedUserIDs.length - 1])
 //          }
@@ -854,7 +858,6 @@ Item {
     }
 
     message.skipped = depot.skipped
-    message.clockwise = depot.clockwise
     message.effect = false // depot.effect
     message.drawAmount = 1 // depot.drawAmount
     message.gameOver = gameOver
@@ -1108,11 +1111,12 @@ Item {
       // continue if the game is still going
       if (!gameOver)
       {
-          console.debug("trigger new turn in endTurn, clockwise: " + depot.clockwise)
+          console.debug("trigger new turn in endTurn: ")
           if (multiplayer.amLeader)
           {
-              triggerNewTurn()
-          } else
+              multiplayer.triggerNextTurn()
+          }
+          else
           {
               // send message to leader to trigger new turn
               multiplayer.sendMessage(messageTriggerTurn, userId)
@@ -1120,14 +1124,14 @@ Item {
       }
   }
 
-  function triggerNewTurn(userId)
-  {
-      if (depot.clockwise){
-          multiplayer.triggerNextTurn(userId)
-      } else {
-          multiplayer.triggerPreviousTurn(userId)
-      }
-  }
+//  function triggerNewTurn(userId)
+//  {
+//      if (depot.clockwise){
+//          multiplayer.triggerNextTurn(userId)
+//      } else {
+//          multiplayer.triggerPreviousTurn(userId)
+//      }
+//  }
 
   // calculate the points for each player
   function calculateScores()
@@ -1170,30 +1174,31 @@ Item {
       gameScene.gameOverWindow.visible = true
 
       // add points to MultiplayerUser score of the winner
-      var currentHand = getHand(multiplayer.localPlayer.userId)
-      if (currentHand)
+      var nPlayerIndex = getHandIndex(multiplayer.localPlayer.userId)
+      if (nPlayerIndex)
+      {
+          var currentHand = playerHands.children[nPlayerIndex]
           gameNetwork.reportRelativeScore(currentHand.score)
 
-      var currentTag
-      for (var i = 0; i < playerTags.children.length; i++){
-          if (playerTags.children[i].player.userId == multiplayer.localPlayer.userId){
-              currentTag = playerTags.children[i]
-          }
-      }
+          var currentTag = playerTags.children[nPlayerIndex]
 
-      // calculate level with new points and check if there was a level up
-      var oldLevel = currentTag.level
-      currentTag.getPlayerData(false)
-      if (oldLevel != currentTag.level){
-          gameScene.gameOverWindow.level = currentTag.level
-          gameScene.gameOverWindow.levelText.visible = true
-      } else {
-          gameScene.gameOverWindow.levelText.visible = false
+          // calculate level with new points and check if there was a level up
+          var oldLevel = currentTag.level
+          currentTag.getPlayerData(false)
+          if (oldLevel != currentTag.level)
+          {
+              gameScene.gameOverWindow.level = currentTag.level
+              gameScene.gameOverWindow.levelText.visible = true
+          }
+          else
+          {
+              gameScene.gameOverWindow.levelText.visible = false
+          }
       }
 
       // show window with text input to switch username
       if (!multiplayer.singlePlayer && !gameNetwork.user.hasCustomNickName()) {
-          gameScene.switchName.visible = true
+          gameScene.switchNameWindow.visible = true
       }
 
       // stop all timers and end the game
@@ -1204,14 +1209,14 @@ Item {
       timerPlayerThinking.running = false
       depot.effectTimer.stop()
 
-      multiplayer.leaderCode(function () {
-          restartGameTimer.start()
-      })
+//      multiplayer.leaderCode(function () {
+//          restartGameTimer.start()
+//      })
   }
 
-  function startNewGame(){
-      restartGameTimer.stop()
-      // the true causes a gameStarted to be emitted
-      gameLogic.initGame(true)
-  }
+//  function startNewGame(){
+////      restartGameTimer.stop()
+//      // the true causes a gameStarted to be emitted
+//      gameLogic.initGame(true)
+//  }
 }

@@ -93,20 +93,20 @@ Item {
 
   // lets the leader restart the game
   ButtonBase {
-    anchors.horizontalCenter: parent.horizontalCenter
-    anchors.top: parent.bottom
-    anchors.topMargin: 10
-    height: (20 + buttonText.height + paddingVertical * 2)
-    paddingHorizontal: 8
-    paddingVertical: 4
-    box.border.width: Constants.nBorderWidth
-    box.radius: 30
-    textSize: 28
-    text: "New Game"
-    visible: multiplayer.amLeader
-    onClicked: {
-      gameLogic.startNewGame()
-    }
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.bottom
+      anchors.topMargin: 10
+      height: (20 + buttonText.height + paddingVertical * 2)
+      paddingHorizontal: 8
+      paddingVertical: 4
+      box.border.width: Constants.nBorderWidth
+      box.radius: 30
+      textSize: 28
+      text: "New Game"
+      visible: multiplayer.amLeader
+      onClicked: {
+          gameLogic.initGame(true)
+      }
   }
 
   // get the score of a player with their array index
