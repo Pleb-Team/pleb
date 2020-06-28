@@ -37,14 +37,14 @@ Item {
     createCards()
   }
 
-  // the other players sync their deck with the leader in the beginning of the game
-  function syncDeck(deckInfo){
-    reset()
-    for (var i = 0; i < numberCardsInDeck; i ++){
-      cardInfo[i] = deckInfo[i]
-    }
-    createCards()
-  }
+//  // the other players sync their deck with the leader in the beginning of the game
+//  function syncDeck(deckInfo){
+//    reset()
+//    for (var i = 0; i < numberCardsInDeck; i ++){
+//      cardInfo[i] = deckInfo[i]
+//    }
+//    createCards()
+//  }
 
   // create the information for all cards
   function createCardInfos(){

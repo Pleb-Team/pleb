@@ -10,6 +10,8 @@ Item {
   property bool initialized: false
   onInitializedChanged: console.debug("GameLogic.initialized changed to:", initialized)
 
+  property alias arschlochGameLogic: arschlochGameLogic
+
   // the remaining turn time for the active player
   property double remainingTime
   property double elapsedHintTime
@@ -25,7 +27,7 @@ Item {
   property int restartTime: 8000
 
   property bool acted: false
-  property bool gameOver: false
+//  property bool gameOver: false
 
   property int messageSyncGameState: 0
   property int messageRequestGameState: 1
@@ -65,32 +67,30 @@ Item {
   }
 
   // timer decreases the remaining turn time for the active player
-  Timer {
-      id: timerPlayerThinking
-      repeat: true
-      running: !gameOver
-      interval: 1000
+//  Timer {
+//      id: timerPlayerThinking
+//      repeat: true
+//      running: !gameOver
+//      interval: 1000
 
-      onTriggered: {
-          remainingTime -= 1
+//      onTriggered: {
+//          remainingTime -= 1
 
-          // let the AI play for the connected player after 10 seconds
-          if (remainingTime === 0) {
-              gameLogic.turnTimedOut()
-          }
+//          // let the AI play for the connected player after 10 seconds
+//          if (remainingTime === 0)
+//              gameLogic.turnTimedOut()
 
-          // mark the valid card options for the active player
-          if (multiplayer.myTurn){
-              markValid()
-              scaleHand()
-          }
+//          // mark the valid card options for the active player
+//          if (multiplayer.myTurn){
+//              markValid()
+//              scaleHand()
+//          }
 
-          // repaint the timer circle on the playerTag every second
-          for (var i = 0; i < playerTags.children.length; i++){
-              playerTags.children[i].canvas.requestPaint()
-          }
-      }
-  }
+//          // repaint the timer circle on the playerTag every second
+//          for (var i = 0; i < playerTags.children.length; i++)
+//              playerTags.children[i].canvas.requestPaint()
+//      }
+//  }
 
   // timer decreases the remaining turn time for the active player
   Timer {
@@ -167,7 +167,8 @@ Item {
         if(multiplayer.amLeader)
         {
             console.debug("this player just became the new leader")
-            if(!timerPlayerThinking.running && !gameOver)
+            if(arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+//                if(!timerPlayerThinking.running && !gameOver)
             {
                 console.debug("New leader selected, but the timer is currently not running, thus trigger a new turn now")
                 // even when we comment this, the game does not stall 100%, thus it is likely that we would skip a player here. but better to skip a player once and make sure the game is continued than stalling the game. hard to reproduce, as it does not happen every time the leader changes!
@@ -190,43 +191,43 @@ Item {
         return
       }
 
-      // sync the game state for existing and newly joined players
-      if (code == messageSyncGameState)
-      {
-        if (!message.receiverPlayerId || message.receiverPlayerId === multiplayer.localPlayer.userId || !compareGameStateWithLeader(message.playerHands)) {
-          console.debug("Sync Game State now")
-          console.debug("Received Message: " + JSON.stringify(message))
-          // NOTE: the activePlayer can be undefined here, when the player makes a late-join! thus add a check in syncDepot() -> depositCard() and handle the case that it is undefined!
-          console.debug("multiplayer.activePlayer when syncing game state:", multiplayer.activePlayer)
+//      // sync the game state for existing and newly joined players
+//      if (code == messageSyncGameState)
+//      {
+//        if (!message.receiverPlayerId || message.receiverPlayerId === multiplayer.localPlayer.userId || !compareGameStateWithLeader(message.playerHands)) {
+//          console.debug("Sync Game State now")
+//          console.debug("Received Message: " + JSON.stringify(message))
+//          // NOTE: the activePlayer can be undefined here, when the player makes a late-join! thus add a check in syncDepot() -> depositCard() and handle the case that it is undefined!
+//          console.debug("multiplayer.activePlayer when syncing game state:", multiplayer.activePlayer)
 
-          syncPlayers()
-          initTags()
-          syncDeck(message.deck)
-          depot.syncDepot(message.depot, message.lastDepositIDs, message.lastDepositCardColors, message.skipped, message.effect, message.drawAmount, message.lastPlayerUserID, message.finishedUserIDs)
-          syncHands(message.playerHands)
+//          syncPlayers()
+//          initTags()
+//          syncDeck(message.deck)
+//          depot.syncDepot(message.depot, message.lastDepositIDs, message.lastDepositCardColors, message.skipped, message.effect, message.drawAmount, message.lastPlayerUserID, message.finishedUserIDs)
+//          syncHands(message.playerHands)
 
-          // join a game which is already over
-          gameOver = message.gameOver
-          gameScene.gameOverWindow.visible = gameOver
-          timerPlayerThinking.running = !gameOver
+//          // join a game which is already over
+//          gameOver = message.gameOver
+//          gameScene.gameOverWindow.visible = gameOver
+//          timerPlayerThinking.running = !gameOver
 
-          console.debug("finished syncGameState, setting initialized to true now")
-          initialized = true
+//          console.debug("finished syncGameState, setting initialized to true now")
+//          initialized = true
 
-          // if we before received a message before game state was in sync, do request a new game state from the leader now
-          if(receivedMessageBeforeGameStateInSync) {
-            console.debug("requesting a new game state from server now, as receivedMessageBeforeGameStateInSync was true")
-            multiplayer.sendMessage(messageRequestGameState, multiplayer.localPlayer.userId)
-            receivedMessageBeforeGameStateInSync = false
-          }
+//          // if we before received a message before game state was in sync, do request a new game state from the leader now
+//          if(receivedMessageBeforeGameStateInSync) {
+//            console.debug("requesting a new game state from server now, as receivedMessageBeforeGameStateInSync was true")
+//            multiplayer.sendMessage(messageRequestGameState, multiplayer.localPlayer.userId)
+//            receivedMessageBeforeGameStateInSync = false
+//          }
 
-          // request the detailed playerTag info from the other players (highscore, level and badge)
-          // if the message was specifically sent to the local user (for example when he or she joins)
-          if (message.receiverPlayerId){
-            multiplayer.sendMessage(messageRequestPlayerTags, multiplayer.localPlayer.userId)
-          }
-        }
-      }
+//          // request the detailed playerTag info from the other players (highscore, level and badge)
+//          // if the message was specifically sent to the local user (for example when he or she joins)
+//          if (message.receiverPlayerId){
+//            multiplayer.sendMessage(messageRequestPlayerTags, multiplayer.localPlayer.userId)
+//          }
+//        }
+//      }
 
       // send a new game state to the requesting user
       else if (code == messageRequestGameState)
@@ -471,27 +472,28 @@ Item {
       }
   }
 
-  // sync deck with leader and set up the game
-  function syncDeck(cardInfo)
-  {
-      console.debug("GameLogic::syncDeck()")
-      deck.syncDeck(cardInfo)
-      depot.createDepot()
+//  // sync deck with leader and set up the game
+//  function syncDeck(cardInfo)
+//  {
+//      console.debug("GameLogic::syncDeck()")
+//      deck.syncDeck(cardInfo)
+//      depot.createDepot()
 
-      // reset all values at the start of the game
-      gameOver = false
-      timerPlayerThinking.start()
-      scaleHand()
-      markValid()
-      gameScene.gameOverWindow.visible = false
-      gameScene.leaveGameWindow.visible = false
-      gameScene.switchNameWindow.visible = false
-      playerInfoPopup.visible = false
-      chat.reset()
-  }
+//      // reset all values at the start of the game
+//      gameOver = false
+////      timerPlayerThinking.start()
+//      scaleHand()
+//      markValid()
+//      gameScene.gameOverWindow.visible = false
+//      gameScene.leaveGameWindow.visible = false
+//      gameScene.switchNameWindow.visible = false
+//      playerInfoPopup.visible = false
+//      chat.reset()
+//  }
 
   // deposit the selected cards
-  function depositCards(cardIds, userId){
+  function depositCards(cardIds, userId)
+  {
       var activeHand = null
 
       // unmark all highlighted cards
@@ -585,23 +587,24 @@ Item {
           depot.lastPlayerUserID = null
 
       // give the connected player <xxx> seconds until the AI takes over
-      remainingTime = userInterval
-      timerPlayerThinking.stop()
-      if (!gameOver)
-      {
-          timerPlayerThinking.start()
-          scaleHand()
-          markValid()
-      }
+//      remainingTime = userInterval
+//      timerPlayerThinking.stop()
+//      if (!gameOver)
+//      {
+////          timerPlayerThinking.start()
+//          scaleHand()
+//          markValid()
+//      }
 
+      // Reset hint
       gameScene.hintRectangle.visible = false;
       elapsedHintTime = 0;
       hintTimer.start();
 
       // the player didn't act yet
       acted = false
-      unmark()
-      scaleHand(1.0)
+
+//      scaleHand(1.0)
 
 
 
@@ -624,6 +627,10 @@ Item {
           if (canPlay)
           {
               depot.skipTurn(false)
+
+              unmark()
+              scaleHand()
+              markValid()
           }
           else
           {
@@ -633,22 +640,22 @@ Item {
       }
 
       // zoom in on the hand of the active local player
-      if (!depot.skipped && multiplayer.myTurn)
-          scaleHand(1.6)
+//      if (!depot.skipped && multiplayer.myTurn)
+//          scaleHand(1.6)
 
 
       // mark the valid card options
-      markValid()
+//      markValid()
 
       elapsedHintTime = 0;
       hintTimer.start()
 
       // repaint the timer circle
-      for (var i = 0; i < playerTags.children.length; i++){
-          playerTags.children[i].canvas.requestPaint()
-      }
+//      for (var i = 0; i < playerTags.children.length; i++){
+//          playerTags.children[i].canvas.requestPaint()
+//      }
 
-      // schedule AI to take over in 3 seconds in case the connected player is gone
+      // schedule AI to take over in 3 seconds for AI players / not connected initPlayers()
       multiplayer.leaderCode(function() {
           if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected) {
               aiTimeOutTimer.start()
@@ -672,27 +679,27 @@ Item {
 
 
   // schedule AI to take over after 10 seconds if the connected player is inactive
-  function turnTimedOut()
-  {
-      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-      console.debug("[turnTimedOut] called. Active player UserID: " + userId)
+//  function turnTimedOut()
+//  {
+//      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+//      console.debug("[turnTimedOut] called. Active player UserID: " + userId)
 
-      if (multiplayer.myTurn && !acted)
-      {
-          acted = true
-          scaleHand(1.0)
-      }
+//      if (multiplayer.myTurn && !acted)
+//      {
+//          acted = true
+//          scaleHand(1.0)
+//      }
 
-      // clean up our UI
-      timerPlayerThinking.running = false
+//      // clean up our UI
+//      timerPlayerThinking.running = false
 
-      // player timed out, so leader should take over
-      multiplayer.leaderCode(function () {
-          // play an AI bone if this player never played anything (this happens in the case where the player left some time during his turn, and so the early 3 second AI move didn't get scheduled
-          executeAIMove()
-          endTurn()
-      })
-  }
+//      // player timed out, so leader should take over
+//      multiplayer.leaderCode(function () {
+//          // play an AI bone if this player never played anything (this happens in the case where the player left some time during his turn, and so the early 3 second AI move didn't get scheduled
+//          executeAIMove()
+//          endTurn()
+//      })
+//  }
 
 
   // stop the timers and reset the deck at the end of the game
@@ -702,7 +709,7 @@ Item {
 
       aiTimeOutTimer.stop()
       hintTimer.stop()
-      timerPlayerThinking.running = false
+//      timerPlayerThinking.running = false
       depot.effectTimer.stop()
       deck.reset()
       chat.gConsole.clear()
@@ -742,10 +749,8 @@ Item {
       console.debug("multiplayer.myTurn " + multiplayer.myTurn)
 
       // reset all values at the start of the game
-      gameOver = false
-      timerPlayerThinking.start()
-      scaleHand()
-      markValid()
+//      gameOver = false
+//      timerPlayerThinking.start()
       gameScene.gameOverWindow.visible = false
       gameScene.leaveGameWindow.visible = false
       gameScene.switchNameWindow.visible = false
@@ -760,6 +765,9 @@ Item {
               nPlayerIndexArschloch = n
 
       arschlochGameLogic.resetGameState()
+      arschlochGameLogic.setState(arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+      scaleHand()
+      markValid()
 
       // initialize the players, the deck and the individual hands
       initPlayers()
@@ -844,7 +852,7 @@ Item {
     message.skipped = depot.skipped
     message.effect = false // depot.effect
     message.drawAmount = 1 // depot.drawAmount
-    message.gameOver = gameOver
+//    message.gameOver = gameOver
 
     // save all card ids of the current depot
     var depotIDs = []
@@ -1006,17 +1014,16 @@ Item {
   // draw the specified amount of cards
   function getCards(cards, userId)
   {
-    // find the playerHand of the active player and pick up cards
-    for (var i = 0; i < playerHands.children.length; i++) {
-      if (playerHands.children[i].player.userId === userId){
-        playerHands.children[i].pickUpCards(cards)
-      }
-    }
+      // find the playerHand of the active player and pick up cards
+      for (var i = 0; i < playerHands.children.length; i++)
+          if (playerHands.children[i].player.userId === userId)
+              playerHands.children[i].pickUpCards(cards)
   }
 
 
   // find the playerHand of the active player and mark all valid card options
-  function markValid(){
+  function markValid()
+  {
       if (multiplayer.myTurn && !acted ){
           for (var i = 0; i < playerHands.children.length; i++) {
               if (playerHands.children[i].player === multiplayer.activePlayer){
@@ -1036,13 +1043,22 @@ Item {
   }
 
   // scale the playerHand of the active localPlayer
-  function scaleHand(scale){
-    if (!scale) scale = multiplayer.myTurn && !acted && !depot.skipped ? 1.6 : 1.0
-    for (var i = 0; i < playerHands.children.length; i++){
-      if (playerHands.children[i].player && playerHands.children[i].player.userId == multiplayer.localPlayer.userId){
-        playerHands.children[i].scaleHand(scale)
+  function scaleHand(scale)
+  {
+      if (!scale)
+      {
+          if (  multiplayer.myTurn
+                  && !acted
+                  && !depot.skipped
+                  && arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+              scale = 1.6
+          else
+              scale = 1.0
       }
-    }
+
+      for (var i = 0; i < playerHands.children.length; i++)
+          if (playerHands.children[i].player && playerHands.children[i].player.userId == multiplayer.localPlayer.userId)
+              playerHands.children[i].scaleHand(scale)
   }
 
 
@@ -1063,6 +1079,7 @@ Item {
 
       if (arschlochGameLogic.getPlayerGameResult(nActualPlayerLegacy) === Constants.nGameResultUndefined)
       {
+          // This player just finished
           if (playerHand.checkWin())
           {
               console.debug("[endTurn] Player " + multiplayer.activePlayer + + ", LegacyID: " + nActualPlayerLegacy + " HAS FINISHED!!!")
@@ -1084,20 +1101,13 @@ Item {
           multiplayer.sendMessage(messageEndGame, {userId: userId})
       }
 
-
-      // continue if the game is still going
-      if (!gameOver)
+      else
       {
-          console.debug("trigger new turn in endTurn: ")
+          console.debug("[endTurn] Trigger new turn")
           if (multiplayer.amLeader)
-          {
               multiplayer.triggerNextTurn()
-          }
           else
-          {
-              // send message to leader to trigger new turn
               multiplayer.sendMessage(messageTriggerTurn, userId)
-          }
       }
   }
 
@@ -1134,7 +1144,8 @@ Item {
   //    If he doesn't have a nickname, we ask him to chose one. Then we reset all timers and values.
   function endGame(userId)
   {
-      console.debug("ENDGAME called by user: " + userId)
+      var nPlayerIndex = getHandIndex(multiplayer.localPlayer.userId)
+      console.debug("[endGame] called by user: " + userId + ", LegacyPlayerID: " + nPlayerIndex)
 
       // calculate the points of each player and set the name of the winner
       calculateScores()
@@ -1143,7 +1154,6 @@ Item {
       gameScene.gameOverWindow.visible = true
 
       // add points to MultiplayerUser score of the winner
-      var nPlayerIndex = getHandIndex(multiplayer.localPlayer.userId)
       if (nPlayerIndex)
       {
           var currentHand = playerHands.children[nPlayerIndex]
@@ -1166,16 +1176,16 @@ Item {
       }
 
       // show window with text input to switch username
-      if (!multiplayer.singlePlayer && !gameNetwork.user.hasCustomNickName()) {
+      if (!multiplayer.singlePlayer && !gameNetwork.user.hasCustomNickName())
           gameScene.switchNameWindow.visible = true
-      }
 
       // stop all timers and end the game
-      scaleHand(1.0)
-      gameOver = true
+//      gameOver = true
+      arschlochGameLogic.setState(arschlochGameLogic.getConstant_Jojo_SpielZustandNix())
+      scaleHand()
       hintTimer.stop()
       aiTimeOutTimer.stop()
-      timerPlayerThinking.running = false
+//      timerPlayerThinking.running = false
       depot.effectTimer.stop()
   }
 }
