@@ -138,16 +138,6 @@ Item {
       }
   }
 
-  // start a new match after a few seconds
-//  Timer {
-//      id: restartGameTimer
-//      interval: restartTime
-//      onTriggered:
-//      {
-//          restartGameTimer.stop()
-//          startNewGame()
-//      }
-//  }
 
   // connect to the FelgoMultiplayer object and handle all messages
   Connections {
@@ -183,12 +173,9 @@ Item {
                 // even when we comment this, the game does not stall 100%, thus it is likely that we would skip a player here. but better to skip a player once and make sure the game is continued than stalling the game. hard to reproduce, as it does not happen every time the leader changes!
                 multiplayer.triggerNextTurn()
             }
-//            else if (!timerPlayerThinking.running)
-//            {
-//                restartGameTimer.start()
-//            }
         }
     }
+
 
     onMessageReceived: {
       console.debug("onMessageReceived with code", code, "initialized:", initialized)
@@ -579,8 +566,7 @@ Item {
   // start the turn for the active player
   function turnStarted(playerId)
   {
-      console.debug("#######################################################################################################################################")
-      console.debug("turnStarted() called")
+      console.debug("[turnStarted]")
 
       if(!multiplayer.activePlayer) {
           console.debug("ERROR: activePlayer not valid in turnStarted!")
@@ -590,15 +576,13 @@ Item {
       var nPlayerIndexLegacy = getHandIndex(multiplayer.activePlayer.userId)
 
 
-      console.debug("playerId: " + playerId + ", multiplayer.activePlayer.userId: " + multiplayer.activePlayer.userId)
-      console.debug("Last deposit: " + depot.lastDeposit + " by player " + depot.lastPlayerUserID)
+      console.debug("[turnStarted] PlayerId: " + playerId + ", multiplayer.activePlayer.userId: " + multiplayer.activePlayer.userId)
+      console.debug("[turnStarted] Last deposit: " + depot.lastDeposit + " by player " + depot.lastPlayerUserID)
 
       // Player can play a second time in a row, meaning all other players have passed.
       // Then we have to make sure that the depot is cleared
       if (depot.lastPlayerUserID === multiplayer.activePlayer.userId)
-      {
           depot.lastPlayerUserID = null
-      }
 
       // give the connected player <xxx> seconds until the AI takes over
       remainingTime = userInterval
@@ -619,20 +603,18 @@ Item {
       unmark()
       scaleHand(1.0)
 
-      // All player except 1 have already finished
-//      if (depot.finishedUserIDs.length === playerHands.children.length - 1)
-      if (arschlochGameLogic.getNumberPlayers() <= 1)
-      {
-          // Make sure that only the remaining player indeed is called to move
-//          console.assert(legacyPlebCodeBridge.arschlochGameLogic.getPlayerGameResult(nPlayerIndex) == constants.nGameResultUndefined)
 
-          plebFinish(getHand(multiplayer.activePlayer.userId))
-          endTurn()
-      }
 
       // This player has already finished (but is still called?)
       if (arschlochGameLogic.getPlayerGameResult(nPlayerIndexLegacy) !== Constants.nGameResultUndefined)
       {
+          endTurn()
+      }
+
+      // This player just became Pleb, as all others finished before him
+      else if (arschlochGameLogic.getNumberPlayers() <= 1)
+      {
+          plebFinish(getHand(multiplayer.activePlayer.userId))
           endTurn()
       }
 
@@ -666,7 +648,7 @@ Item {
           playerTags.children[i].canvas.requestPaint()
       }
 
-      // schedule AI to take over in 3 seconds in case the player is gone
+      // schedule AI to take over in 3 seconds in case the connected player is gone
       multiplayer.leaderCode(function() {
           if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected) {
               aiTimeOutTimer.start()
@@ -720,7 +702,6 @@ Item {
 
       aiTimeOutTimer.stop()
       hintTimer.stop()
-//      restartGameTimer.stop()
       timerPlayerThinking.running = false
       depot.effectTimer.stop()
       deck.reset()
@@ -733,9 +714,11 @@ Item {
       console.debug("GameLogic::leaveGame() finish")
   }
 
+
   function joinGame(room){
     multiplayer.joinGame(room)
   }
+
 
   // initialize the game
   // is called from GameOverWindow when the leader restarts the game, and from GameScene when it got visible from GameScene.onVisibleChanged
@@ -1066,7 +1049,7 @@ Item {
   // end the turn of the active player
   function endTurn()
   {
-      console.debug("ENDING TURN <===")
+      console.debug("[endTurn]")
 
       // unmark all highlighted valid card options
       unmark()
@@ -1078,34 +1061,25 @@ Item {
       var nActualPlayerLegacy = getHandIndex(userId)
       var playerHand = getHand(userId)
 
-      // check if the active player has just won the game and end it in that case
-//      for (var i = 0; i < playerHands.children.length; i++)
-//      {
-//          if (playerHands.children[i].player === multiplayer.activePlayer)
-//          {
-      //              if (!depot.finishedUserIDs.includes(userId))
-//      todo hie rarbeiten, die ug abfrage ist immer true
-              if (arschlochGameLogic.getPlayerGameResult(nActualPlayerLegacy) === Constants.nGameResultUndefined)
-              {
-                  if (playerHand.checkWin())
-                  {
-                      console.debug("=================================================================================> " + multiplayer.activePlayer + " HAS FINISHED!!!")
+      if (arschlochGameLogic.getPlayerGameResult(nActualPlayerLegacy) === Constants.nGameResultUndefined)
+      {
+          if (playerHand.checkWin())
+          {
+              console.debug("[endTurn] Player " + multiplayer.activePlayer + + ", LegacyID: " + nActualPlayerLegacy + " HAS FINISHED!!!")
 
-                      // Spielergebnis: 3 = Präsi, 0 = Arschloch
-                      var nNumberPlayers = arschlochGameLogic.getNumberPlayers()
-                      arschlochGameLogic.setPlayerGameResult(nActualPlayerLegacy, nNumberPlayers - 1)
-                      arschlochGameLogic.setNumberPlayers(nNumberPlayers - 1)
-//                      depot.finishedUserIDs.push(userId)
-                  }
-              }
-//          }
-//      }
+              // Spielergebnis: 3 = Präsi, 0 = Arschloch
+              var nNumberPlayers = arschlochGameLogic.getNumberPlayers()
+              arschlochGameLogic.setPlayerGameResult(nActualPlayerLegacy, nNumberPlayers - 1)
+
+              // Should eventually be computed within the C++ legacy game logic itself, instead of this external manipulation
+              arschlochGameLogic.setNumberPlayers(nNumberPlayers - 1)
+          }
+      }
 
       // Everybody has finished
-//      if (depot.finishedUserIDs.length >= playerHands.children.length)
-      if (arschlochGameLogic.getNumberPlayers() == 0)
+      if (arschlochGameLogic.getNumberPlayers() <= 0)
       {
-          console.debug("ENDING GAME <=======================================================================================")
+          console.debug("[endTurn] Ending game")
           endGame()
           multiplayer.sendMessage(messageEndGame, {userId: userId})
       }
@@ -1127,14 +1101,6 @@ Item {
       }
   }
 
-//  function triggerNewTurn(userId)
-//  {
-//      if (depot.clockwise){
-//          multiplayer.triggerNextTurn(userId)
-//      } else {
-//          multiplayer.triggerPreviousTurn(userId)
-//      }
-//  }
 
   // calculate the points for each player
   function calculateScores()
@@ -1211,15 +1177,5 @@ Item {
       aiTimeOutTimer.stop()
       timerPlayerThinking.running = false
       depot.effectTimer.stop()
-
-//      multiplayer.leaderCode(function () {
-//          restartGameTimer.start()
-//      })
   }
-
-//  function startNewGame(){
-////      restartGameTimer.stop()
-//      // the true causes a gameStarted to be emitted
-//      gameLogic.initGame(true)
-//  }
 }
