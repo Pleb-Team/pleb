@@ -50,28 +50,27 @@ Item {
       // first player creates depot by playing first card
   }
 
+
   // return a random number between two values
   function randomIntFromInterval(min,max)
   {
-    return Math.floor(Math.random() * (max - min + 1) + min)
+      return Math.floor(Math.random() * (max - min + 1) + min)
   }
 
+
   // add the selected cards to the depot
-  function depositCards(cardIds){
-//      console.debug("cardIds: " + cardIds)
+  function depositCards(cardIds)
+  {
       var zPos = (lastDeposit.length > 0) ? lastDeposit[lastDeposit.length - 1].z : 0
       lastDeposit = []
-      for (var i = 0; i < cardIds.length; i++) {
+      for (var i = 0; i < cardIds.length; i++)
+      {
           var card = entityManager.getEntityById(cardIds[i])
+
           // change the parent of the card to depot
           changeParent(card)
-          // uncover card right away if the player is connected
-          // used for wild and wild4 cards
-          // activePlayer might be undefined here, when initially synced
-//          console.debug("unhide: " + (!multiplayer.activePlayer || multiplayer.activePlayer.connected))
-          if (!multiplayer.activePlayer || multiplayer.activePlayer.connected){
-              card.hidden = false
-          }
+
+          card.hidden = false
 
           // move the card to the depot and vary the position and rotation
           var rotation = randomIntFromInterval(-5, 5)
@@ -92,47 +91,38 @@ Item {
       lastPlayerUserID = userId
   }
 
+
   // change the card's parent to depot
   function changeParent(card){
-//      console.debug("card: " + card + " depot: " + depot)
-    card.newParent = depot
-    card.state = "depot"
+      card.newParent = depot
+      card.state = "depot"
   }
 
 
   // check if allowed to play the selected card
   function validCard(cardId)
   {
+      // Make sure this card is (still) in the palyers hand.
       var activeHand = gameLogic.getHand(multiplayer.activePlayer.userId)
-
-      // Value is ok and enough cards of this value exist in the players hand
       if (!activeHand)
           return false
       else if (!activeHand.inHand(cardId))
           return false
 
-      var card = entityManager.getEntityById(cardId)
-
-      // Depot is empty --> This player can play freely
+      // Depot is empty or this player played last --> This player can play freely
       if (      !lastPlayerUserID
             ||  lastDeposit === undefined
             ||  lastDeposit === null
             ||  lastDeposit.length === 0
+            ||  multiplayer.activePlayer.userId === lastPlayerUserID
           )
       {
           return true
       }
 
-      // This player played last --> He now can play freely
-      // TODO hier sollten wir niemals landen, denn in dem Fall sollte schon lastPlayerUserID == null sein
-      if (multiplayer.activePlayer.userId === lastPlayerUserID)
-          return true
-
-
-      if (card.points > lastDeposit[0].points && activeHand.countCards(card.points) >= lastDeposit.length)
-          return true
-
-      return false
+      var card = entityManager.getEntityById(cardId)
+      return    card.points > lastDeposit[0].points
+            &&  activeHand.countCards(card.points) >= lastDeposit.length
   }
 
 

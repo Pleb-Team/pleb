@@ -128,26 +128,26 @@ SceneBase {
     onClicked: leaveGameWindow.visible = true
   }
 
-  // button to finish the game
-  // the player who clicked the button will be the winner
-  // for debug purposes
-  ButtonBase {
-    text: "Close\nRound"
-    width: buttonText.contentWidth + 30
-    visible: system.debugBuild && !gameLogic.gameOver
+//  // button to finish the game
+//  // the player who clicked the button will be the winner
+//  // for debug purposes
+//  ButtonBase {
+//    text: "Close\nRound"
+//    width: buttonText.contentWidth + 30
+//    visible: system.debugBuild && !gameLogic.gameOver
 
-//    anchors.horizontalCenter: onuButton.horizontalCenter
-//    anchors.bottom: onuButton.top
-//    anchors.bottomMargin: 20
+////    anchors.horizontalCenter: onuButton.horizontalCenter
+////    anchors.bottom: onuButton.top
+////    anchors.bottomMargin: 20
 
-    anchors.right: depot.left
-    anchors.verticalCenter: depot.verticalCenter
+//    anchors.right: depot.left
+//    anchors.verticalCenter: depot.verticalCenter
 
-    onClicked: {
-      gameLogic.endGame(multiplayer.localPlayer.userId)
-      multiplayer.sendMessage(gameLogic.messageEndGame, {userId: multiplayer.localPlayer.userId, test: true})
-    }
-  }
+//    onClicked: {
+//      gameLogic.endGame(multiplayer.localPlayer.userId)
+//      multiplayer.sendMessage(gameLogic.messageEndGame, {userId: multiplayer.localPlayer.userId, test: true})
+//    }
+//  }
 
   ButtonBase {
     text: "Switch Name"

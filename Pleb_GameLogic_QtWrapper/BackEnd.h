@@ -53,6 +53,16 @@ public:
     Q_INVOKABLE int getConstant_Jojo_SpielZustandKartenTauschen() { return Jojo_SpielZustandKartenTauschen; }
     Q_INVOKABLE int getConstant_Jojo_SpielZustandSpielen() { return Jojo_SpielZustandSpielen; }
 
+    // Access to the current Player, i.e. the one who is next to play
+    // \todo Integrate as a parameter into the rountine think()
+    Q_INVOKABLE int getState() { return m_GameState.m_nZustand; }
+    Q_INVOKABLE void setState(int n) { m_GameState.m_nZustand = (Jojo_Zustand) n; }
+
+    // Access to the current Player, i.e. the one who is next to play
+    // \todo Integrate as a parameter into the rountine think()
+    Q_INVOKABLE int getActualPlayerID() { return m_GameState.m_nActualPlayer; }
+    Q_INVOKABLE void setActualPlayerID(int n) { m_GameState.m_nActualPlayer = n; }
+
 
     // Manipulate internal MoveSimple just as GUI helper
     Q_INVOKABLE QString getMoveSimpleText() { return QString::fromStdString(m_MoveSimple.GetText() );  }
@@ -94,17 +104,6 @@ public:
     Q_INVOKABLE void setLastMoveSimple(int nLastPlayerID, int nNumberCards, int nValueCards) {
         m_GameState.m_nLastPlayer = nLastPlayerID;
         m_GameState.m_LastMoveSimple = TMoveSimple(nNumberCards, nValueCards); }
-
-    // Access to the current Player, i.e. the one who is next to play
-    // \todo Integrate as a parameter into the rountine think()
-    Q_INVOKABLE int getState() { return m_GameState.m_nZustand; }
-    Q_INVOKABLE void setState(int n) { m_GameState.m_nZustand = (Jojo_Zustand) n; }
-
-
-    // Access to the current Player, i.e. the one who is next to play
-    // \todo Integrate as a parameter into the rountine think()
-    Q_INVOKABLE int getActualPlayerID() { return m_GameState.m_nActualPlayer; }
-    Q_INVOKABLE void setActualPlayerID(int n) { m_GameState.m_nActualPlayer = n; }
 
     // Start the AI think routine and let the AI compute a smart move for the current player, which
     // will be stored in m_MoveSimpleAI. It can be read through getMoveSimpleAI(Value|Number)
