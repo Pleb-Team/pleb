@@ -105,20 +105,25 @@ Item {
 
           if (elapsedHintTime >= 5)
           {
-              var s2
-              var s
+              var s2 = ""
+              var s = ""
 
-              if (depot.lastPlayerUserID && depot.lastDeposit)
-                  s2 = "Beat your opponent and play higher than " + depot.lastDeposit[0].variationType + "!"
-              else
-                  s2 = "You may start freely and play arbitrary cards. Get rid of something :-)"
+              if (arschlochGameLogic.getState() == arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
+                  s = "You won/lost! Select xxx cards to exchange with player xxx"
+              else if (arschlochGameLogic.getState() == arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+              {
+                  if (depot.lastPlayerUserID && depot.lastDeposit)
+                      s2 = "Beat your opponent and play higher than " + depot.lastDeposit[0].variationType + "!"
+                  else
+                      s2 = "You may start freely and play arbitrary cards. Get rid of something :-)"
 
-              if (depot.lastPlayerUserID && depot.lastDeposit.length === 1)
-                  s = "Select 1 card and press the screen center to play, or simply press screen center to pass."
-              else if (depot.lastPlayerUserID && depot.lastDeposit.length > 1)
-                  s = "Select " + depot.lastDeposit.length + " cards and press the screen center to play, or simply press screen center to pass."
-              else
-                  s = "Select arbitrary cards of the same value and press the screen center to play."
+                  if (depot.lastPlayerUserID && depot.lastDeposit.length === 1)
+                      s = "Select 1 card and press the screen center to play, or simply press screen center to pass."
+                  else if (depot.lastPlayerUserID && depot.lastDeposit.length > 1)
+                      s = "Select " + depot.lastDeposit.length + " cards and press the screen center to play, or simply press screen center to pass."
+                  else
+                      s = "Select arbitrary cards of the same value and press the screen center to play."
+              }
 
               gameScene.hintRectangleText.text = s2 + "\n\n" + s
               gameScene.hintRectangle.visible = true
@@ -378,11 +383,12 @@ Item {
         if (entityManager.getEntityById(cardId).state === "stack"){
             // stackSelected()
             // deposit the valid card
-        } else if (entityManager.getEntityById(cardId).state === "player"){
-            if (multiplayer.myTurn && !depot.skipped && !acted) {
-
-                if (depot.validCard(cardId)){
-
+        } else if (entityManager.getEntityById(cardId).state === "player")
+        {
+            if (multiplayer.myTurn && !depot.skipped && !acted)
+            {
+                if (depot.validCard(cardId))
+                {
                     var selectedCard = entityManager.getEntityById(cardId)
                     if (selectedCard.glowImage.visible || selectedCard.selected) {
                         selectedCard.selected = !selectedCard.selected
@@ -426,7 +432,9 @@ Item {
 
                 }
             }
-        } else if (entityManager.getEntityById(cardId).state === "depot") {
+        }
+        else if (entityManager.getEntityById(cardId).state === "depot")
+        {
             console.debug("DEPOT CARD SELECTED")
             skipOrPlay()
         }
@@ -441,35 +449,30 @@ Item {
 
   function skipOrPlay()
   {
-      if (multiplayer.myTurn && !depot.skipped && !acted)
+      // Make sure this player still has to play
+      if (!multiplayer.myTurn || depot.skipped || acted)
+          return
+
+      // get all selected cards into cardID array
+      var cardIds = []
+      var activeHand = getHand(multiplayer.localPlayer.userId).hand
+      for (var i = 0; i < activeHand.length; i++)
+          if (activeHand[i].selected)
+              cardIds.push(activeHand[i].entityId)
+
+      // Move cards to depot and inform Multiplayer
+      acted = true
+      if (cardIds.length > 0)
       {
-          // get all selected cards into cardID array
-          var cardIds = []
-          var activeHand = getHand(multiplayer.localPlayer.userId).hand
-          for (var i = 0; i < activeHand.length; i++) {
-              if (activeHand[i].selected) {
-                  cardIds.push(activeHand[i].entityId)
-              }
-          }
-
-          // Move cards to depot and inform Multiplayer
-          acted = true
-          if (cardIds.length > 0)
-          {
-              console.debug("Player " + multiplayer.localPlayer.userId + " is playing: " + cardIds)
-              depositCards(cardIds, multiplayer.localPlayer.userId)
-              multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: multiplayer.localPlayer.userId})
-          }
-          else
-          {
-              console.debug("Player " + multiplayer.localPlayer.userId + "skipped its turn")
-          }
-
-          if (multiplayer.myTurn)
-          {
-              endTurn()
-          }
+          console.debug("Player " + multiplayer.localPlayer.userId + " is playing: " + cardIds)
+          depositCards(cardIds, multiplayer.localPlayer.userId)
+          multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: multiplayer.localPlayer.userId})
       }
+      else
+          console.debug("Player " + multiplayer.localPlayer.userId + "skipped its turn")
+
+
+      endTurn()
   }
 
 //  // sync deck with leader and set up the game
@@ -494,39 +497,25 @@ Item {
   // deposit the selected cards
   function depositCards(cardIds, userId)
   {
-      var activeHand = null
+      var activeHand = getHand(userId)
 
-      // unmark all highlighted cards
+      // unmark all highlighted cards. Good point here, as the cards flying to the depot shall not be marked
       unmark()
 
       // scale down the active localPlayer playerHand
-      scaleHand(1.0)
-      for (var i = 0; i < playerHands.children.length; i++)
+//      scaleHand(1.0)
+
+      // find the playerHand for the active player
+      // if the selected card is in the playerHand of the active player
+      if (activeHand.inHand(cardIds[0]))
       {
-          activeHand = playerHands.children[i]
+          for (var l = 0; l < cardIds.length; l++)
+              activeHand.removeFromHand(cardIds[l])
 
-          // find the playerHand for the active player
-          // if the selected card is in the playerHand of the active player
-          if (activeHand.inHand(cardIds[0]))
-          {
-              for (var l = 0; l < cardIds.length; l++) {
-                  activeHand.removeFromHand(cardIds[l])
-              }
-
-              // Joachim: We know which player has played the card, why this ugly lookup again? Replace above LOC by getHand()
-              console.assert(getHand(userId) === activeHand)
-
-              // deposit the cards
-              depot.depositCards(cardIds)
-
-              // uncover the card for disconnected players after chosing the color
-              if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected){
-                  for (var m = 0; m < depot.lastDeposit.length; m++) {
-                      depot.lastDeposit[m].hidden = false
-                  }
-              }
-          }
+          // deposit the cards
+          depot.depositCards(cardIds)
       }
+
       return cardIds
   }
 
@@ -596,10 +585,6 @@ Item {
 //          markValid()
 //      }
 
-      // Reset hint
-      gameScene.hintRectangle.visible = false;
-      elapsedHintTime = 0;
-      hintTimer.start();
 
       // the player didn't act yet
       acted = false
@@ -610,9 +595,7 @@ Item {
 
       // This player has already finished (but is still called?)
       if (arschlochGameLogic.getPlayerGameResult(nPlayerIndexLegacy) !== Constants.nGameResultUndefined)
-      {
           endTurn()
-      }
 
       // This player just became Pleb, as all others finished before him
       else if (arschlochGameLogic.getNumberPlayers() <= 1)
@@ -647,6 +630,8 @@ Item {
       // mark the valid card options
 //      markValid()
 
+      // Reset hint
+      gameScene.hintRectangle.visible = false;
       elapsedHintTime = 0;
       hintTimer.start()
 
@@ -732,13 +717,12 @@ Item {
   function initGame(calledFromGameOverScreen)
   {
       console.debug("initGame() called: " + calledFromGameOverScreen)
-      if (calledFromGameOverScreen) {
+      if (calledFromGameOverScreen)
           console.debug("************************************ NEW GAME ***************************************")
-      }
 
-      if(!multiplayer.initialized && !multiplayer.singlePlayer){
+      if(!multiplayer.initialized && !multiplayer.singlePlayer)
           multiplayer.createGame()
-      }
+
 
       console.debug("multiplayer.localPlayer: " + multiplayer.localPlayer)
       console.debug("multiplayer.localPlayer.userId: " + multiplayer.localPlayer.userId)
@@ -1045,20 +1029,26 @@ Item {
   // scale the playerHand of the active localPlayer
   function scaleHand(scale)
   {
+      var nLocalPlayerLegacyID = getHandIndex(multiplayer.localPlayer.userId)
+      console.assert(nLocalPlayerLegacyID >= 0)
+
       if (!scale)
       {
           if (  multiplayer.myTurn
                   && !acted
                   && !depot.skipped
-                  && arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+                  && arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen()
+                  )
+              scale = 1.6
+          else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen()
+                && arschlochGameLogic.getCardExchangeNumber(nLocalPlayerLegacyID) !== 0
+                   )
               scale = 1.6
           else
-              scale = 1.0
+              scale = 1
       }
 
-      for (var i = 0; i < playerHands.children.length; i++)
-          if (playerHands.children[i].player && playerHands.children[i].player.userId == multiplayer.localPlayer.userId)
-              playerHands.children[i].scaleHand(scale)
+      playerHands.children[nLocalPlayerLegacyID].scaleHand(scale)
   }
 
 
@@ -1183,6 +1173,7 @@ Item {
 //      gameOver = true
       arschlochGameLogic.setState(arschlochGameLogic.getConstant_Jojo_SpielZustandNix())
       scaleHand()
+      gameScene.hintRectangle.visible = false;
       hintTimer.stop()
       aiTimeOutTimer.stop()
 //      timerPlayerThinking.running = false
