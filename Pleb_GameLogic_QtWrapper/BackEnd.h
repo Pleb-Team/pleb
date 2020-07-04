@@ -87,12 +87,24 @@ public:
 
     // --------------------------------------------------------------------------------------------
 
+    // Resets Lastmove, LastPlayer, NumberPlayer, ActualPLayer all to initial invalid (-1)
+    // and clears all cards, i.e. all players have empty hands
+    Q_INVOKABLE void checkCardExchangePartners() { m_GameState.SpielBeginnen(); }
+
+    Q_INVOKABLE int getCardExchangePartner(int nPlayer) { return m_GameState.m_nCardExchangePartner[nPlayer]; }
+    Q_INVOKABLE int getCardExchangeNumber(int nPlayer) { return m_GameState.m_nCardExchangeNumber[nPlayer]; }
+    Q_INVOKABLE void getCardExchangeNumber(int nPlayer, int nNumber) { m_GameState.m_nCardExchangeNumber[nPlayer] = nNumber; }
+
 
     // Resets Lastmove, LastPlayer, NumberPlayer, ActualPLayer all to initial invalid (-1)
     // and clears all cards, i.e. all players have empty hands
     Q_INVOKABLE void resetGameState() {
         m_MoveSimpleAI = c_MoveSimpleSchieben;
         m_GameState.Reset(); }
+
+    // Resets the result of the last game
+    Q_INVOKABLE void resetGameResult() { m_GameState.m_GameResult.Reset(); }
+
 
     // Adds the given card number and value to the mentioned players cards in his hand
     Q_INVOKABLE void addPlayerCards(int nPlayerID, int nNumberCards, int nValueCards)    {

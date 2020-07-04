@@ -32,6 +32,14 @@ public:
 	/// Muß man mit der Karo7 herauskommen?
 	bool m_bMustStartWith7Diamond;
 
+    /// Who has to give cards to whom at the beginning of each game
+    int m_nCardExchangePartner[NUMBER_PLAYER];
+
+    /// How many best (positive numbers) or arbitrary (negative numbers) cards every player has to give
+    /// to his exchange partner
+    int m_nCardExchangeNumber[NUMBER_PLAYER];
+
+
 	/// Der zuletzt gespielte Move, der auf dem Tisch liegt. Also der letzte Move, bei dem nicht geschoben wurde
 	/// bzw. ein Schieben-Move zu Beginn des Spieles und nachdem eine Runde lang geschoben wurde
 	TMoveSimple m_LastMoveSimple;
@@ -73,6 +81,9 @@ public:
 	/// Puts cards on the stack if Move is legal (According to State->LastMove->IsLegal)
 	/// and calls NaechsterSpieler()
 	inline int PlayCards( const TMoveSimple & MoveSimple, bool bSofortNeuNurBeiAs, bool bCheck = false);
+
+    /// Startet neues Spiel: bestimmt den Anfangsspieler und wer mit wem tauschen muss
+    void SpielBeginnen();
 
 	/// Es wird bestimmt, welcher Spieler als nächstes dran ist (s. Eingabe), 
     /// wenn man neu herauskommen darf, wird auch m_LastMoveSimple gelöscht !
@@ -300,6 +311,74 @@ inline void CGameState::NaechsterSpieler( bool bSofortNeuNurBeiAs )
 }
 
 
+//---------------------------------------------------------------------------------------------------
+/// Es wird festgelegt, welcher Spieler ganz am Anfang beginnt (der mit der Karo7) und welcher
+/// Spieler mit wem wie viele Karten tauschen soll nach einem Spiel
+///
+/// Zustand => Jojo_SpielZustandKartenTauschen oder
+///	        => Jojo_SpielZustandSpielen
+///
+/// Moved here from CGameControlView keeping original function name and comments
+//---------------------------------------------------------------------------------------------------
+inline void CGameState::SpielBeginnen()
+{
+    int n;
+    int Neger = -1, VizeNeger = -1, Master = -1, VizeMaster = -1;
+
+    // In dieser Schleife checken, ob bereits ein Spiel war, und wer auf welchem Platz sitzt
+    for (n = 0; n < NUMBER_PLAYER; n++)
+        switch ( (int) m_GameResult.Value[n] )
+        {
+            case RESULT_NEGER:		Neger = n;		break;
+            case RESULT_VIZENEGER:	VizeNeger = n;	break;
+            case RESULT_VIZEPRAESI: VizeMaster = n; break;
+            case RESULT_PRAESI:		Master = n;		break;
+        }
+
+
+    // Nach einem Spiel jedem Spieler mitteilen, mit wem er Karten tauschen soll
+    if ( (Neger >= 0) && (VizeNeger >= 0) && (VizeMaster >= 0) && (Master >= 0) )
+    {
+        m_nActualPlayer = Neger;
+        m_nZustand = Jojo_SpielZustandKartenTauschen;
+
+        /// Who has to give cards to whom at the beginning of each game
+        m_nCardExchangePartner[Neger] = Master;
+        m_nCardExchangePartner[VizeNeger] = VizeMaster;
+        m_nCardExchangePartner[VizeMaster] = VizeNeger;
+        m_nCardExchangePartner[Neger] = Neger;
+
+        /// How many best (positive numbers) or arbitrary (negative numbers) cards every player has to give
+        /// to his exchange partner
+        m_nCardExchangeNumber[Neger] = +2;
+        m_nCardExchangeNumber[VizeNeger] = +1;
+        m_nCardExchangeNumber[VizeMaster] = -1;
+        m_nCardExchangeNumber[Master] = -2;
+    }
+    else
+    {
+//        // Ansonsten faengt der Player mit der Karo 7 an
+//        for (n = 0; n < NUMBER_PLAYER; n++)
+//        {
+//            for (m = 0; m < m_pPlayerViews[n]->GetNumberCards3D(); m++)
+//                if ( m_pPlayerViews[n]->GetCard3D(m)->GetMove() == CMove(CARD_7, COLOR_KARO) )
+//                {
+//                    GetGameState()->m_bMustStartWith7Diamond = true;
+//                    GetGameState()->m_nActualPlayer = n;
+//                    break;
+//                }
+//        }
+
+        // Sonst faengt halt der erste Spieler an (passiert egtl nur im Debug-Spiel, wenn es evtl keine Karo7 gibt)
+//        if (m_nActualPlayer < 0)
+            m_nActualPlayer = 0;
+
+        // Jetzt noch den Zustand setzen
+        m_nZustand = Jojo_SpielZustandSpielen;
+    }
+}
+
+
 
 //---------------------------------------------------------------------------------------------------
 /// \todo saulahmer < operator, aber dient ja erstmal nur testzwecken
@@ -367,18 +446,19 @@ void CGameState::Reset()
 	m_nLastPlayer = -1; 
 	m_LastMoveSimple = c_MoveSimpleSchieben; 
 	m_bMustStartWith7Diamond = false;
-
 	m_nNumberPlayers = NUMBER_PLAYER; 
-
-	// Der Einfachheit halber auf 0 setzen, dann kann das Kartenverteilen direkt loslegen
 	m_nActualPlayer = -1; 
 	m_nZustand = Jojo_Zustand_Nix;	
+
 	m_GameResult.Reset();
 
 	// das mitgezählte Blatt aller anderen Spieler auf 0 setzen
     std::memset(m_CardDistributionTotal, 0, sizeof(m_CardDistributionTotal));
     std::memset(m_CardNumberDistribution, 0, sizeof(m_CardNumberDistribution));
     std::memset(m_CardDistribution, 0, sizeof(m_CardDistribution));
+
+    std::memset(m_nCardExchangeNumber, 0, sizeof(m_nCardExchangeNumber));
+    std::memset(m_nCardExchangePartner, -1, sizeof(m_nCardExchangePartner));
 };
 
 
