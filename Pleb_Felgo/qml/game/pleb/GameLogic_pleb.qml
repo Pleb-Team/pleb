@@ -743,23 +743,26 @@ Item {
       depot.reset()
 
       // Check who was Pleb, BEFORE we reset the gamestate and thus the game result
-      var nPlayerIndexArschloch = undefined
-      for (var n = 0; n < arschlochGameLogic.getNumberPlayersMax(); n++)
-          if (arschlochGameLogic.getPlayerGameResult(n) == 0)
-              nPlayerIndexArschloch = n
+//      var nPlayerIndexArschloch = undefined
+//      for (var n = 0; n < arschlochGameLogic.getNumberPlayersMax(); n++)
+//          if (arschlochGameLogic.getPlayerGameResult(n) === 0)
+//              nPlayerIndexArschloch = n
 
-      arschlochGameLogic.resetGameState()
-      arschlochGameLogic.setState(arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
-      scaleHand()
-      markValid()
+      // computes
+      // - Card exchange numbers + Partners
+      // - Game state (Exchange cards or Play)
+      // - First player to play
+      arschlochGameLogic.checkCardExchangePartners()
+      arschlochGameLogic.resetGameResult()
 
       // initialize the players, the deck and the individual hands
       initPlayers()
       initDeck()
       initHands()
-
-      // reset all tags and set tag data of the leader
       initTags()
+
+      scaleHand()
+      markValid()
 
       // set the game state for all players
       multiplayer.leaderCode(function ()
@@ -769,23 +772,24 @@ Item {
 
           // if we call this here, gameStarted is called twice. it is not needed to call, because it is already called when the room is setup
           // thus we must not call this! forceStartGame() is called from the MatchMakingView, not from the GameScene!
-          if(calledFromGameOverScreen) {
+          if(calledFromGameOverScreen)
               // by calling restartGame, we emit a gameStarted call on the leader and the clients
               multiplayer.restartGame()
-          }
 
           // we want to send the state to all players in this case, thus set the playerId to undefined and this case is handled in onMessageReceived so all players handle the game state syncing if playerId is undefined
           // send game state after forceStartGame, otherwise the message will not be received by the initial players!
-          if (!multiplayer.singlePlayer) {
+          if (!multiplayer.singlePlayer)
               sendGameStateToPlayer(undefined)
-          }
 
 
-          // Leader starts, if there is no Pleb yet. Otherwise, the Pleb starts
-          if (nPlayerIndexArschloch === undefined)
-              multiplayer.triggerNextTurn(multiplayer.leaderPlayer.userId)
-          else
-              multiplayer.triggerNextTurn(playerHands.children[nPlayerIndexArschloch].player.userId)
+          // Set first player to play
+          var nActualPlayer = arschlochGameLogic.getActualPlayerID()
+          console.assert(nActualPlayer >= 0)
+
+          if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+              multiplayer.triggerNextTurn(playerHands.children[nActualPlayer].player.userId)
+
+          scaleHand()
       })
 
 
