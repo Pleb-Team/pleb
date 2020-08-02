@@ -956,19 +956,19 @@ Item {
   }
 
 
-  // the other players position the players at the borders of the game field
-  function syncPlayers()
-  {
-      console.debug("syncPlayers()")
-      // it can happen that the multiplayer.players array is different than the one from the local user
-      // possible reasons are, that a player meanwhile joined the game but this did not get forwarded to the room, or not forwarded to the leader yet
+//  // the other players position the players at the borders of the game field
+//  function syncPlayers()
+//  {
+//      console.debug("syncPlayers()")
+//      // it can happen that the multiplayer.players array is different than the one from the local user
+//      // possible reasons are, that a player meanwhile joined the game but this did not get forwarded to the room, or not forwarded to the leader yet
 
-      // assign the players to the positions at the borders of the game field
-      for (var j = 0; j < multiplayer.players.length; j++) {
-          playerTags.children[j].player = multiplayer.players[j]
-          playerHands.children[j].player = multiplayer.players[j]
-      }
-  }
+//      // assign the players to the positions at the borders of the game field
+//      for (var j = 0; j < multiplayer.players.length; j++) {
+//          playerTags.children[j].player = multiplayer.players[j]
+//          playerHands.children[j].player = multiplayer.players[j]
+//      }
+//  }
 
   // the leader creates the deck and depot
   function initDeck()
@@ -990,19 +990,19 @@ Item {
       })
   }
 
-  // sync all hands according to the leader
-  function syncHands(messageHands){
-    console.debug("syncHands()")
-    for (var i = 0; i < playerHands.children.length; i++){
-      var currentUserId = playerHands.children[i].player.userId
-      for (var j = 0; j < messageHands.length; j++){
-        var messageUserId = messageHands[j].userId
-        if (currentUserId == messageUserId){
-          playerHands.children[i].syncHand(messageHands[j].handIds)
-        }
-      }
-    }
-  }
+//  // sync all hands according to the leader
+//  function syncHands(messageHands){
+//    console.debug("syncHands()")
+//    for (var i = 0; i < playerHands.children.length; i++){
+//      var currentUserId = playerHands.children[i].player.userId
+//      for (var j = 0; j < messageHands.length; j++){
+//        var messageUserId = messageHands[j].userId
+//        if (currentUserId == messageUserId){
+//          playerHands.children[i].syncHand(messageHands[j].handIds)
+//        }
+//      }
+//    }
+//  }
 
   // reset all tags and init the tag for the local player
   function initTags()

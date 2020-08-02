@@ -152,22 +152,22 @@ Item {
     neatHand()
   }
 
-  // change the current hand card array
-  function syncHand(cardIDs) {
-    hand = []
-    for (var i = 0; i < cardIDs.length; i++){
-      var tmpCard = entityManager.getEntityById(cardIDs[i])
-      hand.push(tmpCard)
-      changeParent(tmpCard)
-      deck.numberCardsInStack --
-      if (multiplayer.localPlayer == player){
-        tmpCard.hidden = false
-      }
-      drawSound.play()
-    }
-    // reorganize the hand
-    neatHand()
-  }
+//  // change the current hand card array
+//  function syncHand(cardIDs) {
+//      hand = []
+//      for (var i = 0; i < cardIDs.length; i++){
+//          var tmpCard = entityManager.getEntityById(cardIDs[i])
+//          hand.push(tmpCard)
+//          changeParent(tmpCard)
+//          deck.numberCardsInStack --
+//          if (multiplayer.localPlayer == player){
+//              tmpCard.hidden = false
+//          }
+//          drawSound.play()
+//      }
+//      // reorganize the hand
+//      neatHand()
+//  }
 
   // change the parent of the card to playerHand
   function changeParent(card){
