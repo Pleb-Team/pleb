@@ -229,13 +229,14 @@ Item {
     }
   }
 
-  function getSelectedGroup() {
+  function getSelectedCards()
+  {
       var result = []
-      for (var i = 0; i < hand.length; i++) {
-          if (hand[i].selected === true) {
+      for (var i = 0; i < hand.length; i++)
+          if (hand[i].selected === true)
               result.push(hand[i])
-          }
-      }
+
+
       return result
   }
 
@@ -265,10 +266,10 @@ Item {
   // highlight all valid cards by setting the glowImage visible
   function markValid()
   {
-      if (depot.skipped || gameLogic.arschlochGameLogic.getState() == gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandNix() )
+      if (depot.skipped || gameLogic.arschlochGameLogic.getState() === gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandNix() )
           unmark()
 
-      var selectedGroup = getSelectedGroup()
+      var selectedGroup = getSelectedCards()
       for (var i = 0; i < hand.length; i ++)
       {
           // Unmark invalid cards
@@ -287,7 +288,9 @@ Item {
           }
 
 
-          if (  selectedGroup[0].points === hand[i].points
+          // ... already some card selected --> allow further cards to be selected only of same value
+          // and correct number of cards
+          else if (  selectedGroup[0].points === hand[i].points
                   &&  (
                       depot.lastDeposit.length === 0
                       ||  selectedGroup.length < depot.lastDeposit.length
