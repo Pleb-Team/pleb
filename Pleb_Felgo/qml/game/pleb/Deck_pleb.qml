@@ -86,23 +86,27 @@ Item {
   // hand out cards from cardDeck
   function handOutCards(amount)
   {
-      var handOut = []
-      for (var i = 0; i < (numberCardsInStack + i) && i < amount; i ++){
-          // highest index for the last card on top of the others
-          var index = deck.cardDeck.length - (deck.cardDeck.length - deck.numberCardsInStack) - 1
-          handOut.push(cardDeck[index])
+      // Move cards from stack to cardEntities
+      var cardEntities = []
+      for (var i = 0; 0 < numberCardsInStack && i < amount; i ++)
+      {
+          var index = deck.numberCardsInStack - 1
+          cardEntities.push(cardDeck[index])
           numberCardsInStack --
       }
 
-      if (numberCardsInStack < playerHands.children.length) {
-          for (; numberCardsInStack > 0; numberCardsInStack--) {
+      // Change parent of ALL OTHER CARDS to 0. Why?
+      if (numberCardsInStack < playerHands.children.length)
+      {
+          for (; numberCardsInStack > 0; numberCardsInStack--)
+          {
               cardDeck[numberCardsInStack - 1].newParent = null
               cardDeck[numberCardsInStack - 1].state = "void"
               console.debug("voided " + cardDeck[numberCardsInStack - 1])
           }
       }
 
-      return handOut
+      return cardEntities
   }
 
 

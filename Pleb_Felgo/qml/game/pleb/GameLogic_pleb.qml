@@ -98,6 +98,10 @@ Item {
 
       onTriggered:
       {
+          var nPlayerIndexLegacy = getHandIndex(multiplayer.activePlayer.userId)
+          var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
+          var nCardExchangeNumber = arschlochGameLogic.getCardExchangeNumber(nPlayerIndexLegacy)
+
           elapsedHintTime += 1
 
           if (elapsedHintTime >= 5)
@@ -106,7 +110,9 @@ Item {
               var s = ""
 
               if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
-                  s = "You won/lost! Select xxx cards to exchange with player xxx"
+              {
+                  s = "You won/lost! Give " + nCardExchangeNumber + " cards to player " + nPlayerIndexCardExchange
+              }
               else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
               {
                   if (depot.lastPlayerUserID && depot.lastDeposit)
@@ -135,8 +141,64 @@ Item {
       interval: aiTurnTime
       onTriggered:
       {
-          gameLogic.executeAIMove()
-          endTurn()
+          var nPlayerIndexLegacy = -1;
+          var userId = 0;
+          var cardIds = []
+
+          if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
+          {
+              // Search for AI player which still has to exchange cards
+              for (var m = 0; m < playerHands.children.length; m++)
+              {
+                  if (  (playerHands.children[m].player !== multiplayer.localPlayer)
+                     && (arschlochGameLogic.getCardExchangeNumber(m) !== 0) )
+                  {
+                      nPlayerIndexLegacy = m
+                      userId = playerHands.children[m].player.userId
+                      break
+                  }
+              }
+
+              if (nPlayerIndexLegacy === -1)
+                  return
+
+              cardIds = legacyPlebCodeBridge.calcMoveCardExchange(userId, nPlayerIndexLegacy)
+              console.assert(cardIds.length === 1)
+
+              var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
+              var exchangePartnerHand = playerHands.children[nPlayerIndexCardExchange]
+
+              // First deposit the cards to the depot for 1 ms such that the owner is changed correctly
+              depositCards(cardIds, userId)
+
+              // ... then hand them over to the exchange partner. Note that we need an array here
+              var cards = []
+              cards.push(entityManager.getEntityById(cardIds[0]))
+              exchangePartnerHand.pickUpCards(cards)
+
+              // Sync legacy gamestate
+              arschlochGameLogic.giveCardToExchangePartner(nPlayerIndexLegacy, nPlayerIndexCardExchange, cards[0].points - 7)
+          }
+
+          else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+          {
+              // Compute AI move and play it
+              userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+              if (!depot.skipped && userId)
+              {
+                  nPlayerIndexLegacy = getHandIndex(userId)
+                  cardIds = legacyPlebCodeBridge.calcMove(userId, nPlayerIndexLegacy)
+
+                  // Play card animation or skip sound
+                  if (cardIds.length > 0)
+                  {
+                      multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
+                      depositCards(cardIds, userId)
+                  }
+              }
+
+              endTurn()
+          }
       }
   }
 
@@ -461,25 +523,41 @@ Item {
 
   function skipOrPlay()
   {
+      var activeHand = getHand(multiplayer.localPlayer.userId)
+      var nPlayerIndexLegacy = getHandIndex(multiplayer.localPlayer.userId)
+      var cardIds = activeHand.getSelectedCardIDs()
+
+
       if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
       {
 
+          if (  (arschlochGameLogic.getCardExchangeNumber(nPlayerIndexLegacy) === 0)
+            ||  (arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy) < 0) )
+          {
+              console.debug("Card exchange is already finished or no exchange partner defined for player index:" + nPlayerIndexLegacy)
+              return
+          }
+
+          var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
+          var selectedCards = activeHand.getSelectedCards()
+          var exchangePartnerHand = playerHands.children[nPlayerIndexCardExchange]
+
+          // First deposit the cards to the depot for 1 ms such that the owner is changed correctly
+          depositCards(cardIds, multiplayer.localPlayer.userId)
+
+          // ... then hand them over to the exchange partner
+          exchangePartnerHand.pickUpCards(selectedCards)
+
+          // Sync legacy gamestate
+          for (var n = 0; n < selectedCards.length; n++)
+              arschlochGameLogic.giveCardToExchangePartner(nPlayerIndexLegacy, nPlayerIndexCardExchange, selectedCards[n].points - 7)
       }
 
       else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
       {
-
-
           // Make sure this player still has to play
           if (!multiplayer.myTurn || depot.skipped || acted)
               return
-
-          // get all selected cards into cardID array
-          var cardIds = []
-          var activeHand = getHand(multiplayer.localPlayer.userId).hand
-          for (var i = 0; i < activeHand.length; i++)
-              if (activeHand[i].selected)
-                  cardIds.push(activeHand[i].entityId)
 
           // Move cards to depot and inform Multiplayer
           acted = true
@@ -516,16 +594,13 @@ Item {
 //      chat.reset()
 //  }
 
-  // deposit the selected cards
+  // deposit the selected cards from player hand to depot
   function depositCards(cardIds, userId)
   {
       var activeHand = getHand(userId)
 
       // unmark all highlighted cards. Good point here, as the cards flying to the depot shall not be marked
       unmark()
-
-      // scale down the active localPlayer playerHand
-//      scaleHand(1.0)
 
       // find the playerHand for the active player
       // if the selected card is in the playerHand of the active player
@@ -537,36 +612,8 @@ Item {
           // deposit the cards
           depot.depositCards(cardIds)
       }
-
-      return cardIds
   }
 
-  // let AI take over if the player is not skipped
-  function executeAIMove() {
-    if(!depot.skipped){
-        playPlebCustom()
-    }
-  }
-
-
-  function playPlebCustom()
-  {
-      // Compute AI move and play it
-      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-      if (!userId)
-          return
-
-      var nActualPlayerLegacy = getHandIndex(userId)
-
-      var cardIds = legacyPlebCodeBridge.calcMove(userId, nActualPlayerLegacy)
-
-      // Play card animation or skip sound
-      if (cardIds.length > 0)
-      {
-          multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
-          depositCards(cardIds, userId)
-      }
-  }
 
   // check whether a user with a specific id has valid cards or not
   function hasValidCards(user){
@@ -809,13 +856,16 @@ Item {
           console.assert(nActualPlayer >= 0)
 
           if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+          {
               multiplayer.triggerNextTurn(playerHands.children[nActualPlayer].player.userId)
+          }
           else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
           {
               // Reset hint
               gameScene.hintRectangle.visible = false;
               elapsedHintTime = 0;
               hintTimer.start()
+              aiThinkingTimer.start()
           }
 
           scaleHand()
@@ -916,12 +966,10 @@ Item {
       multiplayer.leaderCode(function () {
           console.debug("Leader Init Players")
           var clientPlayers = multiplayer.players
-          var playerInfo = []
           for (var i = 0; i < clientPlayers.length; i++)
           {
               playerTags.children[i].player = clientPlayers[i]
               playerHands.children[i].player = clientPlayers[i]
-              playerInfo[i] = clientPlayers[i].userId
           }
       })
   }
@@ -1023,7 +1071,7 @@ Item {
       // find the playerHand of the active player and pick up cards
       for (var i = 0; i < playerHands.children.length; i++)
           if (playerHands.children[i].player.userId === userId)
-              playerHands.children[i].pickUpCards(cards)
+              playerHands.children[i].pickUpCardsFromDeck(cards)
   }
 
 
