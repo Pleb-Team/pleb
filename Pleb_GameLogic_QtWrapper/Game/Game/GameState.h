@@ -82,8 +82,12 @@ public:
 	/// and calls NaechsterSpieler()
 	inline int PlayCards( const TMoveSimple & MoveSimple, bool bSofortNeuNurBeiAs, bool bCheck = false);
 
+    /// As the name says, this function is called during the first phase of ard exchange.
+    /// Note that it is called once for every single card exchanged.
+    inline int GiveCardToExchangePartner(int nPlayerIDGive, int nPlayerIDReceive, int nValueCards);
+
     /// Startet neues Spiel: bestimmt den Anfangsspieler und wer mit wem tauschen muss
-    void SpielBeginnen();
+    inline void SpielBeginnen();
 
 	/// Es wird bestimmt, welcher Spieler als nächstes dran ist (s. Eingabe), 
     /// wenn man neu herauskommen darf, wird auch m_LastMoveSimple gelöscht !
@@ -248,6 +252,34 @@ inline int CGameState::PlayCards( const TMoveSimple & MoveSimple, bool bSofortNe
 }
 
 
+inline int CGameState::GiveCardToExchangePartner(int nPlayerIDGive, int nPlayerIDReceive, int nValueCards)
+{
+    TMoveSimple MoveSimple(1, nValueCards);
+
+    assert(m_nCardExchangePartner[nPlayerIDGive] == nPlayerIDReceive);
+    assert(m_nCardExchangeNumber[nPlayerIDGive] != 0);
+
+    // Gamestate updaten
+//    if (PlayerVerliertKarten( MoveSimple, nPlayerIDGive ) == JOJO_ERROR)
+//        return JOJO_ERROR;
+
+//    PlayerBekommtKarten( MoveSimple, nPlayerIDReceive );
+
+    // Den Counter, wieviele Karten abgegeben werden muessen, updaten
+    if (m_nCardExchangeNumber[nPlayerIDGive] > 0)
+        m_nCardExchangeNumber[nPlayerIDGive]--;
+    else if (m_nCardExchangeNumber[nPlayerIDGive] < 0)
+        m_nCardExchangeNumber[nPlayerIDGive]++;
+
+
+    // SpielerZumTauschen resetten, wenn fertig getauscht
+    if (m_nCardExchangeNumber[nPlayerIDGive] == 0)
+        m_nCardExchangePartner[nPlayerIDGive] = -1;
+
+    return JOJO_OK;
+}
+
+
 //---------------------------------------------------------------------------------------------------
 /// Hierdrin werden die Spielregeln "verkörpert": Nach jedem Spielzug wird
 /// diese Routine aufgerufen. Es wird bestimmt, welcher Spieler als nächstes dran ist (s. Eingabe)
@@ -346,14 +378,14 @@ inline void CGameState::SpielBeginnen()
         m_nCardExchangePartner[Neger] = Master;
         m_nCardExchangePartner[VizeNeger] = VizeMaster;
         m_nCardExchangePartner[VizeMaster] = VizeNeger;
-        m_nCardExchangePartner[Neger] = Neger;
+        m_nCardExchangePartner[Master] = Neger;
 
         /// How many best (positive numbers) or arbitrary (negative numbers) cards every player has to give
         /// to his exchange partner
-        m_nCardExchangeNumber[Neger] = +2;
-        m_nCardExchangeNumber[VizeNeger] = +1;
-        m_nCardExchangeNumber[VizeMaster] = -1;
-        m_nCardExchangeNumber[Master] = -2;
+        m_nCardExchangeNumber[Neger] = +1; // +2;
+        m_nCardExchangeNumber[VizeNeger] = 0; // +1;
+        m_nCardExchangeNumber[VizeMaster] = 0; // -1;
+        m_nCardExchangeNumber[Master] = -1; // -2;
     }
     else
     {
