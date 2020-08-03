@@ -276,6 +276,15 @@ inline int CGameState::GiveCardToExchangePartner(int nPlayerIDGive, int nPlayerI
     if (m_nCardExchangeNumber[nPlayerIDGive] == 0)
         m_nCardExchangePartner[nPlayerIDGive] = -1;
 
+    // Check if some card echange is still left
+    bool bCardExchangeStillOngoing = false;
+    for (int n = 0; n < NUMBER_PLAYER; n++)
+        if ( m_nCardExchangeNumber[n] != 0 )
+            bCardExchangeStillOngoing = true;
+
+    if (!bCardExchangeStillOngoing)
+        m_nZustand = Jojo_SpielZustandSpielen;
+
     return JOJO_OK;
 }
 
@@ -482,7 +491,7 @@ void CGameState::Reset()
 	m_nActualPlayer = -1; 
 	m_nZustand = Jojo_Zustand_Nix;	
 
-	m_GameResult.Reset();
+//	m_GameResult.Reset();
 
 	// das mitgezählte Blatt aller anderen Spieler auf 0 setzen
     std::memset(m_CardDistributionTotal, 0, sizeof(m_CardDistributionTotal));
