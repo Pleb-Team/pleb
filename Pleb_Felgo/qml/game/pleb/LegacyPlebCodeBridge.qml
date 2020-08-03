@@ -18,6 +18,7 @@ Item {
     function syncStateQML2Legacy(nActualPlayerLegacy)
     {
         arschlochGameLogicLocal.resetGameState()
+        arschlochGameLogicLocal.resetGameResult()
 
         // Set players cards
         for (var nPlayer = 0; nPlayer < playerHands.children.length; nPlayer++)
@@ -60,6 +61,7 @@ Item {
     }
 
 
+    // \out Array of card IDs
     function calcMove(userId, nActualPlayerLegacy)
     {
         var playerHand = getHand(userId)
@@ -80,6 +82,7 @@ Item {
     }
 
 
+    // \out Array of card IDs
     function calcMoveCardExchange(userId, nActualPlayerLegacy)
     {
         var playerHand = getHand(userId)

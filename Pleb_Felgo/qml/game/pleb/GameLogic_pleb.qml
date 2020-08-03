@@ -98,7 +98,7 @@ Item {
 
       onTriggered:
       {
-          var nPlayerIndexLegacy = getHandIndex(multiplayer.activePlayer.userId)
+          var nPlayerIndexLegacy = getHandIndex(multiplayer.localPlayer.userId)
           var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
           var nCardExchangeNumber = arschlochGameLogic.getCardExchangeNumber(nPlayerIndexLegacy)
 
@@ -111,7 +111,10 @@ Item {
 
               if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
               {
-                  s = "You won/lost! Give " + nCardExchangeNumber + " cards to player " + nPlayerIndexCardExchange
+                  if (nCardExchangeNumber > 0)
+                        s = "You lost! Give your " + nCardExchangeNumber + " highest cards to player " + nPlayerIndexCardExchange
+                  else if (nCardExchangeNumber < 0)
+                      s = "You won! Give your " + nCardExchangeNumber + " lowest or other arbitrary cards to player " + nPlayerIndexCardExchange
               }
               else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
               {
@@ -178,6 +181,10 @@ Item {
 
               // Sync legacy gamestate
               arschlochGameLogic.giveCardToExchangePartner(nPlayerIndexLegacy, nPlayerIndexCardExchange, cards[0].points - 7)
+
+              // Card exchange has just finished
+              if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+                  multiplayer.triggerNextTurn(playerHands.children[arschlochGameLogic.getActualPlayerID()].player.userId)
           }
 
           else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
@@ -551,6 +558,10 @@ Item {
           // Sync legacy gamestate
           for (var n = 0; n < selectedCards.length; n++)
               arschlochGameLogic.giveCardToExchangePartner(nPlayerIndexLegacy, nPlayerIndexCardExchange, selectedCards[n].points - 7)
+
+          // Card exchange has just finished
+          if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+              multiplayer.triggerNextTurn(playerHands.children[arschlochGameLogic.getActualPlayerID()].player.userId)
       }
 
       else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
@@ -821,6 +832,7 @@ Item {
       // - Card exchange numbers + Partners
       // - Game state (Exchange cards or Play)
       // - First player to play
+      arschlochGameLogic.resetGameState()
       arschlochGameLogic.checkCardExchangePartners()
       arschlochGameLogic.resetGameResult()
 
@@ -1138,9 +1150,9 @@ Item {
       var nActualPlayerLegacy = getHandIndex(userId)
       var playerHand = getHand(userId)
 
+      // CHeck if player just won
       if (arschlochGameLogic.getPlayerGameResult(nActualPlayerLegacy) === Constants.nGameResultUndefined)
       {
-          // This player just finished
           if (playerHand.checkWin())
           {
               console.debug("[endTurn] Player " + multiplayer.activePlayer + + ", LegacyID: " + nActualPlayerLegacy + " HAS FINISHED!!!")
