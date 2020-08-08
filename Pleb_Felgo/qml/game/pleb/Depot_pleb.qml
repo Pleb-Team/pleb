@@ -157,21 +157,21 @@ Item {
 //      finishedUserIDs = []
   }
 
-  // sync the depot with the leader
-  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, effect, drawAmount, lastPlayerUserID, finishedUserIDs)
-  {
-    for (var i = 0; i < depotCardIDs.length; i++){
-      depositCards([depotCardIDs[i]])
-      deck.numberCardsInStack --
-    }
+//  // sync the depot with the leader
+//  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, effect, drawAmount, lastPlayerUserID, finishedUserIDs)
+//  {
+//    for (var i = 0; i < depotCardIDs.length; i++){
+//      depositCards([depotCardIDs[i]])
+//      deck.numberCardsInStack --
+//    }
 
-    depositCards(lastDepositIDs)
-    for (var j = 0; j < lastDepositIDs.length; j++) {
-        lastDeposit[j].cardColor = lastDepositCardColors[j]
-    }
+//    depositCards(lastDepositIDs)
+//    for (var j = 0; j < lastDepositIDs.length; j++) {
+//        lastDeposit[j].cardColor = lastDepositCardColors[j]
+//    }
 
-    depot.skipped = skipped
-    depot.lastPlayerUserID = lastPlayerUserID
-//    depot.finishedUserIDs = finishedUserIDs
-  }
+//    depot.skipped = skipped
+//    depot.lastPlayerUserID = lastPlayerUserID
+////    depot.finishedUserIDs = finishedUserIDs
+//  }
 }

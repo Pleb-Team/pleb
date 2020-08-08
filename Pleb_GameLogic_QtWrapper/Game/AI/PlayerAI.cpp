@@ -146,9 +146,9 @@ int CPlayerAI::SumValuePresent(int Min, int Max) {
 TMoveSimple CPlayerAI::ThinkKartenTauschen() 
 {
 	// Abhängig von der Situation die höchste / niedrigste Karte wählen
-	if (m_nKartenAbgeben > 0)	
+    if (MYCARDEXCHANGENUMBER > 0)
 														return SuchBesteKarte();
-	else if (m_nKartenAbgeben < 0) 
+    else if (MYCARDEXCHANGENUMBER < 0)
 														return SuchSchlechtesteKarte();
 	else
 														return c_MoveSimpleSchieben;
@@ -157,7 +157,6 @@ TMoveSimple CPlayerAI::ThinkKartenTauschen()
 
 //------------------------------------------------------------------------------------------------------------
 /// Ausgabe: Schlechteste Karte
-/// \todo das hier ist noch unsinn : bei 7,8,9,9 würde der Präsi beide 9 abgeben
 //------------------------------------------------------------------------------------------------------------
 TMoveSimple CPlayerAI::SuchSchlechtesteKarte() 
 {
@@ -166,9 +165,11 @@ TMoveSimple CPlayerAI::SuchSchlechtesteKarte()
 	// Erstmal checken, ob man einen Wert blank drücken kann
 	for (n = 0; n < nMittelwert-1; n++)
 
-		if ( MYCARDS[n] == -m_nKartenAbgeben )			return TMoveSimple( 1, n );
+//        if ( MYCARDS[n] == -MYCARDEXCHANGENUMBER )			return TMoveSimple( 1, n );
+        if ( MYCARDS[n] == 1 )			return TMoveSimple( 1, n );
 
-	// Geht nicht mit niedrigen Karten, dann halt einfach die schlechteste Karte rausrücken
+    // Hier angekommen heißt: Alle niedrigen Karten sind wenn dann als mind. als Päärchen vorhanden!
+    // Dann halt einfach die schlechteste Karte rausrücken
 	for (n = 0; n < NUMBER_VALUE-1; n++)
 
 		if ( MYCARDS[n] > 0 )							return TMoveSimple( 1, n );

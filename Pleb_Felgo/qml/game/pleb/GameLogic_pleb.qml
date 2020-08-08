@@ -26,6 +26,8 @@ Item {
   // restart the game at the end after a few seconds
   property int restartTime: 8000
 
+  // Redundant to !multiplayer.myTurn, however the multiplayer.myTurn information is updated delayed due to network,
+  // so we must store the information twice that the player just acted
   property bool acted: false
 //  property bool gameOver: false
 
@@ -58,7 +60,6 @@ Item {
   }
 
 
-
   // bling sound effect when selecting a color for wild or wild4 cards
   SoundEffect {
     volume: 0.5
@@ -72,20 +73,16 @@ Item {
 //      repeat: true
 //      running: !gameOver
 //      interval: 1000
-
 //      onTriggered: {
 //          remainingTime -= 1
-
 //          // let the AI play for the connected player after 10 seconds
 //          if (remainingTime === 0)
 //              gameLogic.turnTimedOut()
-
 //          // mark the valid card options for the active player
 //          if (multiplayer.myTurn){
 //              markValid()
 //              scaleHand()
 //          }
-
 //          // repaint the timer circle on the playerTag every second
 //          for (var i = 0; i < playerTags.children.length; i++)
 //              playerTags.children[i].canvas.requestPaint()
@@ -101,6 +98,10 @@ Item {
 
       onTriggered:
       {
+          var nPlayerIndexLegacy = getHandIndex(multiplayer.localPlayer.userId)
+          var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
+          var nCardExchangeNumber = arschlochGameLogic.getCardExchangeNumber(nPlayerIndexLegacy)
+
           elapsedHintTime += 1
 
           if (elapsedHintTime >= 5)
@@ -108,9 +109,20 @@ Item {
               var s2 = ""
               var s = ""
 
-              if (arschlochGameLogic.getState() == arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
-                  s = "You won/lost! Select xxx cards to exchange with player xxx"
-              else if (arschlochGameLogic.getState() == arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+              if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
+              {
+                  if (nCardExchangeNumber > 0)
+                      s2 = "You lost! Give your " + nCardExchangeNumber + " highest cards to player " + nPlayerIndexCardExchange
+                  else if (nCardExchangeNumber < 0)
+                      s2 = "You won! Give your " + (-nCardExchangeNumber) + " lowest cards to player " + nPlayerIndexCardExchange
+                  else
+                      s2 = "Lean back and wait for the others to finish exchanging cards"
+
+                  if (nCardExchangeNumber !== 0)
+                      s = "Select cards and press the screen center to pass them to your exchange player."
+
+              }
+              else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
               {
                   if (depot.lastPlayerUserID && depot.lastDeposit)
                       s2 = "Beat your opponent and play higher than " + depot.lastDeposit[0].variationType + "!"
@@ -132,347 +144,465 @@ Item {
   }
 
 
-  // AI takes over after a few seconds if the player is not connected
+  // AI will play after short time
   Timer {
-      id: aiTimeOutTimer
+      id: aiThinkingTimer
       interval: aiTurnTime
+      repeat: false
       onTriggered:
       {
-          gameLogic.executeAIMove()
-          endTurn()
-      }
-  }
+          var nPlayerIndexLegacy = -1;
+          var userId = 0;
+          var cardIds = []
 
-
-  // connect to the FelgoMultiplayer object and handle all messages
-  Connections {
-    // this is important! only handle the messages when we are currently in the game scene
-    // otherwise, we would handle the playerJoined signal when the player is still in matchmaking view!
-    // do not use the visible property here! as visible only gets triggered with the opacity animation in SceneBase
-    target: multiplayer
-    enabled: activeScene === gameScene
-
-    onGameStarted: {
-      // the gameStarted signal is received by the client as well not only by the leader, otherwise we would not realize when a new game starts
-      // otherwise only the leader would trigger a "User.RestartGame" event
-      // this is called internally though, thus make it a system event
-      if(gameRestarted) {
-//        flurry.logEvent("System.GameReStarted", "singlePlayer", multiplayer.singlePlayer)
-//        flurry.logTimedEvent("Game.TimeInGameSingleMatch", {"singlePlayer": multiplayer.singlePlayer})
-      } else {
-//        flurry.logEvent("System.GameStarted", "singlePlayer", multiplayer.singlePlayer)
-//        flurry.logTimedEvent("Game.TimeInGameTotal", {"singlePlayer": multiplayer.singlePlayer})
-      }
-    }
-
-    onAmLeaderChanged: {
-        if (multiplayer.leaderPlayer)
-            console.debug("Current Leader is: " + multiplayer.leaderPlayer.userId)
-
-        if(multiplayer.amLeader)
-        {
-            console.debug("this player just became the new leader")
-            if(arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
-//                if(!timerPlayerThinking.running && !gameOver)
-            {
-                console.debug("New leader selected, but the timer is currently not running, thus trigger a new turn now")
-                // even when we comment this, the game does not stall 100%, thus it is likely that we would skip a player here. but better to skip a player once and make sure the game is continued than stalling the game. hard to reproduce, as it does not happen every time the leader changes!
-                multiplayer.triggerNextTurn()
-            }
-        }
-    }
-
-
-    onMessageReceived: {
-      console.debug("onMessageReceived with code", code, "initialized:", initialized)
-      // not relevant for google analytics, causes to exceed the free limit
-
-      if(!initialized && code !== messageSyncGameState) {
-        console.debug("ERROR: received message before gameState was synced and user is not initialized:", code, message)
-
-        if (message.receiverPlayerId === multiplayer.localPlayer.userId && !compareGameStateWithLeader(message.playerHands)) {
-          receivedMessageBeforeGameStateInSync = true
-        }
-        return
-      }
-
-//      // sync the game state for existing and newly joined players
-//      if (code == messageSyncGameState)
-//      {
-//        if (!message.receiverPlayerId || message.receiverPlayerId === multiplayer.localPlayer.userId || !compareGameStateWithLeader(message.playerHands)) {
-//          console.debug("Sync Game State now")
-//          console.debug("Received Message: " + JSON.stringify(message))
-//          // NOTE: the activePlayer can be undefined here, when the player makes a late-join! thus add a check in syncDepot() -> depositCard() and handle the case that it is undefined!
-//          console.debug("multiplayer.activePlayer when syncing game state:", multiplayer.activePlayer)
-
-//          syncPlayers()
-//          initTags()
-//          syncDeck(message.deck)
-//          depot.syncDepot(message.depot, message.lastDepositIDs, message.lastDepositCardColors, message.skipped, message.effect, message.drawAmount, message.lastPlayerUserID, message.finishedUserIDs)
-//          syncHands(message.playerHands)
-
-//          // join a game which is already over
-//          gameOver = message.gameOver
-//          gameScene.gameOverWindow.visible = gameOver
-//          timerPlayerThinking.running = !gameOver
-
-//          console.debug("finished syncGameState, setting initialized to true now")
-//          initialized = true
-
-//          // if we before received a message before game state was in sync, do request a new game state from the leader now
-//          if(receivedMessageBeforeGameStateInSync) {
-//            console.debug("requesting a new game state from server now, as receivedMessageBeforeGameStateInSync was true")
-//            multiplayer.sendMessage(messageRequestGameState, multiplayer.localPlayer.userId)
-//            receivedMessageBeforeGameStateInSync = false
-//          }
-
-//          // request the detailed playerTag info from the other players (highscore, level and badge)
-//          // if the message was specifically sent to the local user (for example when he or she joins)
-//          if (message.receiverPlayerId){
-//            multiplayer.sendMessage(messageRequestPlayerTags, multiplayer.localPlayer.userId)
-//          }
-//        }
-//      }
-
-      // send a new game state to the requesting user
-      else if (code == messageRequestGameState)
-      {
-        multiplayer.leaderCode(function() {
-          sendGameStateToPlayer(message)
-        })
-      }
-
-      // move card to hand
-      else if (code == messageMoveCardsHand){
-        // if there is an active player with a different userId, the message is invalid
-        // the message was probably sent after the leader triggered the next turn
-        if (multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
-          multiplayer.leaderCode(function() {
-            sendGameStateToPlayer(message.userId)
-          })
-          return
-        }
-
-        getCards(message.cards, message.userId)
-      }
-
-      // move card to depot
-      else if (code == messageMoveCardsDepot)
-      {
-        // if there is an active player with a different userId, the message is invalid
-        // the message was probably sent after the leader triggered the next turn
-        if (multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
-          multiplayer.leaderCode(function() {
-            sendGameStateToPlayer(message.userId)
-          })
-          return
-        }
-
-        depositCards(message.cardIds, message.userId)
-      }
-
-//      // lasting card effect
-//      else if (code == messageSetEffect){
-//        // if the message wasn't sent by the leader and
-//        // if it wasn't sent by the active player, the message is invalid
-//        // the message was probably sent after the leader triggered the next turn
-//        if (multiplayer.leaderPlayer.userId != message.userId &&
-//            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
-//          return
-//        }
-
-//        depot.effect = message.effect
-//      }
-
-      // sync skipped state
-      else if (code == messageSetSkipped)
-      {
-        // if the message wasn't sent by the leader and
-        // if it wasn't sent by the active player, the message is invalid
-        // the message was probably sent after the leader triggered the next turn
-        if (multiplayer.leaderPlayer.userId != message.userId &&
-            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
-          return
-        }
-
-        depot.skipped = message.skipped
-      }
-//      // sync turn direction
-//      else if (code == messageSetReverse){
-//        // if the message wasn't sent by the leader and
-//        // if it wasn't sent by the active player, the message is invalid
-//        // the message was probably sent after the leader triggered the next turn
-//        if (multiplayer.leaderPlayer.userId != message.userId &&
-//            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
-//          return
-//        }
-
-//        depot.clockwise = message.clockwise
-//      }
-
-
-      // game ends
-      else if (code == messageEndGame)
-      {
-        // if the message wasn't sent by the leader and
-        // if it wasn't a desktop test and
-        // if it wasn't sent by the active player, the message is invalid
-        // the message was probably sent after the leader triggered the next turn
-        if (multiplayer.leaderPlayer.userId != message.userId &&
-            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId && !message.test){
-          return
-        }
-
-        endGame(message.userId)
-      }
-
-      // chat message
-      else if (code == messagePrintChat)
-      {
-        if (!chat.gConsole.visible){
-          chat.chatButton.buttonImage.source = "../../../assets/img/Chat2.png"
-        }
-        chat.gConsole.printLn(message)
-      }
-
-      // set highscore and level from other players
-      else if (code == messageSetPlayerInfo)
-      {
-          updateTag(message.userId, message.level, message.highscore, message.rank)
-      }
-
-      // let the leader trigger a new turn
-      else if (code == messageTriggerTurn)
-      {
-          multiplayer.leaderCode(function()
+          if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
           {
-              // the leader only triggers the turn if the requesting user is still the active player
-              if (multiplayer.activePlayer && multiplayer.activePlayer.userId == message){
-                  multiplayer.triggerNextTurn()
+              // Search for AI player which still has to exchange cards
+              for (var m = 0; m < playerHands.children.length; m++)
+              {
+                  if (  (playerHands.children[m].player !== multiplayer.localPlayer)
+                     && (arschlochGameLogic.getCardExchangeNumber(m) !== 0) )
+                  {
+                      nPlayerIndexLegacy = m
+                      userId = playerHands.children[m].player.userId
+                      break
+                  }
               }
 
-              // if the requesting user is no longer active, it means that he timed out according to the leader
-              // his last action happened after his turn and is therefore invalid
-              // the leader has to send the user a new game state
-              else {
-                  sendGameStateToPlayer(message)
-              }
-          })
-      }
+              if (nPlayerIndexLegacy === -1)
+                  return
 
-      // reset player tag info and send it to other player because it was requested
-      /*
-         Only the local user can access their highscore and rank from the leaderboard.
-         This is the reason why we sync this information with messageSetPlayerInfo messages.
-         Late join users have to request this information again after they initialize the game with a messageSyncGameState message.
-         Another option would be to let the leader send highscore, rank and level of each user via messageSyncGameState.
-      */
-      else if (code == messageRequestPlayerTags){
-        initTags()
+              cardIds = legacyPlebCodeBridge.calcMoveCardExchange(userId, nPlayerIndexLegacy)
+              console.assert(cardIds.length === 1)
+
+              var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
+              var exchangePartnerHand = playerHands.children[nPlayerIndexCardExchange]
+
+              // First deposit the cards to the depot for 1 ms such that the owner is changed correctly
+              depositCards(cardIds, userId)
+              depot.reset()
+
+              // ... then hand them over to the exchange partner. Note that we need an array here
+              var cards = []
+              cards.push(entityManager.getEntityById(cardIds[0]))
+              exchangePartnerHand.pickUpCards(cards)
+              scaleHand()
+
+              // Sync legacy gamestate
+              arschlochGameLogic.giveCardToExchangePartner(nPlayerIndexLegacy, nPlayerIndexCardExchange, cards[0].points - 7)
+
+              // Card exchange has just finished
+              // Trigger a new turn
+              if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+              {
+                  aiThinkingTimer.stop()
+                  multiplayer.triggerNextTurn(playerHands.children[arschlochGameLogic.getActualPlayerID()].player.userId)
+              }
+          }
+
+          else if (     (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+                   &&   (multiplayer.activePlayer !== 0)
+                   &&   (multiplayer.localPlayer !== multiplayer.activePlayer) )
+          {
+              userId = multiplayer.activePlayer.userId
+              if ( !depot.skipped )
+              {
+                  nPlayerIndexLegacy = getHandIndex(userId)
+                  cardIds = legacyPlebCodeBridge.calcMove(userId, nPlayerIndexLegacy)
+
+                  // Play card animation or skip sound
+                  if (cardIds.length > 0)
+                  {
+                      multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
+                      depositCards(cardIds, userId)
+                  }
+              }
+
+              endTurn()
+          }
       }
-    }
   }
+
+
+//  // connect to the FelgoMultiplayer object and handle all messages
+//  Connections {
+//    // this is important! only handle the messages when we are currently in the game scene
+//    // otherwise, we would handle the playerJoined signal when the player is still in matchmaking view!
+//    // do not use the visible property here! as visible only gets triggered with the opacity animation in SceneBase
+//    target: multiplayer
+//    enabled: activeScene === gameScene
+
+
+//    onAmLeaderChanged: {
+//        if (multiplayer.leaderPlayer)
+//            console.debug("Current Leader is: " + multiplayer.leaderPlayer.userId)
+
+//        if(multiplayer.amLeader)
+//        {
+//            console.debug("this player just became the new leader")
+//            if(arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+////                if(!timerPlayerThinking.running && !gameOver)
+//            {
+//                console.debug("New leader selected, but the timer is currently not running, thus trigger a new turn now")
+//                // even when we comment this, the game does not stall 100%, thus it is likely that we would skip a player here. but better to skip a player once and make sure the game is continued than stalling the game. hard to reproduce, as it does not happen every time the leader changes!
+//                multiplayer.triggerNextTurn()
+//            }
+//        }
+//    }
+
+//    // Is not called in offline single player mode, only in online multiplayer mode
+//    onMessageReceived: {
+//      console.debug("onMessageReceived with code", code, "initialized:", initialized)
+//      // not relevant for google analytics, causes to exceed the free limit
+
+//      if(!initialized && code !== messageSyncGameState) {
+//        console.debug("ERROR: received message before gameState was synced and user is not initialized:", code, message)
+
+//        if (message.receiverPlayerId === multiplayer.localPlayer.userId && !compareGameStateWithLeader(message.playerHands)) {
+//          receivedMessageBeforeGameStateInSync = true
+//        }
+//        return
+//      }
+
+////      // sync the game state for existing and newly joined players
+////      if (code == messageSyncGameState)
+////      {
+////        if (!message.receiverPlayerId || message.receiverPlayerId === multiplayer.localPlayer.userId || !compareGameStateWithLeader(message.playerHands)) {
+////          console.debug("Sync Game State now")
+////          console.debug("Received Message: " + JSON.stringify(message))
+////          // NOTE: the activePlayer can be undefined here, when the player makes a late-join! thus add a check in syncDepot() -> depositCard() and handle the case that it is undefined!
+////          console.debug("multiplayer.activePlayer when syncing game state:", multiplayer.activePlayer)
+
+////          syncPlayers()
+////          initTags()
+////          syncDeck(message.deck)
+////          depot.syncDepot(message.depot, message.lastDepositIDs, message.lastDepositCardColors, message.skipped, message.effect, message.drawAmount, message.lastPlayerUserID, message.finishedUserIDs)
+////          syncHands(message.playerHands)
+
+////          // join a game which is already over
+////          gameOver = message.gameOver
+////          gameScene.gameOverWindow.visible = gameOver
+////          timerPlayerThinking.running = !gameOver
+
+////          console.debug("finished syncGameState, setting initialized to true now")
+////          initialized = true
+
+////          // if we before received a message before game state was in sync, do request a new game state from the leader now
+////          if(receivedMessageBeforeGameStateInSync) {
+////            console.debug("requesting a new game state from server now, as receivedMessageBeforeGameStateInSync was true")
+////            multiplayer.sendMessage(messageRequestGameState, multiplayer.localPlayer.userId)
+////            receivedMessageBeforeGameStateInSync = false
+////          }
+
+////          // request the detailed playerTag info from the other players (highscore, level and badge)
+////          // if the message was specifically sent to the local user (for example when he or she joins)
+////          if (message.receiverPlayerId){
+////            multiplayer.sendMessage(messageRequestPlayerTags, multiplayer.localPlayer.userId)
+////          }
+////        }
+////      }
+
+//      // send a new game state to the requesting user
+//      else if (code == messageRequestGameState)
+//      {
+//        multiplayer.leaderCode(function() {
+//          sendGameStateToPlayer(message)
+//        })
+//      }
+
+//      // move card to hand
+//      else if (code == messageMoveCardsHand){
+//        // if there is an active player with a different userId, the message is invalid
+//        // the message was probably sent after the leader triggered the next turn
+//        if (multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
+//          multiplayer.leaderCode(function() {
+//            sendGameStateToPlayer(message.userId)
+//          })
+//          return
+//        }
+
+//        getCards(message.cards, message.userId)
+//      }
+
+//      // move card to depot
+//      else if (code == messageMoveCardsDepot)
+//      {
+//        // if there is an active player with a different userId, the message is invalid
+//        // the message was probably sent after the leader triggered the next turn
+//        if (multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
+//          multiplayer.leaderCode(function() {
+//            sendGameStateToPlayer(message.userId)
+//          })
+//          return
+//        }
+
+//        depositCards(message.cardIds, message.userId)
+//      }
+
+////      // lasting card effect
+////      else if (code == messageSetEffect){
+////        // if the message wasn't sent by the leader and
+////        // if it wasn't sent by the active player, the message is invalid
+////        // the message was probably sent after the leader triggered the next turn
+////        if (multiplayer.leaderPlayer.userId != message.userId &&
+////            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
+////          return
+////        }
+
+////        depot.effect = message.effect
+////      }
+
+//      // sync skipped state
+//      else if (code == messageSetSkipped)
+//      {
+//        // if the message wasn't sent by the leader and
+//        // if it wasn't sent by the active player, the message is invalid
+//        // the message was probably sent after the leader triggered the next turn
+//        if (multiplayer.leaderPlayer.userId != message.userId &&
+//            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
+//          return
+//        }
+
+//        depot.skipped = message.skipped
+//      }
+////      // sync turn direction
+////      else if (code == messageSetReverse){
+////        // if the message wasn't sent by the leader and
+////        // if it wasn't sent by the active player, the message is invalid
+////        // the message was probably sent after the leader triggered the next turn
+////        if (multiplayer.leaderPlayer.userId != message.userId &&
+////            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId){
+////          return
+////        }
+
+////        depot.clockwise = message.clockwise
+////      }
+
+
+//      // game ends
+//      else if (code == messageEndGame)
+//      {
+//        // if the message wasn't sent by the leader and
+//        // if it wasn't a desktop test and
+//        // if it wasn't sent by the active player, the message is invalid
+//        // the message was probably sent after the leader triggered the next turn
+//        if (multiplayer.leaderPlayer.userId != message.userId &&
+//            multiplayer.activePlayer && multiplayer.activePlayer.userId != message.userId && !message.test){
+//          return
+//        }
+
+//        endGame(message.userId)
+//      }
+
+//      // chat message
+//      else if (code == messagePrintChat)
+//      {
+//        if (!chat.gConsole.visible){
+//          chat.chatButton.buttonImage.source = "../../../assets/img/Chat2.png"
+//        }
+//        chat.gConsole.printLn(message)
+//      }
+
+//      // set highscore and level from other players
+//      else if (code == messageSetPlayerInfo)
+//      {
+//          updateTag(message.userId, message.level, message.highscore, message.rank)
+//      }
+
+//      // let the leader trigger a new turn
+//      else if (code == messageTriggerTurn)
+//      {
+//          multiplayer.leaderCode(function()
+//          {
+//              // the leader only triggers the turn if the requesting user is still the active player
+//              if (multiplayer.activePlayer && multiplayer.activePlayer.userId == message){
+//                  multiplayer.triggerNextTurn()
+//              }
+
+//              // if the requesting user is no longer active, it means that he timed out according to the leader
+//              // his last action happened after his turn and is therefore invalid
+//              // the leader has to send the user a new game state
+//              else {
+//                  sendGameStateToPlayer(message)
+//              }
+//          })
+//      }
+
+//      // reset player tag info and send it to other player because it was requested
+//      /*
+//         Only the local user can access their highscore and rank from the leaderboard.
+//         This is the reason why we sync this information with messageSetPlayerInfo messages.
+//         Late join users have to request this information again after they initialize the game with a messageSyncGameState message.
+//         Another option would be to let the leader send highscore, rank and level of each user via messageSyncGameState.
+//      */
+//      else if (code == messageRequestPlayerTags){
+//        initTags()
+//      }
+//    }
+//  }
 
   // connect to the gameScene and handle all signals
   Connections {
-    target: gameScene
+      target: gameScene
 
-    // the player selected a card
-    onCardSelected: {
-        // if the selected card is from the stack, signal it
-        if (entityManager.getEntityById(cardId).state === "stack"){
-            // stackSelected()
-            // deposit the valid card
-        } else if (entityManager.getEntityById(cardId).state === "player")
-        {
-            if (multiplayer.myTurn && !depot.skipped && !acted)
-            {
-                if (depot.validCard(cardId))
-                {
-                    var selectedCard = entityManager.getEntityById(cardId)
-                    if (selectedCard.glowImage.visible || selectedCard.selected) {
-                        selectedCard.selected = !selectedCard.selected
-                        selectedCard.glowImage.visible = !selectedCard.selected
+      // the player selected a card
+      onCardSelected:
+      {
+          // if the selected card is from the stack, signal it
+          if (entityManager.getEntityById(cardId).state === "stack")
+          {
+              // stackSelected()
+              // deposit the valid card
+          }
+          else if (entityManager.getEntityById(cardId).state === "player")
+          {
+              var selectedCard = entityManager.getEntityById(cardId)
+              if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
+              {
+                  // Todo: Regeln fürs selektieren einer Karte
+                  // Aktuell kann man sogar die Karten der Gegner selektieren
+//                  if (selectedCard.glowImage.visible || selectedCard.selected)
+//                  {
+                      selectedCard.selected = !selectedCard.selected
+//                  }
 
-                        // convenience for the player to auto-select groups
-                        // if there is a last move by another player which has to be beaten
-                        if (depot.lastPlayerUserID && depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayerUserID)
-                        {
-                            var activeHand = getHand(multiplayer.localPlayer.userId).hand
-                            if (selectedCard.selected) {
-                                var groupSize = 1
-                                for (var i = 0; i < activeHand.length; i++) {
-                                    if (activeHand[i].entityId !== selectedCard.entityId) {
-                                        if (activeHand[i].points === selectedCard.points) {
-                                            if (groupSize < depot.lastDeposit.length) {
-                                                activeHand[i].selected = true
-                                                activeHand[i].glowImage.visible = false
-                                                groupSize++
-                                            } else {
-                                                activeHand[i].selected = false
-                                                activeHand[i].glowImage.visible = false
-                                            }
-                                        }
-                                    }
-                                }
-                            } else {
-                                for (var j = 0; j < activeHand.length; j++) {
-                                    if (activeHand[j].entityId !== selectedCard.entityId) {
-                                        if (activeHand[j].points === selectedCard.points) {
-                                            activeHand[j].selected = false
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                  // refresh hand display
+//                  markValid()
 
-                        // refresh hand display
-                        markValid()
-                    }
+                  return
+              }
 
-                }
-            }
-        }
-        else if (entityManager.getEntityById(cardId).state === "depot")
-        {
-            console.debug("DEPOT CARD SELECTED")
-            skipOrPlay()
-        }
-    }
 
-    onDepotSelected: {
-        console.debug("DEPOT ITSELF SELECTED")
-        skipOrPlay()
-    }
+
+              if (multiplayer.myTurn && !depot.skipped && !acted)
+              {
+                  if (!depot.validCard(cardId))
+                      return
+
+
+                  if (selectedCard.glowImage.visible || selectedCard.selected)
+                  {
+                      selectedCard.selected = !selectedCard.selected
+                      selectedCard.glowImage.visible = !selectedCard.selected
+
+                      // convenience for the player to auto-select groups
+                      // if there is a last move by another player which has to be beaten
+                      if (depot.lastPlayerUserID && depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayerUserID)
+                      {
+                          var activeHand = getHand(multiplayer.localPlayer.userId).hand
+                          if (selectedCard.selected) {
+                              var groupSize = 1
+                              for (var i = 0; i < activeHand.length; i++) {
+                                  if (activeHand[i].entityId !== selectedCard.entityId) {
+                                      if (activeHand[i].points === selectedCard.points) {
+                                          if (groupSize < depot.lastDeposit.length) {
+                                              activeHand[i].selected = true
+                                              activeHand[i].glowImage.visible = false
+                                              groupSize++
+                                          } else {
+                                              activeHand[i].selected = false
+                                              activeHand[i].glowImage.visible = false
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                          else
+                          {
+                              // Unselect other cards of same value
+                              for (var j = 0; j < activeHand.length; j++) {
+                                  if (    (activeHand[j].entityId !== selectedCard.entityId)
+                                      &&  (activeHand[j].points === selectedCard.points) )
+                                  {
+                                      activeHand[j].selected = false
+                                  }
+                              }
+                          }
+                      }
+
+                      // refresh hand display
+                      markValid()
+                  }
+
+
+              }
+          }
+          else if (entityManager.getEntityById(cardId).state === "depot")
+          {
+              console.debug("DEPOT CARD SELECTED")
+              skipOrPlay()
+          }
+      }
+
+      onDepotSelected:
+      {
+          console.debug("DEPOT ITSELF SELECTED")
+          skipOrPlay()
+      }
   }
 
 
   function skipOrPlay()
   {
-      // Make sure this player still has to play
-      if (!multiplayer.myTurn || depot.skipped || acted)
-          return
+      var activeHand = getHand(multiplayer.localPlayer.userId)
+      var nPlayerIndexLegacy = getHandIndex(multiplayer.localPlayer.userId)
+      var cardIds = activeHand.getSelectedCardIDs()
+      var selectedCards = activeHand.getSelectedCards()
 
-      // get all selected cards into cardID array
-      var cardIds = []
-      var activeHand = getHand(multiplayer.localPlayer.userId).hand
-      for (var i = 0; i < activeHand.length; i++)
-          if (activeHand[i].selected)
-              cardIds.push(activeHand[i].entityId)
 
-      // Move cards to depot and inform Multiplayer
-      acted = true
-      if (cardIds.length > 0)
+      if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
       {
-          console.debug("Player " + multiplayer.localPlayer.userId + " is playing: " + cardIds)
+
+          if (  (arschlochGameLogic.getCardExchangeNumber(nPlayerIndexLegacy) === 0)
+            ||  (arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy) < 0)
+            ||  (selectedCards.length === 0)      )
+          {
+              console.debug("Card exchange is already finished or no exchange partner defined for player index:" + nPlayerIndexLegacy)
+              return
+          }
+
+          var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
+          var exchangePartnerHand = playerHands.children[nPlayerIndexCardExchange]
+
+          // First deposit the cards to the depot for 1 ms such that the owner is changed correctly
           depositCards(cardIds, multiplayer.localPlayer.userId)
-          multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: multiplayer.localPlayer.userId})
+          depot.reset()
+
+          // ... then hand them over to the exchange partner
+          exchangePartnerHand.pickUpCards(selectedCards)
+
+          // Sync legacy gamestate
+          for (var n = 0; n < selectedCards.length; n++)
+              arschlochGameLogic.giveCardToExchangePartner(nPlayerIndexLegacy, nPlayerIndexCardExchange, selectedCards[n].points - 7)
+
+          // Card exchange has just finished
+          if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+          {
+              aiThinkingTimer.stop()
+              multiplayer.triggerNextTurn(playerHands.children[arschlochGameLogic.getActualPlayerID()].player.userId)
+          }
       }
-      else
-          console.debug("Player " + multiplayer.localPlayer.userId + "skipped its turn")
+
+      else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+      {
+          // Make sure this player still has to play
+          if (!multiplayer.myTurn || depot.skipped || acted)
+              return
+
+          // Move cards to depot and inform Multiplayer
+          acted = true
+          if (cardIds.length > 0)
+          {
+              console.debug("Player " + multiplayer.localPlayer.userId + " is playing: " + cardIds)
+              depositCards(cardIds, multiplayer.localPlayer.userId)
+              multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: multiplayer.localPlayer.userId})
+          }
+          else
+              console.debug("Player " + multiplayer.localPlayer.userId + "skipped its turn")
 
 
-      endTurn()
+          endTurn()
+      }
   }
 
 //  // sync deck with leader and set up the game
@@ -494,16 +624,13 @@ Item {
 //      chat.reset()
 //  }
 
-  // deposit the selected cards
+  // deposit the selected cards from player hand to depot
   function depositCards(cardIds, userId)
   {
       var activeHand = getHand(userId)
 
       // unmark all highlighted cards. Good point here, as the cards flying to the depot shall not be marked
       unmark()
-
-      // scale down the active localPlayer playerHand
-//      scaleHand(1.0)
 
       // find the playerHand for the active player
       // if the selected card is in the playerHand of the active player
@@ -515,36 +642,8 @@ Item {
           // deposit the cards
           depot.depositCards(cardIds)
       }
-
-      return cardIds
   }
 
-  // let AI take over if the player is not skipped
-  function executeAIMove() {
-    if(!depot.skipped){
-        playPlebCustom()
-    }
-  }
-
-
-  function playPlebCustom()
-  {
-      // Compute AI move and play it
-      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-      if (!userId)
-          return
-
-      var nActualPlayerLegacy = getHandIndex(userId)
-
-      var cardIds = legacyPlebCodeBridge.calcMove(userId, nActualPlayerLegacy)
-
-      // Play card animation or skip sound
-      if (cardIds.length > 0)
-      {
-          multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
-          depositCards(cardIds, userId)
-      }
-  }
 
   // check whether a user with a specific id has valid cards or not
   function hasValidCards(user){
@@ -640,10 +739,11 @@ Item {
 //          playerTags.children[i].canvas.requestPaint()
 //      }
 
-      // schedule AI to take over in 3 seconds for AI players / not connected initPlayers()
+      // schedule AI to play after some time
       multiplayer.leaderCode(function() {
           if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected) {
-              aiTimeOutTimer.start()
+              aiThinkingTimer.start()
+              aiThinkingTimer.repeat = false
           }
       })
   }
@@ -692,7 +792,7 @@ Item {
   {
       console.debug("GameLogic::leaveGame() start")
 
-      aiTimeOutTimer.stop()
+      aiThinkingTimer.stop()
       hintTimer.stop()
 //      timerPlayerThinking.running = false
       depot.effectTimer.stop()
@@ -752,6 +852,7 @@ Item {
       // - Card exchange numbers + Partners
       // - Game state (Exchange cards or Play)
       // - First player to play
+      arschlochGameLogic.resetGameState()
       arschlochGameLogic.checkCardExchangePartners()
       arschlochGameLogic.resetGameResult()
 
@@ -760,9 +861,6 @@ Item {
       initDeck()
       initHands()
       initTags()
-
-      scaleHand()
-      markValid()
 
       // set the game state for all players
       multiplayer.leaderCode(function ()
@@ -787,11 +885,24 @@ Item {
           console.assert(nActualPlayer >= 0)
 
           if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+          {
               multiplayer.triggerNextTurn(playerHands.children[nActualPlayer].player.userId)
+          }
+          else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
+          {
+              // Reset hint
+              gameScene.hintRectangle.visible = false;
+              elapsedHintTime = 0;
+              hintTimer.start()
 
-          scaleHand()
+              // Repeating timer needed here s.t. all AI players can act
+              aiThinkingTimer.start()
+              aiThinkingTimer.repeat = true
+          }
       })
 
+      scaleHand()
+      markValid()
 
       console.debug("InitGame finished!")
   }
@@ -887,27 +998,14 @@ Item {
       multiplayer.leaderCode(function () {
           console.debug("Leader Init Players")
           var clientPlayers = multiplayer.players
-          var playerInfo = []
           for (var i = 0; i < clientPlayers.length; i++)
           {
               playerTags.children[i].player = clientPlayers[i]
               playerHands.children[i].player = clientPlayers[i]
-              playerInfo[i] = clientPlayers[i].userId
           }
       })
   }
 
-//  // find player by userId
-//  function getPlayer(userId){
-//    for (var i = 0; i < multiplayer.players.length; i++){
-//      console.debug("All UserIDs: " + multiplayer.players[i].userId + ", Looking for: " + userId)
-//      if (multiplayer.players[i].userId == userId){
-//        return multiplayer.players[i]
-//      }
-//    }
-//    console.debug("ERROR: could not find player with id", userId, "in the multiplayer.players list!")
-//    return undefined
-//  }
 
   // find hand by userId
   function getHand(userId)
@@ -938,19 +1036,19 @@ Item {
   }
 
 
-  // the other players position the players at the borders of the game field
-  function syncPlayers()
-  {
-      console.debug("syncPlayers()")
-      // it can happen that the multiplayer.players array is different than the one from the local user
-      // possible reasons are, that a player meanwhile joined the game but this did not get forwarded to the room, or not forwarded to the leader yet
+//  // the other players position the players at the borders of the game field
+//  function syncPlayers()
+//  {
+//      console.debug("syncPlayers()")
+//      // it can happen that the multiplayer.players array is different than the one from the local user
+//      // possible reasons are, that a player meanwhile joined the game but this did not get forwarded to the room, or not forwarded to the leader yet
 
-      // assign the players to the positions at the borders of the game field
-      for (var j = 0; j < multiplayer.players.length; j++) {
-          playerTags.children[j].player = multiplayer.players[j]
-          playerHands.children[j].player = multiplayer.players[j]
-      }
-  }
+//      // assign the players to the positions at the borders of the game field
+//      for (var j = 0; j < multiplayer.players.length; j++) {
+//          playerTags.children[j].player = multiplayer.players[j]
+//          playerHands.children[j].player = multiplayer.players[j]
+//      }
+//  }
 
   // the leader creates the deck and depot
   function initDeck()
@@ -972,19 +1070,19 @@ Item {
       })
   }
 
-  // sync all hands according to the leader
-  function syncHands(messageHands){
-    console.debug("syncHands()")
-    for (var i = 0; i < playerHands.children.length; i++){
-      var currentUserId = playerHands.children[i].player.userId
-      for (var j = 0; j < messageHands.length; j++){
-        var messageUserId = messageHands[j].userId
-        if (currentUserId == messageUserId){
-          playerHands.children[i].syncHand(messageHands[j].handIds)
-        }
-      }
-    }
-  }
+//  // sync all hands according to the leader
+//  function syncHands(messageHands){
+//    console.debug("syncHands()")
+//    for (var i = 0; i < playerHands.children.length; i++){
+//      var currentUserId = playerHands.children[i].player.userId
+//      for (var j = 0; j < messageHands.length; j++){
+//        var messageUserId = messageHands[j].userId
+//        if (currentUserId == messageUserId){
+//          playerHands.children[i].syncHand(messageHands[j].handIds)
+//        }
+//      }
+//    }
+//  }
 
   // reset all tags and init the tag for the local player
   function initTags()
@@ -999,27 +1097,19 @@ Item {
       }
   }
 
-  // draw the specified amount of cards
-  function getCards(cards, userId)
-  {
-      // find the playerHand of the active player and pick up cards
-      for (var i = 0; i < playerHands.children.length; i++)
-          if (playerHands.children[i].player.userId === userId)
-              playerHands.children[i].pickUpCards(cards)
-  }
-
 
   // find the playerHand of the active player and mark all valid card options
   function markValid()
   {
-      if (multiplayer.myTurn && !acted ){
-          for (var i = 0; i < playerHands.children.length; i++) {
-              if (playerHands.children[i].player === multiplayer.activePlayer){
-                  playerHands.children[i].markValid()
-              }
-          }
-      } else {
-          unmark()
+//      if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
+//      {
+//      }
+//      else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+      {
+          if (multiplayer.myTurn && !acted )
+              getHand(multiplayer.activePlayer.userId).markValid()
+          else
+              unmark()
       }
   }
 
@@ -1071,9 +1161,9 @@ Item {
       var nActualPlayerLegacy = getHandIndex(userId)
       var playerHand = getHand(userId)
 
+      // CHeck if player just won
       if (arschlochGameLogic.getPlayerGameResult(nActualPlayerLegacy) === Constants.nGameResultUndefined)
       {
-          // This player just finished
           if (playerHand.checkWin())
           {
               console.debug("[endTurn] Player " + multiplayer.activePlayer + + ", LegacyID: " + nActualPlayerLegacy + " HAS FINISHED!!!")
@@ -1158,7 +1248,7 @@ Item {
           // calculate level with new points and check if there was a level up
           var oldLevel = currentTag.level
           currentTag.getPlayerData(false)
-          if (oldLevel != currentTag.level)
+          if (oldLevel !== currentTag.level)
           {
               gameScene.gameOverWindow.level = currentTag.level
               gameScene.gameOverWindow.levelText.visible = true
@@ -1179,7 +1269,7 @@ Item {
       scaleHand()
       gameScene.hintRectangle.visible = false;
       hintTimer.stop()
-      aiTimeOutTimer.stop()
+      aiThinkingTimer.stop()
 //      timerPlayerThinking.running = false
       depot.effectTimer.stop()
   }

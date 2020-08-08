@@ -82,10 +82,22 @@ public:
     Q_INVOKABLE int getLastPlayerID() { return m_GameState.m_nLastPlayer; }
     Q_INVOKABLE void setLastPlayerID(int n) { m_GameState.m_nLastPlayer = n; }
 
+    // --------------------------------------------------------------------------------------------
 
+    // Actions a player can directly perform
     Q_INVOKABLE void playCards();
+    Q_INVOKABLE void giveCardToExchangePartner(int nPlayerIDGive, int nPlayerIDReceive, int nValueCard);
 
     // --------------------------------------------------------------------------------------------
+
+    // Resets Lastmove, LastPlayer, NumberPlayer, ActualPLayer all to initial invalid (-1)
+    // and clears all cards, i.e. all players have empty hands
+    Q_INVOKABLE void checkCardExchangePartners() { m_GameState.SpielBeginnen(); }
+
+    Q_INVOKABLE int getCardExchangePartner(int nPlayer) { return m_GameState.m_nCardExchangePartner[nPlayer]; }
+    Q_INVOKABLE int getCardExchangeNumber(int nPlayer) { return m_GameState.m_nCardExchangeNumber[nPlayer]; }
+    Q_INVOKABLE void setCardExchangeNumber(int nPlayer, int nNumber) { m_GameState.m_nCardExchangeNumber[nPlayer] = nNumber; }
+    Q_INVOKABLE void setCardExchangePartner(int nPlayer, int nPartner) { m_GameState.m_nCardExchangePartner[nPlayer] = nPartner; }
 
 
     // Resets Lastmove, LastPlayer, NumberPlayer, ActualPLayer all to initial invalid (-1)
@@ -93,6 +105,10 @@ public:
     Q_INVOKABLE void resetGameState() {
         m_MoveSimpleAI = c_MoveSimpleSchieben;
         m_GameState.Reset(); }
+
+    // Resets the result of the last game
+    Q_INVOKABLE void resetGameResult() { m_GameState.m_GameResult.Reset(); }
+
 
     // Adds the given card number and value to the mentioned players cards in his hand
     Q_INVOKABLE void addPlayerCards(int nPlayerID, int nNumberCards, int nValueCards)    {
@@ -110,6 +126,13 @@ public:
     Q_INVOKABLE void think() {
         CPlayerSimpleAI2 PlayerSimpleAI2;
         m_MoveSimpleAI = PlayerSimpleAI2.ThinkInGameState(&m_GameState);   }
+
+    // Start the AI think routine and let the AI compute a smart move for the current player, which
+    // will be stored in m_MoveSimpleAI. It can be read through getMoveSimpleAI(Value|Number)
+    Q_INVOKABLE void thinkCardExchange(int nPlayerID) {
+        CPlayerSimpleAI2 PlayerSimpleAI2;
+        m_MoveSimpleAI = PlayerSimpleAI2.ThinkKartenTauschenInGameState(&m_GameState, nPlayerID);   }
+
 
     // Read the AI move as computed before via think()
     // \todo would be nicer to return this tuple directly as function result of think(), but how to return 2 integers?

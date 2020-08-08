@@ -83,7 +83,8 @@ Item {
   // start the hand by picking up a specified amount of cards
   function startHand()
   {
-      pickUpCards(numberCardsAtBeginningOfGame)
+//      pickUpCardsFromDeck(numberCardsAtBeginningOfGame)
+      pickUpCardsFromDeck(1)
   }
 
   // reset the hand by removing all cards
@@ -134,46 +135,57 @@ Item {
       }
   }
 
+
   // pick up specified amount of cards
-  function pickUpCards(amount){
-    var pickUp = deck.handOutCards(amount)
-
-    // add the stack cards to the playerHand array
-    for (var i = 0; i < pickUp.length; i ++){
-      hand.push(pickUp[i])
-      changeParent(pickUp[i])
-      if (multiplayer.localPlayer == player){
-        pickUp[i].hidden = false
-      }
-      drawSound.play()
-    }
-
-    // reorganize the hand
-    neatHand()
+  function pickUpCardsFromDeck(amount)
+  {
+      var cardEntities = deck.handOutCards(amount)
+      pickUpCards(cardEntities)
   }
 
-  // change the current hand card array
-  function syncHand(cardIDs) {
-    hand = []
-    for (var i = 0; i < cardIDs.length; i++){
-      var tmpCard = entityManager.getEntityById(cardIDs[i])
-      hand.push(tmpCard)
-      changeParent(tmpCard)
-      deck.numberCardsInStack --
-      if (multiplayer.localPlayer == player){
-        tmpCard.hidden = false
+
+  // pick up specified amount of cards
+  function pickUpCards(cardEntities)
+  {
+      // add the stack cards to the playerHand array
+      for (var i = 0; i < cardEntities.length; i ++)
+      {
+          hand.push(cardEntities[i])
+          changeParent(cardEntities[i])
+
+          cardEntities[i].hidden = (multiplayer.localPlayer !== player)
+          drawSound.play()
       }
-      drawSound.play()
-    }
-    // reorganize the hand
-    neatHand()
+
+      // reorganize the hand
+      neatHand()
   }
+
+
+//  // change the current hand card array
+//  function syncHand(cardIDs) {
+//      hand = []
+//      for (var i = 0; i < cardIDs.length; i++){
+//          var tmpCard = entityManager.getEntityById(cardIDs[i])
+//          hand.push(tmpCard)
+//          changeParent(tmpCard)
+//          deck.numberCardsInStack --
+//          if (multiplayer.localPlayer == player){
+//              tmpCard.hidden = false
+//          }
+//          drawSound.play()
+//      }
+//      // reorganize the hand
+//      neatHand()
+//  }
 
   // change the parent of the card to playerHand
-  function changeParent(card){
-    card.newParent = playerHandPleb
-    card.state = "player"
+  function changeParent(card)
+  {
+      card.newParent = playerHandPleb
+      card.state = "player"
   }
+
 
   // check if a card with a specific id is on this hand
   function inHand(cardId){
@@ -186,7 +198,7 @@ Item {
   }
 
 
-  function findCards(nNumber, nPoints)
+  function findCardIDs(nNumber, nPoints)
   {
       var result = []
 
@@ -196,7 +208,25 @@ Item {
               result.push(hand[k].entityId)
 
       // Make sure we found all needed cards
-      console.assert(result.length === nNumber, "findCards() failed, cards not found! nNumber, nPoints: " + nNumber + ", " + nPoints)
+      console.assert(result.length === nNumber, "findCardIDs() failed, cards not found! nNumber, nPoints: " + nNumber + ", " + nPoints)
+      if (result.length !== nNumber)
+          result = [
+                  ]
+      return result
+  }
+
+
+  function findCards(nNumber, nPoints)
+  {
+      var result = []
+
+      // Find the cards in the player's hand.
+      for (var k = 0; (result.length < nNumber) && (k < hand.length); k++)
+          if (hand[k].points === nPoints)
+              result.push(hand[k])
+
+      // Make sure we found all needed cards
+      console.assert(result.length === nNumber, "findCardIDs() failed, cards not found! nNumber, nPoints: " + nNumber + ", " + nPoints)
       if (result.length !== nNumber)
           result = [
                   ]
@@ -216,26 +246,41 @@ Item {
 
 
   // remove card with a specific id from hand
-  function removeFromHand(cardId){
-    for (var i = 0; i < hand.length; i ++){
-      if(hand[i].entityId === cardId){
-        hand[i].width = hand[i].originalWidth
-        hand[i].height = hand[i].originalHeight
-        hand.splice(i, 1)
-        depositSound.play()
-        neatHand()
-        return
-      }
-    }
-  }
-
-  function getSelectedGroup() {
-      var result = []
-      for (var i = 0; i < hand.length; i++) {
-          if (hand[i].selected === true) {
-              result.push(hand[i])
+  function removeFromHand(cardId)
+  {
+      for (var i = 0; i < hand.length; i ++)
+      {
+          if(hand[i].entityId === cardId)
+          {
+              hand[i].width = hand[i].originalWidth
+              hand[i].height = hand[i].originalHeight
+              hand.splice(i, 1)
+              depositSound.play()
+              neatHand()
+              return
           }
       }
+  }
+
+
+  function getSelectedCards()
+  {
+      var result = []
+      for (var i = 0; i < hand.length; i++)
+          if (hand[i].selected === true)
+              result.push(hand[i])
+
+      return result
+  }
+
+
+  function getSelectedCardIDs()
+  {
+      var result = []
+      for (var i = 0; i < hand.length; i++)
+          if (hand[i].selected === true)
+              result.push(hand[i].entityId)
+
       return result
   }
 
@@ -265,10 +310,10 @@ Item {
   // highlight all valid cards by setting the glowImage visible
   function markValid()
   {
-      if (depot.skipped || gameLogic.arschlochGameLogic.getState() == gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandNix() )
+      if (depot.skipped || gameLogic.arschlochGameLogic.getState() === gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandNix() )
           unmark()
 
-      var selectedGroup = getSelectedGroup()
+      var selectedGroup = getSelectedCards()
       for (var i = 0; i < hand.length; i ++)
       {
           // Unmark invalid cards
@@ -287,7 +332,9 @@ Item {
           }
 
 
-          if (  selectedGroup[0].points === hand[i].points
+          // ... already some card selected --> allow further cards to be selected only of same value
+          // and correct number of cards
+          else if (  selectedGroup[0].points === hand[i].points
                   &&  (
                       depot.lastDeposit.length === 0
                       ||  selectedGroup.length < depot.lastDeposit.length

@@ -10,6 +10,7 @@
 #define MYPLAYER m_GameState.m_nActualPlayer
 #define MYCARDS m_GameState.m_CardDistribution[ MYPLAYER ]
 #define MYCARDNUMBERS m_GameState.m_CardNumberDistribution[ MYPLAYER ]
+#define MYCARDEXCHANGENUMBER m_GameState.m_nCardExchangeNumber[ MYPLAYER ]
 
 
 //------------------------------------------------------------------------------------------------
@@ -83,7 +84,7 @@ public:
 	/// Gibt an, wieviele Karten der Player abgeben muß (zu Beginn des spiels). Wenn > 0, müssen so viele
 	/// hohe Karten abgegeben werden - wenn < 0 müssen niedrige Karten abgegeben werden
     // \todo protected machen und als Prameter in ThinkKartenTauschen() einbauen
-    int m_nKartenAbgeben;
+//    int m_nKartenAbgeben;
 
     /// Show the last debug messages that were created during Thinking etc.
     virtual std::string GetDebugMessages() { return m_sDebugMessages; }
@@ -98,7 +99,7 @@ public:
 		m_sDebugMessages = "";
 //		m_pGlobalGameHistory = pGlobalGameHistory;
 		m_fMittelwertGegnerKarten = -1;
-		m_nKartenAbgeben = 0;
+//		m_nKartenAbgeben = 0;
     }
 
 
@@ -133,7 +134,7 @@ public:
 
 	/// Rahmenroutine zum Kartentauschen. PlayerID muß übergeben werden, weil der Kartentausch
 	/// in beliebiger Reihenfolge sein kann
-	TMoveSimple ThinkKartenTauschen(CGameState* pGameState, int nPlayerID) 
+    TMoveSimple ThinkKartenTauschenInGameState(CGameState* pGameState, int nPlayerID)
 	{ 
 		m_GameState = *pGameState;
 		m_GameState.m_nActualPlayer = nPlayerID; // Vereinfacht allgemeine Berechnungen, zB Mittelwert...
