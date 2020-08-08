@@ -391,10 +391,10 @@ inline void CGameState::SpielBeginnen()
 
         /// How many best (positive numbers) or arbitrary (negative numbers) cards every player has to give
         /// to his exchange partner
-        m_nCardExchangeNumber[Neger] = +1; // +2;
-        m_nCardExchangeNumber[VizeNeger] = 0; // +1;
-        m_nCardExchangeNumber[VizeMaster] = 0; // -1;
-        m_nCardExchangeNumber[Master] = -1; // -2;
+        m_nCardExchangeNumber[Neger] = +2;
+        m_nCardExchangeNumber[VizeNeger] = +1;
+        m_nCardExchangeNumber[VizeMaster] = -1;
+        m_nCardExchangeNumber[Master] = -2;
     }
     else
     {

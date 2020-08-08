@@ -112,9 +112,15 @@ Item {
               if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
               {
                   if (nCardExchangeNumber > 0)
-                        s = "You lost! Give your " + nCardExchangeNumber + " highest cards to player " + nPlayerIndexCardExchange
+                      s2 = "You lost! Give your " + nCardExchangeNumber + " highest cards to player " + nPlayerIndexCardExchange
                   else if (nCardExchangeNumber < 0)
-                      s = "You won! Give your " + nCardExchangeNumber + " lowest or other arbitrary cards to player " + nPlayerIndexCardExchange
+                      s2 = "You won! Give your " + (-nCardExchangeNumber) + " lowest cards to player " + nPlayerIndexCardExchange
+                  else
+                      s2 = "Lean back and wait for the others to finish exchanging cards"
+
+                  if (nCardExchangeNumber !== 0)
+                      s = "Select cards and press the screen center to pass them to your exchange player."
+
               }
               else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
               {
@@ -142,6 +148,7 @@ Item {
   Timer {
       id: aiThinkingTimer
       interval: aiTurnTime
+      repeat: false
       onTriggered:
       {
           var nPlayerIndexLegacy = -1;
@@ -173,25 +180,32 @@ Item {
 
               // First deposit the cards to the depot for 1 ms such that the owner is changed correctly
               depositCards(cardIds, userId)
+              depot.reset()
 
               // ... then hand them over to the exchange partner. Note that we need an array here
               var cards = []
               cards.push(entityManager.getEntityById(cardIds[0]))
               exchangePartnerHand.pickUpCards(cards)
+              scaleHand()
 
               // Sync legacy gamestate
               arschlochGameLogic.giveCardToExchangePartner(nPlayerIndexLegacy, nPlayerIndexCardExchange, cards[0].points - 7)
 
               // Card exchange has just finished
+              // Trigger a new turn
               if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+              {
+                  aiThinkingTimer.stop()
                   multiplayer.triggerNextTurn(playerHands.children[arschlochGameLogic.getActualPlayerID()].player.userId)
+              }
           }
 
-          else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+          else if (     (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+                   &&   (multiplayer.activePlayer !== 0)
+                   &&   (multiplayer.localPlayer !== multiplayer.activePlayer) )
           {
-              // Compute AI move and play it
-              userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-              if (!depot.skipped && userId)
+              userId = multiplayer.activePlayer.userId
+              if ( !depot.skipped )
               {
                   nPlayerIndexLegacy = getHandIndex(userId)
                   cardIds = legacyPlebCodeBridge.calcMove(userId, nPlayerIndexLegacy)
@@ -533,24 +547,26 @@ Item {
       var activeHand = getHand(multiplayer.localPlayer.userId)
       var nPlayerIndexLegacy = getHandIndex(multiplayer.localPlayer.userId)
       var cardIds = activeHand.getSelectedCardIDs()
+      var selectedCards = activeHand.getSelectedCards()
 
 
       if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
       {
 
           if (  (arschlochGameLogic.getCardExchangeNumber(nPlayerIndexLegacy) === 0)
-            ||  (arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy) < 0) )
+            ||  (arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy) < 0)
+            ||  (selectedCards.length === 0)      )
           {
               console.debug("Card exchange is already finished or no exchange partner defined for player index:" + nPlayerIndexLegacy)
               return
           }
 
           var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
-          var selectedCards = activeHand.getSelectedCards()
           var exchangePartnerHand = playerHands.children[nPlayerIndexCardExchange]
 
           // First deposit the cards to the depot for 1 ms such that the owner is changed correctly
           depositCards(cardIds, multiplayer.localPlayer.userId)
+          depot.reset()
 
           // ... then hand them over to the exchange partner
           exchangePartnerHand.pickUpCards(selectedCards)
@@ -561,7 +577,10 @@ Item {
 
           // Card exchange has just finished
           if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+          {
+              aiThinkingTimer.stop()
               multiplayer.triggerNextTurn(playerHands.children[arschlochGameLogic.getActualPlayerID()].player.userId)
+          }
       }
 
       else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
@@ -720,10 +739,11 @@ Item {
 //          playerTags.children[i].canvas.requestPaint()
 //      }
 
-      // schedule AI to take over in 3 seconds for AI players / not connected initPlayers()
+      // schedule AI to play after some time
       multiplayer.leaderCode(function() {
           if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected) {
               aiThinkingTimer.start()
+              aiThinkingTimer.repeat = false
           }
       })
   }
@@ -842,9 +862,6 @@ Item {
       initHands()
       initTags()
 
-      scaleHand()
-      markValid()
-
       // set the game state for all players
       multiplayer.leaderCode(function ()
       {
@@ -877,12 +894,15 @@ Item {
               gameScene.hintRectangle.visible = false;
               elapsedHintTime = 0;
               hintTimer.start()
-              aiThinkingTimer.start()
-          }
 
-          scaleHand()
+              // Repeating timer needed here s.t. all AI players can act
+              aiThinkingTimer.start()
+              aiThinkingTimer.repeat = true
+          }
       })
 
+      scaleHand()
+      markValid()
 
       console.debug("InitGame finished!")
   }
@@ -1075,15 +1095,6 @@ Item {
               playerTags.children[i].getPlayerData(true)
           }
       }
-  }
-
-  // draw the specified amount of cards
-  function getCards(cards, userId)
-  {
-      // find the playerHand of the active player and pick up cards
-      for (var i = 0; i < playerHands.children.length; i++)
-          if (playerHands.children[i].player.userId === userId)
-              playerHands.children[i].pickUpCardsFromDeck(cards)
   }
 
 
