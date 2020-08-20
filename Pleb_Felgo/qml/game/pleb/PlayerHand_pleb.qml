@@ -84,7 +84,7 @@ Item {
   function startHand()
   {
 //      pickUpCardsFromDeck(numberCardsAtBeginningOfGame)
-      pickUpCardsFromDeck(1)
+      pickUpCardsFromDeck(2)
   }
 
   // reset the hand by removing all cards
