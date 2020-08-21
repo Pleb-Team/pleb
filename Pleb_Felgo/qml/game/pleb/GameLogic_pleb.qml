@@ -129,184 +129,35 @@ Item {
       repeat: false
       onTriggered:
       {
-          var nPlayerIndexLegacy = -1;
-          var userId = 0;
-          var cardIds = []
 
           if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
           {
               // Search for AI player which still has to exchange cards
               for (var m = 0; m < playerHands.children.length; m++)
-              {
                   if (  (playerHands.children[m].player !== multiplayer.localPlayer)
                      && (arschlochGameLogic.getCardExchangeNumber(m) !== 0) )
                   {
-                      nPlayerIndexLegacy = m
-                      userId = playerHands.children[m].player.userId
-                      break
+                      skipOrPlay(playerHands.children[m].player.userId, false)
                   }
-              }
-
-              if (nPlayerIndexLegacy === -1)
-                  return
-
-              cardIds = legacyPlebCodeBridge.calcMoveCardExchange(userId, nPlayerIndexLegacy)
-              console.assert(cardIds.length === 1)
-
-              var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
-              var exchangePartnerHand = playerHands.children[nPlayerIndexCardExchange]
-
-              // First deposit the cards to the depot for 1 ms such that the owner is changed correctly
-              depositCards(cardIds, userId)
-              depot.reset()
-
-              // ... then hand them over to the exchange partner. Note that we need an array here
-              var cards = []
-              cards.push(entityManager.getEntityById(cardIds[0]))
-              exchangePartnerHand.pickUpCards(cards)
-              scaleHand()
-
-              // Sync legacy gamestate
-              arschlochGameLogic.giveCardToExchangePartner(nPlayerIndexLegacy, nPlayerIndexCardExchange, cards[0].points - 7)
-
-              // Card exchange has just finished
-              // Trigger a new turn
-              if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
-              {
-                  aiThinkingTimer.stop()
-                  multiplayer.triggerNextTurn(playerHands.children[arschlochGameLogic.getActualPlayerID()].player.userId)
-              }
           }
 
           else if (     (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
                    &&   (multiplayer.activePlayer !== 0)
                    &&   (multiplayer.localPlayer !== multiplayer.activePlayer) )
           {
-              userId = multiplayer.activePlayer.userId
-              if ( !depot.skipped )
-              {
-                  nPlayerIndexLegacy = getHandIndex(userId)
-                  cardIds = legacyPlebCodeBridge.calcMove(userId, nPlayerIndexLegacy)
-
-                  // Play card animation or skip sound
-                  if (cardIds.length > 0)
-                  {
-                      multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
-                      depositCards(cardIds, userId)
-                  }
-              }
-
-              endTurn()
+              skipOrPlay(multiplayer.activePlayer.userId, false)
           }
       }
   }
 
 
-  // connect to the gameScene and handle all signals
-  Connections {
-      target: gameScene
-
-      // the player selected a card
-      onCardSelected:
-      {
-          // if the selected card is from the stack, signal it
-          if (entityManager.getEntityById(cardId).state === "stack")
-          {
-              // stackSelected()
-              // deposit the valid card
-          }
-          else if (entityManager.getEntityById(cardId).state === "player")
-          {
-              var selectedCard = entityManager.getEntityById(cardId)
-              if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
-              {
-                  // Todo: Regeln fürs selektieren einer Karte
-                  // Aktuell kann man sogar die Karten der Gegner selektieren
-//                  if (selectedCard.glowImage.visible || selectedCard.selected)
-//                  {
-                      selectedCard.selected = !selectedCard.selected
-//                  }
-
-                  // refresh hand display
-//                  markValid()
-
-                  return
-              }
-
-
-
-              if (multiplayer.myTurn && !depot.skipped && !acted)
-              {
-                  if (!depot.validCard(cardId))
-                      return
-
-
-                  if (selectedCard.glowImage.visible || selectedCard.selected)
-                  {
-                      selectedCard.selected = !selectedCard.selected
-                      selectedCard.glowImage.visible = !selectedCard.selected
-
-                      // convenience for the player to auto-select groups
-                      // if there is a last move by another player which has to be beaten
-                      if (depot.lastPlayerUserID && depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayerUserID)
-                      {
-                          var activeHand = getHand(multiplayer.localPlayer.userId).hand
-                          if (selectedCard.selected) {
-                              var groupSize = 1
-                              for (var i = 0; i < activeHand.length; i++) {
-                                  if (activeHand[i].entityId !== selectedCard.entityId) {
-                                      if (activeHand[i].points === selectedCard.points) {
-                                          if (groupSize < depot.lastDeposit.length) {
-                                              activeHand[i].selected = true
-                                              activeHand[i].glowImage.visible = false
-                                              groupSize++
-                                          } else {
-                                              activeHand[i].selected = false
-                                              activeHand[i].glowImage.visible = false
-                                          }
-                                      }
-                                  }
-                              }
-                          }
-                          else
-                          {
-                              // Unselect other cards of same value
-                              for (var j = 0; j < activeHand.length; j++) {
-                                  if (    (activeHand[j].entityId !== selectedCard.entityId)
-                                      &&  (activeHand[j].points === selectedCard.points) )
-                                  {
-                                      activeHand[j].selected = false
-                                  }
-                              }
-                          }
-                      }
-
-                      // refresh hand display
-                      markValid()
-                  }
-
-
-              }
-          }
-          else if (entityManager.getEntityById(cardId).state === "depot")
-          {
-              console.debug("DEPOT CARD SELECTED")
-              skipOrPlay()
-          }
-      }
-
-      onDepotSelected:
-      {
-          console.debug("DEPOT ITSELF SELECTED")
-          skipOrPlay()
-      }
-  }
-
-
-  function skipOrPlay()
+  function skipOrPlay(userId, bHumanPlayer)
   {
-      var activeHand = getHand(multiplayer.localPlayer.userId)
-      var nPlayerIndexLegacy = getHandIndex(multiplayer.localPlayer.userId)
+      if (!userId)
+          userId = multiplayer.localPlayer.userId
+
+      var activeHand = getHand(userId)
+      var nPlayerIndexLegacy = getHandIndex(userId)
       var cardIds = activeHand.getSelectedCardIDs()
       var selectedCards = activeHand.getSelectedCards()
 
@@ -315,22 +166,35 @@ Item {
       {
 
           if (  (arschlochGameLogic.getCardExchangeNumber(nPlayerIndexLegacy) === 0)
-            ||  (arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy) < 0)
-            ||  (selectedCards.length === 0)      )
+            ||  (arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy) < 0)  )
           {
               console.debug("Card exchange is already finished or no exchange partner defined for player index:" + nPlayerIndexLegacy)
               return
           }
 
+          if (!bHumanPlayer)
+          {
+              cardIds = legacyPlebCodeBridge.calcMoveCardExchange(userId, nPlayerIndexLegacy)
+              console.assert(cardIds.length === 1)
+
+              selectedCards = []
+              selectedCards.push(entityManager.getEntityById(cardIds[0]))
+          }
+
+          if (selectedCards.length === 0)
+              return
+
+
           var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
           var exchangePartnerHand = playerHands.children[nPlayerIndexCardExchange]
 
-          // First deposit the cards to the depot for 1 ms such that the owner is changed correctly
-          depositCards(cardIds, multiplayer.localPlayer.userId)
+          // Workaround: First deposit the cards to the depot for 1 ms such that the owner is changed correctly
+          depositCards(cardIds, userId)
           depot.reset()
 
           // ... then hand them over to the exchange partner
           exchangePartnerHand.pickUpCards(selectedCards)
+          scaleHand()
 
           // Sync legacy gamestate
           for (var n = 0; n < selectedCards.length; n++)
@@ -341,30 +205,44 @@ Item {
           {
               aiThinkingTimer.stop()
               multiplayer.triggerNextTurn(playerHands.children[arschlochGameLogic.getActualPlayerID()].player.userId)
-          }
+          } 
       }
 
       else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
       {
           // Make sure this player still has to play
-          if (!multiplayer.myTurn || depot.skipped || acted)
-              return
+          if (bHumanPlayer)
+          {
+              if (!multiplayer.myTurn || depot.skipped || acted)
+                  return
+          }
+          else
+          {
+              if (depot.skipped)
+              {
+                  endTurn()
+                  return
+              }
+
+              cardIds = legacyPlebCodeBridge.calcMove(userId, nPlayerIndexLegacy)
+          }
 
           // Move cards to depot and inform Multiplayer
           acted = true
           if (cardIds.length > 0)
           {
-              console.debug("Player " + multiplayer.localPlayer.userId + " is playing: " + cardIds)
-              depositCards(cardIds, multiplayer.localPlayer.userId)
-              multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: multiplayer.localPlayer.userId})
+              console.debug("Player " + userId + " plays these cards: " + cardIds)
+              depositCards(cardIds, userId)
+              multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
           }
           else
-              console.debug("Player " + multiplayer.localPlayer.userId + "skipped its turn")
+              console.debug("Player " + userId + "skipped his turn")
 
 
           endTurn()
       }
   }
+
 
   // deposit the selected cards from player hand to depot
   function depositCards(cardIds, userId)
@@ -430,10 +308,6 @@ Item {
       // the player didn't act yet
       acted = false
 
-//      scaleHand(1.0)
-
-
-
       // This player has already finished (but is still called?)
       if (arschlochGameLogic.getPlayerGameResult(nPlayerIndexLegacy) !== Constants.nGameResultUndefined)
           endTurn()
@@ -459,27 +333,16 @@ Item {
           else
           {
               // skip if the player has no valid cards
+              // Note: The effectTimer used to show the skip message will also trigger the next turn upon expiration
               depot.skipTurn(true)
           }
       }
 
-      // zoom in on the hand of the active local player
-//      if (!depot.skipped && multiplayer.myTurn)
-//          scaleHand(1.6)
-
-
-      // mark the valid card options
-//      markValid()
 
       // Reset hint
       gameScene.hintRectangle.visible = false;
       elapsedHintTime = 0;
       hintTimer.start()
-
-      // repaint the timer circle
-//      for (var i = 0; i < playerTags.children.length; i++){
-//          playerTags.children[i].canvas.requestPaint()
-//      }
 
       // schedule AI to play after some time
       multiplayer.leaderCode(function() {
@@ -773,7 +636,7 @@ Item {
       {
           if (playerHand.checkWin())
           {
-              console.debug("[endTurn] Player " + multiplayer.activePlayer + + ", LegacyID: " + nActualPlayerLegacy + " HAS FINISHED!!!")
+              console.debug("[endTurn] Player " + multiplayer.activePlayer + ", LegacyID: " + nActualPlayerLegacy + " HAS FINISHED!!!")
 
               // Spielergebnis: 3 = Präsi, 0 = Arschloch
               var nNumberPlayers = arschlochGameLogic.getNumberPlayers()
@@ -879,5 +742,107 @@ Item {
       aiThinkingTimer.stop()
 //      timerPlayerThinking.running = false
       depot.effectTimer.stop()
+  }
+
+
+
+  // connect to the gameScene and handle all signals
+  Connections {
+      target: gameScene
+
+      // the player selected a card
+      onCardSelected:
+      {
+          // if the selected card is from the stack, signal it
+          if (entityManager.getEntityById(cardId).state === "stack")
+          {
+              // stackSelected()
+              // deposit the valid card
+          }
+          else if (entityManager.getEntityById(cardId).state === "player")
+          {
+              var selectedCard = entityManager.getEntityById(cardId)
+              if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
+              {
+                  // Todo: Regeln fürs selektieren einer Karte
+                  // Aktuell kann man sogar die Karten der Gegner selektieren
+//                  if (selectedCard.glowImage.visible || selectedCard.selected)
+//                  {
+                      selectedCard.selected = !selectedCard.selected
+//                  }
+
+                  // refresh hand display
+//                  markValid()
+
+                  return
+              }
+
+
+
+              if (multiplayer.myTurn && !depot.skipped && !acted)
+              {
+                  if (!depot.validCard(cardId))
+                      return
+
+
+                  if (selectedCard.glowImage.visible || selectedCard.selected)
+                  {
+                      selectedCard.selected = !selectedCard.selected
+                      selectedCard.glowImage.visible = !selectedCard.selected
+
+                      // convenience for the player to auto-select groups
+                      // if there is a last move by another player which has to be beaten
+                      if (depot.lastPlayerUserID && depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayerUserID)
+                      {
+                          var activeHand = getHand(multiplayer.localPlayer.userId).hand
+                          if (selectedCard.selected) {
+                              var groupSize = 1
+                              for (var i = 0; i < activeHand.length; i++) {
+                                  if (activeHand[i].entityId !== selectedCard.entityId) {
+                                      if (activeHand[i].points === selectedCard.points) {
+                                          if (groupSize < depot.lastDeposit.length) {
+                                              activeHand[i].selected = true
+                                              activeHand[i].glowImage.visible = false
+                                              groupSize++
+                                          } else {
+                                              activeHand[i].selected = false
+                                              activeHand[i].glowImage.visible = false
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                          else
+                          {
+                              // Unselect other cards of same value
+                              for (var j = 0; j < activeHand.length; j++) {
+                                  if (    (activeHand[j].entityId !== selectedCard.entityId)
+                                      &&  (activeHand[j].points === selectedCard.points) )
+                                  {
+                                      activeHand[j].selected = false
+                                  }
+                              }
+                          }
+                      }
+
+                      // refresh hand display
+                      markValid()
+                  }
+
+
+              }
+          }
+          else if (entityManager.getEntityById(cardId).state === "depot")
+          {
+              console.debug("DEPOT CARD SELECTED")
+              skipOrPlay(multiplayer.localPlayer.userId, true)
+          }
+      }
+
+      onDepotSelected:
+      {
+          console.debug("DEPOT ITSELF SELECTED")
+          skipOrPlay(multiplayer.localPlayer.userId, true)
+      }
   }
 }

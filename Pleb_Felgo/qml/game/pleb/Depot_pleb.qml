@@ -32,17 +32,18 @@ Item {
 
   // blocks the player for a short period of time and trigger a new turn when he gets skipped
   Timer {
-    id: effectTimer
-    repeat: false
-    interval: 1500
-    onTriggered: {
-      effectTimer.stop()
-      skipped = false
-      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-      multiplayer.sendMessage(gameLogic.messageSetSkipped, {skipped: false, userId: userId})
-      console.debug("<<<< Trigger new turn after effect")
-      multiplayer.triggerNextTurn()
-    }
+      id: effectTimer
+      repeat: false
+      interval: 1500
+      onTriggered:
+      {
+          effectTimer.stop()
+          skipped = false
+          var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
+          multiplayer.sendMessage(gameLogic.messageSetSkipped, {skipped: false, userId: userId})
+          console.debug("<<<< Trigger new turn after effect")
+          multiplayer.triggerNextTurn()
+      }
   }
 
   // create the depot by placing a single stack card
@@ -139,7 +140,7 @@ Item {
               })
           }
 
-          console.debug("player " + userId + " MISSED TURN!")
+          console.debug("[skipTurn] player " + userId + " was skipped!")
       } else
       {
           skipped = false
