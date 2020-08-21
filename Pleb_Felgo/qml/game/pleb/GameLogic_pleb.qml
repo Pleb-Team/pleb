@@ -181,7 +181,9 @@ Item {
               selectedCards.push(entityManager.getEntityById(cardIds[0]))
           }
 
-          if (selectedCards.length === 0)
+          // Check if correct number of cards selected
+          if (  (selectedCards.length === 0) ||
+                (selectedCards.length > Math.abs(arschlochGameLogic.getCardExchangeNumber(nPlayerIndexLegacy)) ) )
               return
 
 
