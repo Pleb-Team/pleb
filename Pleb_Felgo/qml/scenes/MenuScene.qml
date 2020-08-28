@@ -277,6 +277,20 @@ SceneBase {
         settings.soundEnabled ^= true
       }
     }
+
+    // button to toggle the sound effects
+    ButtonBase {
+      color: "transparent"
+      width: columnButtons.width
+      height: columnButtons.width
+      buttonImage.source: "../../assets/img/Settings.png"
+      opacity: localStorage.debugMode ? 1.0 :  0.6
+      onClicked: {
+        localStorage.setDebugMode(!localStorage.debugMode)
+        if (localStorage.debugMode)
+            nativeUtils.displayMessageBox(qsTr("Test mode is activated - make sure to know what you're doing!"))
+      }
+    }
   }
 
 
@@ -302,6 +316,7 @@ SceneBase {
       property int appStarts: 0
       property int gamesPlayed: 0 // store number of games played
       property real lastLogin: 0   // date (day) of last login (reward received)
+      property bool debugMode: false
 
       // update app starts counter
       Component.onCompleted:
@@ -332,6 +347,10 @@ SceneBase {
           if(localStorage.getValue("lastlogin") === undefined)
               localStorage.setValue("lastlogin", 0) // will be correctly set when first checked
           lastLogin = localStorage.getValue("lastlogin")
+
+          if(localStorage.getValue("debugMode") === undefined)
+              localStorage.setValue("debugMode", false) // will be correctly set when first checked
+          debugMode = localStorage.getValue("debugMode")
       }
 
       // set and store gamesPlayed locally
@@ -345,6 +364,13 @@ SceneBase {
           localStorage.setValue("lastlogin", day)
           localStorage.lastLogin = day
       }
+
+      // set and store last login day
+      function setDebugMode(b) {
+          localStorage.setValue("debugMode", b)
+          localStorage.debugMode = b
+      }
+
   }
 
   // sync messages on the main menu page

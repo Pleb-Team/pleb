@@ -83,8 +83,10 @@ Item {
   // start the hand by picking up a specified amount of cards
   function startHand()
   {
-//      pickUpCardsFromDeck(numberCardsAtBeginningOfGame)
-      pickUpCardsFromDeck(2)
+      if (menuScene.localStorage.debugMode)
+          pickUpCardsFromDeck(2)
+      else
+          pickUpCardsFromDeck(numberCardsAtBeginningOfGame)
   }
 
   // reset the hand by removing all cards
