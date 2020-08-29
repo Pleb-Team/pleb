@@ -22,11 +22,11 @@ EntityBase {
 
   // hidden cards show the back side  
   // you could also offer an in-app purchase to show the cards of a player for example!
-  property bool hidden: !forceShowAllCards
+  property bool hidden: true
 
   // to show all cards on the screen and to test multiplayer syncing, set this to true
   // it is useful for testing, thus always enable it for debug builds and non-publish builds
-  property bool forceShowAllCards: system.debugBuild && !system.publishBuild
+//  property bool forceShowAllCards: (system.debugBuild && !system.publishBuild) || menuScene.localStorage.debugMode
 
   property bool selected: false
 
@@ -174,9 +174,9 @@ EntityBase {
   // start the card flip animation when the hidden var changes
   onHiddenChanged: {
     // force to set hidden always to false if we are in development mode, this helps in debugging as we can then see all cards
-    if(hidden && forceShowAllCards) {
-      hidden = false
-    }
+//    if(hidden && forceShowAllCards) {
+//      hidden = false
+//    }
 
     hiddenAnimation.start()
   }
@@ -184,7 +184,7 @@ EntityBase {
   // update the card image of turning cards
   function updateCardImage(){
     // hidden cards show the back side without effect
-    if (hidden){
+    if (hidden && !menuScene.localStorage.debugMode){
       cardImage.source = "../../../assets/img/cards/back.png"
     } else if (variationType == "ten") {
         cardImage.source = "../../../assets/img/cards/" + "X" + cardColor.charAt(0).toLowerCase() + ".png"
