@@ -76,11 +76,12 @@ QString BackEnd::getPlayerCardsText(int nPlayerID)
 
 
 
-Q_INVOKABLE void BackEnd::playCards()
+Q_INVOKABLE bool BackEnd::playCards()
 {
     if (m_GameState.PlayCards(m_MoveSimple, true, true) == JOJO_ERROR)
     {
         std::cout << "[BackEnd::playCards] Error: You cannot play this move " << m_MoveSimple.GetText() << std::endl;
+        return false;
     }
 
     std::string s = m_GameState.GetDescription();
@@ -91,18 +92,23 @@ Q_INVOKABLE void BackEnd::playCards()
     emit actualPlayerIDChanged();
     emit lastPlayerIDChanged();
     emit playerCardsChanged(m_GameState.m_nLastPlayer);
+
+    return true;
 }
 
-Q_INVOKABLE void BackEnd::giveCardToExchangePartner(int nPlayerIDGive, int nPlayerIDReceive, int nValueCard)
+Q_INVOKABLE bool BackEnd::giveCardToExchangePartner(int nPlayerIDGive, int nPlayerIDReceive, int nValueCard)
 {
     if (m_GameState.GiveCardToExchangePartner(nPlayerIDGive, nPlayerIDReceive, nValueCard) == JOJO_ERROR)
     {
         std::cout << "[BackEnd::giveCardsToExchangePartner] Error when Player " << nPlayerIDGive;
         std::cout << " gives card " << nValueCard << " to Player " << nPlayerIDReceive << std::endl;
+        return false;
     }
 
     std::string s = m_GameState.GetDescription();
     std::cout << s << std::endl;
+
+    return true;
 }
 
 

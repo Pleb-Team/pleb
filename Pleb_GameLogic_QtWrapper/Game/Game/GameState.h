@@ -260,10 +260,10 @@ inline int CGameState::GiveCardToExchangePartner(int nPlayerIDGive, int nPlayerI
     assert(m_nCardExchangeNumber[nPlayerIDGive] != 0);
 
     // Gamestate updaten
-//    if (PlayerVerliertKarten( MoveSimple, nPlayerIDGive ) == JOJO_ERROR)
-//        return JOJO_ERROR;
+    if (PlayerVerliertKarten( MoveSimple, nPlayerIDGive ) == JOJO_ERROR)
+        return JOJO_ERROR;
 
-//    PlayerBekommtKarten( MoveSimple, nPlayerIDReceive );
+    PlayerBekommtKarten( MoveSimple, nPlayerIDReceive );
 
     // Den Counter, wieviele Karten abgegeben werden muessen, updaten
     if (m_nCardExchangeNumber[nPlayerIDGive] > 0)

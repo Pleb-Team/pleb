@@ -80,6 +80,18 @@ Item {
           var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
           var nCardExchangeNumber = arschlochGameLogic.getCardExchangeNumber(nPlayerIndexLegacy)
 
+          for (var n = 0; n < 4; n++)
+          {
+              var playerHand = playerHands.children[n]
+              if (playerHand.hand.length !== arschlochGameLogic.getPlayerCardsNumber(n))
+              {
+                  console.error("------------------------------------ERROR! Internal game state discrepancy --------------------------")
+
+                  var sCards = arschlochGameLogic.getPlayerCardsText()
+                  console.error("Internal state\n" + sCards)
+              }
+          }
+
           elapsedHintTime += 1
 
           if (elapsedHintTime >= 5)
@@ -102,12 +114,16 @@ Item {
               }
               else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
               {
-                  if (depot.lastPlayerUserID && depot.lastDeposit)
+                  if (depot.lastPlayerUserID && depot.lastDeposit && !hasValidCards(multiplayer.localPlayer))
+                      s2 = "Too bad, you cannot exceed your opponents move :-("
+                  else if (depot.lastPlayerUserID && depot.lastDeposit)
                       s2 = "Beat your opponent and play higher than " + depot.lastDeposit[0].variationType + "!"
                   else
-                      s2 = "You may start freely and play arbitrary cards. Get rid of something :-)"
+                      s2 = "Start freely and play arbitrary cards. Get rid of something :-)"
 
-                  if (depot.lastPlayerUserID && depot.lastDeposit.length === 1)
+                  if (depot.lastPlayerUserID && depot.lastDeposit && !hasValidCards(multiplayer.localPlayer))
+                      s = "Press screen center to pass."
+                  else if (depot.lastPlayerUserID && depot.lastDeposit.length === 1)
                       s = "Select 1 card and press the screen center to play, or simply press screen center to pass."
                   else if (depot.lastPlayerUserID && depot.lastDeposit.length > 1)
                       s = "Select " + depot.lastDeposit.length + " cards and press the screen center to play, or simply press screen center to pass."
@@ -160,7 +176,8 @@ Item {
       var nPlayerIndexLegacy = getHandIndex(userId)
       var cardIds = activeHand.getSelectedCardIDs()
       var selectedCards = activeHand.getSelectedCards()
-
+      var moveSimpleValue = -1
+      var moveSimpleNumber = 0
 
       if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
       {
@@ -236,9 +253,26 @@ Item {
               console.debug("Player " + userId + " plays these cards: " + cardIds)
               depositCards(cardIds, userId)
               multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
+
+              var card = entityManager.getEntityById(cardIds[0])
+              moveSimpleNumber = cardIds.length
+              moveSimpleValue = card.points - 7
           }
           else
               console.debug("Player " + userId + "skipped his turn")
+
+
+          // Now play in the internal legacy game model
+          console.assert(nPlayerIndexLegacy === arschlochGameLogic.getActualPlayerID(), "Wrong Player Ids! QML: " + nPlayerIndexLegacy + ", Legacy: " + arschlochGameLogic.getActualPlayerID());
+
+          arschlochGameLogic.setMoveSimpleNumber(moveSimpleNumber)
+          arschlochGameLogic.setMoveSimpleValue(moveSimpleValue)
+          if (!arschlochGameLogic.playCards())
+          {
+              var s = arschlochGameLogic.getPlayerCardsText()
+              console.error("Error when playing cards! Player " + userId + " tried to play number cards: " + moveSimpleNumber + ", value legacy: " + moveSimpleValue)
+              console.error("Internal game state: \n" + s)
+          }
 
 
           endTurn()
@@ -268,10 +302,11 @@ Item {
 
 
   // check whether a user with a specific id has valid cards or not
-  function hasValidCards(user){
-    var playerHand = getHand(user.userId)
-    var valids = playerHand.getValidCards()
-    return valids.length > 0
+  function hasValidCards(user)
+  {
+      var playerHand = getHand(user.userId)
+      var valids = playerHand.getValidCards()
+      return valids.length > 0
   }
 
 
@@ -279,7 +314,6 @@ Item {
   function turnStarted(playerId)
   {
       console.debug("[turnStarted]")
-
       if(!multiplayer.activePlayer) {
           console.debug("ERROR: activePlayer not valid in turnStarted!")
           return
@@ -294,7 +328,25 @@ Item {
       // Player can play a second time in a row, meaning all other players have passed.
       // Then we have to make sure that the depot is cleared
       if (depot.lastPlayerUserID === multiplayer.activePlayer.userId)
+      {
           depot.lastPlayerUserID = null
+          depot.lastDeposit = []
+      }
+
+      // Verify last move
+      if ((depot.lastPlayerUserID === null) !== (arschlochGameLogic.getLastPlayerID() === -1))
+      {
+          var nProblem = 42;
+      }
+
+
+      console.assert((depot.lastPlayerUserID === null) === (arschlochGameLogic.getLastPlayerID() === -1), "Last move discrepancy!")
+      if (depot.lastPlayerUserID !== null)
+      {
+          console.assert(depot.lastDeposit.length === arschlochGameLogic.getLastMoveSimpleNumber())
+          console.assert(depot.lastDeposit[0].points - 7 === arschlochGameLogic.getLastMoveSimpleValue())
+      }
+
 
       // give the connected player <xxx> seconds until the AI takes over
 //      remainingTime = userInterval
@@ -323,21 +375,21 @@ Item {
 
       else
       {
-          var canPlay = hasValidCards(multiplayer.activePlayer)
-          if (canPlay)
-          {
+//          var canPlay = hasValidCards(multiplayer.activePlayer)
+//          if (canPlay)
+//          {
               depot.skipTurn(false)
 
               unmark()
               scaleHand()
               markValid()
-          }
-          else
-          {
-              // skip if the player has no valid cards
-              // Note: The effectTimer used to show the skip message will also trigger the next turn upon expiration
-              depot.skipTurn(true)
-          }
+//          }
+//          else
+//          {
+//              // skip if the player has no valid cards
+//              // Note: The effectTimer used to show the skip message will also trigger the next turn upon expiration
+////              depot.skipTurn(true)
+//          }
       }
 
 
@@ -361,9 +413,7 @@ Item {
       // let the new Pleb finish its game by playing all its remaining cards
       var lastcards = []
       for (var l = 0; l < plebHand.hand.length; l++)
-      {
           lastcards.push(plebHand.hand[l].entityId)
-      }
 
       multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: lastcards, userId: plebHand.player.userId})
       depositCards(lastcards, plebHand.player.userId)
@@ -417,8 +467,6 @@ Item {
       console.debug("multiplayer.myTurn " + multiplayer.myTurn)
 
       // reset all values at the start of the game
-//      gameOver = false
-//      timerPlayerThinking.start()
       gameScene.gameOverWindow.visible = false
       gameScene.leaveGameWindow.visible = false
       gameScene.switchNameWindow.visible = false
@@ -426,11 +474,6 @@ Item {
       chat.reset()
       depot.reset()
 
-      // Check who was Pleb, BEFORE we reset the gamestate and thus the game result
-//      var nPlayerIndexArschloch = undefined
-//      for (var n = 0; n < arschlochGameLogic.getNumberPlayersMax(); n++)
-//          if (arschlochGameLogic.getPlayerGameResult(n) === 0)
-//              nPlayerIndexArschloch = n
 
       // computes
       // - Card exchange numbers + Partners
@@ -443,6 +486,8 @@ Item {
       // initialize the players, the deck and the individual hands
       initPlayers()
       initDeck()
+
+      // Players take cards from the deck
       initHands()
       initTags()
 
@@ -465,12 +510,12 @@ Item {
 
 
           // Set first player to play
-          var nActualPlayer = arschlochGameLogic.getActualPlayerID()
-          console.assert(nActualPlayer >= 0)
+          var nActualPlayerLegacy = arschlochGameLogic.getActualPlayerID()
+          console.assert(nActualPlayerLegacy >= 0)
 
           if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
           {
-              multiplayer.triggerNextTurn(playerHands.children[nActualPlayer].player.userId)
+              multiplayer.triggerNextTurn(playerHands.children[nActualPlayerLegacy].player.userId)
           }
           else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
           {
@@ -563,7 +608,7 @@ Item {
       for (var i = 0; i < playerTags.children.length; i++)
       {
           playerTags.children[i].initTag()
-          if (playerHands.children[i].player && playerHands.children[i].player.userId == multiplayer.localPlayer.userId){
+          if (playerHands.children[i].player && playerHands.children[i].player.userId === multiplayer.localPlayer.userId){
               playerTags.children[i].getPlayerData(true)
           }
       }
@@ -633,26 +678,26 @@ Item {
       var nActualPlayerLegacy = getHandIndex(userId)
       var playerHand = getHand(userId)
 
-      // CHeck if player just won
+      // Check if player just won
       if (arschlochGameLogic.getPlayerGameResult(nActualPlayerLegacy) === Constants.nGameResultUndefined)
-      {
           if (playerHand.checkWin())
           {
               console.debug("[endTurn] Player " + multiplayer.activePlayer + ", LegacyID: " + nActualPlayerLegacy + " HAS FINISHED!!!")
 
               // Spielergebnis: 3 = Präsi, 0 = Arschloch
-              var nNumberPlayers = arschlochGameLogic.getNumberPlayers()
-              arschlochGameLogic.setPlayerGameResult(nActualPlayerLegacy, nNumberPlayers - 1)
+//              var nNumberPlayers = arschlochGameLogic.getNumberPlayers()
+//              arschlochGameLogic.setPlayerGameResult(nActualPlayerLegacy, nNumberPlayers - 1)
 
               // Should eventually be computed within the C++ legacy game logic itself, instead of this external manipulation
-              arschlochGameLogic.setNumberPlayers(nNumberPlayers - 1)
+//              arschlochGameLogic.setNumberPlayers(nNumberPlayers - 1)
           }
-      }
 
       // Everybody has finished
       if (arschlochGameLogic.getNumberPlayers() <= 0)
       {
           console.debug("[endTurn] Ending game")
+          console.assert(arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielZuEnde)
+
           endGame()
           multiplayer.sendMessage(messageEndGame, {userId: userId})
       }
@@ -661,7 +706,13 @@ Item {
       {
           console.debug("[endTurn] Trigger new turn")
           if (multiplayer.amLeader)
-              multiplayer.triggerNextTurn()
+          {
+              nActualPlayerLegacy = arschlochGameLogic.getActualPlayerID()
+              console.assert(nActualPlayerLegacy >= 0)
+              console.assert(arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+
+              multiplayer.triggerNextTurn(playerHands.children[nActualPlayerLegacy].player.userId)
+          }
           else
               multiplayer.sendMessage(messageTriggerTurn, userId)
       }
@@ -671,23 +722,12 @@ Item {
   // calculate the points for each player
   function calculateScores()
   {
-      // Store the winnerPlayer
-//      console.assert(depot.finishedUserIDs.length > 0)
-
       for (var i = 0; i < arschlochGameLogic.getNumberPlayersMax(); i++)
       {
-//          var playerHand = getHand(depot.finishedUserIDs[i])
           var playerHand = playerHands.children[i]
-//          console.assert(playerHand)
-
-          // President = +2 ... Pleb = -2, Vice = +-1
-//          var vScores = [2, 1, -1, -2]
-//          playerHand.score = vScores[i]
-//          playerHand.scoreAllGames+= vScores[i]
           playerHand.score = arschlochGameLogic.getPlayerGameResult(i)
           playerHand.scoreAllGames+= playerHand.score
 
-          // Store the overall winner - president
           if (i === 0)
               gameScene.gameOverWindow.winnerPlayer = playerHand.player
       }

@@ -68,9 +68,8 @@ Item {
       {
           var card = entityManager.getEntityById(cardIds[i])
 
-          // change the parent of the card to depot
-          changeParent(card)
-
+          card.newParent = depot
+          card.state = "depot"
           card.hidden = false
 
           // move the card to the depot and vary the position and rotation
@@ -90,13 +89,6 @@ Item {
 
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
       lastPlayerUserID = userId
-  }
-
-
-  // change the card's parent to depot
-  function changeParent(card){
-      card.newParent = depot
-      card.state = "depot"
   }
 
 
@@ -127,7 +119,8 @@ Item {
   }
 
 
-  function skipTurn(skipMove) {
+  function skipTurn(skipMove)
+  {
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
       if (skipMove)
       {
@@ -155,24 +148,7 @@ Item {
       effectTimer.stop()
       lastDeposit = []
       lastPlayerUserID = null
-//      finishedUserIDs = []
   }
 
-//  // sync the depot with the leader
-//  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, effect, drawAmount, lastPlayerUserID, finishedUserIDs)
-//  {
-//    for (var i = 0; i < depotCardIDs.length; i++){
-//      depositCards([depotCardIDs[i]])
-//      deck.numberCardsInStack --
-//    }
 
-//    depositCards(lastDepositIDs)
-//    for (var j = 0; j < lastDepositIDs.length; j++) {
-//        lastDeposit[j].cardColor = lastDepositCardColors[j]
-//    }
-
-//    depot.skipped = skipped
-//    depot.lastPlayerUserID = lastPlayerUserID
-////    depot.finishedUserIDs = finishedUserIDs
-//  }
 }

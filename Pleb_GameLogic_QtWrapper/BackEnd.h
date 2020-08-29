@@ -52,6 +52,7 @@ public:
     Q_INVOKABLE int getConstant_Jojo_SpielZustandNix() { return Jojo_Zustand_Nix; }
     Q_INVOKABLE int getConstant_Jojo_SpielZustandKartenTauschen() { return Jojo_SpielZustandKartenTauschen; }
     Q_INVOKABLE int getConstant_Jojo_SpielZustandSpielen() { return Jojo_SpielZustandSpielen; }
+    Q_INVOKABLE int getConstant_Jojo_SpielZustandSpielZuEnde() { return Jojo_SpielZustandSpielZuEnde; }
 
     // Access to the current Player, i.e. the one who is next to play
     // \todo Integrate as a parameter into the rountine think()
@@ -76,6 +77,7 @@ public:
 
     Q_INVOKABLE QString getPlayerCardsText() { return QString::fromStdString(m_GameState.GetDescription()); }
     Q_INVOKABLE QString getPlayerCardsText(int nPlayerID);
+    Q_INVOKABLE int getPlayerCardsNumber(int nPlayerID) { return m_GameState.m_CardNumberDistribution[nPlayerID]; }
 
     // Access to LastPlayerID, i.e. thte player who played the last move which is currently
     // visible in the center of the table (deck)
@@ -85,8 +87,8 @@ public:
     // --------------------------------------------------------------------------------------------
 
     // Actions a player can directly perform
-    Q_INVOKABLE void playCards();
-    Q_INVOKABLE void giveCardToExchangePartner(int nPlayerIDGive, int nPlayerIDReceive, int nValueCard);
+    Q_INVOKABLE bool playCards();
+    Q_INVOKABLE bool giveCardToExchangePartner(int nPlayerIDGive, int nPlayerIDReceive, int nValueCard);
 
     // --------------------------------------------------------------------------------------------
 
@@ -110,12 +112,16 @@ public:
     Q_INVOKABLE void resetGameResult() { m_GameState.m_GameResult.Reset(); }
 
 
-    // Adds the given card number and value to the mentioned players cards in his hand
-    Q_INVOKABLE void addPlayerCards(int nPlayerID, int nNumberCards, int nValueCards)    {
+    // Adds / removes the given card number and value to the mentioned players cards in his hand
+    Q_INVOKABLE void addPlayerCards(int nPlayerID, int nNumberCards, int nValueCards) {
         m_GameState.PlayerBekommtKarten(TMoveSimple(nNumberCards, nValueCards), nPlayerID);  }
+    Q_INVOKABLE void removePlayerCards(int nPlayerID, int nNumberCards, int nValueCards) {
+        m_GameState.PlayerVerliertKarten(TMoveSimple(nNumberCards, nValueCards), nPlayerID);  }
 
     // Set the last move, i.e. what cards are currently visible in the centre of the table.
     // For the game rules, it is also important who played these cards thus nLastPlayerID must be given
+    Q_INVOKABLE int getLastMoveSimpleNumber() { return m_GameState.m_LastMoveSimple.NumberCards;  }
+    Q_INVOKABLE int getLastMoveSimpleValue() { return m_GameState.m_LastMoveSimple.ValueCards;  }
     Q_INVOKABLE QString getLastMoveSimpleText() { return QString::fromStdString(m_GameState.m_LastMoveSimple.GetText() );  }
     Q_INVOKABLE void setLastMoveSimple(int nLastPlayerID, int nNumberCards, int nValueCards) {
         m_GameState.m_nLastPlayer = nLastPlayerID;

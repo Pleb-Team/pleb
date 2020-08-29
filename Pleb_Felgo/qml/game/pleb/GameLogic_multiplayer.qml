@@ -318,11 +318,11 @@
 
     // sync the depot variables
     message.lastDepositIDs = []
-    message.lastDepositCardColors = []
+//    message.lastDepositCardColors = []
 
     for (var l = 0; l < depot.lastDeposit.length; l++) {
         message.lastDepositIDs.push(depot.lastDeposit[l].entityId)
-        message.lastDepositCardColors.push(depot.lastDeposit[l].cardColor)
+//        message.lastDepositCardColors.push(depot.lastDeposit[l].cardColor)
     }
 
     message.skipped = depot.skipped
@@ -397,4 +397,46 @@
 //        }
 //      }
 //    }
+//  }
+
+
+
+// ------------------ from PlayerHand -------------------------------------
+
+//  // change the current hand card array
+//  function syncHand(cardIDs) {
+//      hand = []
+//      for (var i = 0; i < cardIDs.length; i++){
+//          var tmpCard = entityManager.getEntityById(cardIDs[i])
+//          hand.push(tmpCard)
+//          changeParent(tmpCard)
+//          deck.numberCardsInStack --
+//          if (multiplayer.localPlayer == player){
+//              tmpCard.hidden = false
+//          }
+//          drawSound.play()
+//      }
+//      // reorganize the hand
+//      neatHand()
+//  }
+
+// ------------------ from Depot -------------------------------------
+
+
+//  // sync the depot with the leader
+//  function syncDepot(depotCardIDs, lastDepositIDs, lastDepositCardColors, skipped, effect, drawAmount, lastPlayerUserID, finishedUserIDs)
+//  {
+//    for (var i = 0; i < depotCardIDs.length; i++){
+//      depositCards([depotCardIDs[i]])
+//      deck.numberCardsInStack --
+//    }
+
+//    depositCards(lastDepositIDs)
+//    for (var j = 0; j < lastDepositIDs.length; j++) {
+//        lastDeposit[j].cardColor = lastDepositCardColors[j]
+//    }
+
+//    depot.skipped = skipped
+//    depot.lastPlayerUserID = lastPlayerUserID
+////    depot.finishedUserIDs = finishedUserIDs
 //  }
