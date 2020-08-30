@@ -185,7 +185,7 @@ EntityBase {
   // update the card image of turning cards
   function updateCardImage(){
     // hidden cards show the back side without effect
-    if (hidden /*&& !menuScene.localStorage.debugMode*/){
+    if (hidden && !menuScene.localStorage.debugMode){
       cardImage.source = "../../../assets/img/cards/back.png"
     } else if (variationType == "ten") {
         cardImage.source = "../../../assets/img/cards/" + "X" + cardColor.charAt(0).toLowerCase() + ".png"
