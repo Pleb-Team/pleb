@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Felgo 3.0
 import QtGraphicalEffects 1.0
 import "../../scenes"
+import "../../common"
 
 EntityBase {
   id: cardPleb
@@ -119,33 +120,33 @@ EntityBase {
     id: hiddenAnimation
     running: false
 
-    NumberAnimation { target: scaleTransform; property: "xScale"; easing.type: Easing.InOutQuad; to: 0; duration: 80 }
+//    NumberAnimation { target: scaleTransform; property: "xScale"; easing.type: Easing.InOutQuad; to: 0; duration: 80 }
 
     PropertyAction { target: cardImage; property: "source"; value: updateCardImage() }
 
-    NumberAnimation { target: scaleTransform; property: "xScale"; easing.type: Easing.InOutQuad; to: 1.0; duration: 80 }
+//    NumberAnimation { target: scaleTransform; property: "xScale"; easing.type: Easing.InOutQuad; to: 1.0; duration: 80 }
   }
 
 
   // Behaviors animate the card x and y movement and rotation
   Behavior on x {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 600 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 
   Behavior on y {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 600 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 
   Behavior on rotation {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 600 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 
   Behavior on width {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 600 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 
   Behavior on height {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 600 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 
   // reparent card when it changes its state
@@ -184,7 +185,7 @@ EntityBase {
   // update the card image of turning cards
   function updateCardImage(){
     // hidden cards show the back side without effect
-    if (hidden && !menuScene.localStorage.debugMode){
+    if (hidden /*&& !menuScene.localStorage.debugMode*/){
       cardImage.source = "../../../assets/img/cards/back.png"
     } else if (variationType == "ten") {
         cardImage.source = "../../../assets/img/cards/" + "X" + cardColor.charAt(0).toLowerCase() + ".png"

@@ -389,10 +389,10 @@ Item {
 
   // animate the playerHand width and height
   Behavior on width {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 600 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 
   Behavior on height {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 600 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 }
