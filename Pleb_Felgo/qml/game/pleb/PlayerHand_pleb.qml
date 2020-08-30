@@ -187,8 +187,8 @@ Item {
       // Make sure we found all needed cards
       console.assert(result.length === nNumber, "findCardIDs() failed, cards not found! nNumber, nPoints: " + nNumber + ", " + nPoints)
       if (result.length !== nNumber)
-          result = [
-                  ]
+          result = []
+
       return result
   }
 
@@ -225,23 +225,21 @@ Item {
   // remove card with a specific id from hand
   function removeFromHand(cardId)
   {
-      var nPlayerIndexLegacy = gameLogic.getHandIndex(player.userId)
-
       for (var i = 0; i < hand.length; i ++)
       {
           if(hand[i].entityId === cardId)
           {
-//              gameLogic.arschlochGameLogic.removePlayerCards(nPlayerIndexLegacy, 1, hand[i].points - 7)
-
               hand[i].width = hand[i].originalWidth
               hand[i].height = hand[i].originalHeight
               hand.splice(i, 1)
               depositSound.play()
               neatHand()
 
-              return
+              return true
           }
       }
+
+      return false
   }
 
 
@@ -296,6 +294,8 @@ Item {
           unmark()
 
       var selectedGroup = getSelectedCards()
+      var nPlayerIndexLegacy = gameLogic.getHandIndex(player.userId)
+
       for (var i = 0; i < hand.length; i ++)
       {
           // Unmark invalid cards
@@ -317,11 +317,9 @@ Item {
           // ... already some card selected --> allow further cards to be selected only of same value
           // and correct number of cards
           else if (  selectedGroup[0].points === hand[i].points
-                  &&  (
-                      depot.lastDeposit.length === 0
-                      ||  selectedGroup.length < depot.lastDeposit.length
-                      ||  !depot.lastPlayerUserID
-                      ||  player.userId === depot.lastPlayerUserID
+                  &&  (   gameLogic.arschlochGameLogic.getLastPlayerID() < 0
+                      ||  gameLogic.arschlochGameLogic.getLastPlayerID() === nPlayerIndexLegacy
+                      ||  gameLogic.arschlochGameLogic.getLastMoveSimpleNumber() > selectedGroup.length
                       )
                   )
           {
@@ -360,8 +358,10 @@ Item {
 
 
   // get an array with all valid cards
-  function getValidCards(){
+  function getValidCards()
+  {
       var valids = []
+
       // put all valid card options in the array
       for (var i = 0; i < hand.length; i ++)
           if (depot.validCard(hand[i].entityId))

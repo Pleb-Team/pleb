@@ -80,21 +80,20 @@ Item {
           var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
           var nCardExchangeNumber = arschlochGameLogic.getCardExchangeNumber(nPlayerIndexLegacy)
 
-          for (var n = 0; n < 4; n++)
-          {
-              var playerHand = playerHands.children[n]
-              if (playerHand.hand.length !== arschlochGameLogic.getPlayerCardsNumber(n))
-              {
-                  console.error("------------------------------------ERROR! Internal game state discrepancy --------------------------")
+          // Verify internal game state
+          verifyInternalGameState()
 
-                  var sCards = arschlochGameLogic.getPlayerCardsText()
-                  console.error("Internal state\n" + sCards)
-              }
-          }
+          // Check if local player has to do anything, if not return
+          if (      (multiplayer.localPlayer !== multiplayer.activePlayer)
+                &&  (nCardExchangeNumber === 0)  )
+                return
+
+
 
           elapsedHintTime += 1
 
-          if (elapsedHintTime >= 5)
+          if (      (elapsedHintTime >= 5)
+                ||  (menuScene.localStorage.debugMode && elapsedHintTime >= 0) )
           {
               var s2 = ""
               var s = ""
@@ -114,19 +113,19 @@ Item {
               }
               else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
               {
-                  if (depot.lastPlayerUserID && depot.lastDeposit && !hasValidCards(multiplayer.localPlayer))
+                  if (!hasValidCards(multiplayer.localPlayer))
                       s2 = "Too bad, you cannot exceed your opponents move :-("
-                  else if (depot.lastPlayerUserID && depot.lastDeposit)
-                      s2 = "Beat your opponent and play higher than " + depot.lastDeposit[0].variationType + "!"
+                  else if (arschlochGameLogic.getLastPlayerID() >= 0)
+                      s2 = "Beat your opponent and play higher than " + arschlochGameLogic.getLastMoveSimpleText() /*depot.lastDeposit[0].variationType*/ + "!"
                   else
                       s2 = "Start freely and play arbitrary cards. Get rid of something :-)"
 
-                  if (depot.lastPlayerUserID && depot.lastDeposit && !hasValidCards(multiplayer.localPlayer))
+                  if (!hasValidCards(multiplayer.localPlayer))
                       s = "Press screen center to pass."
-                  else if (depot.lastPlayerUserID && depot.lastDeposit.length === 1)
+                  else if (arschlochGameLogic.getLastMoveSimpleNumber() === 1)
                       s = "Select 1 card and press the screen center to play, or simply press screen center to pass."
-                  else if (depot.lastPlayerUserID && depot.lastDeposit.length > 1)
-                      s = "Select " + depot.lastDeposit.length + " cards and press the screen center to play, or simply press screen center to pass."
+                  else if (arschlochGameLogic.getLastMoveSimpleNumber() > 1)
+                      s = "Select " + arschlochGameLogic.getLastMoveSimpleNumber() + " cards and press the screen center to play, or simply press screen center to pass."
                   else
                       s = "Select arbitrary cards of the same value and press the screen center to play."
               }
@@ -167,6 +166,22 @@ Item {
   }
 
 
+  // verify that the internal legacy game state matches the card distribution of the GUI
+  function verifyInternalGameState()
+  {
+      for (var nPlayer = 0; nPlayer < 4; nPlayer++)
+      {
+          var playerHand = playerHands.children[nPlayer]
+          if (playerHand.hand.length !== arschlochGameLogic.getPlayerCardsNumber(nPlayer))
+          {
+              var sCards = arschlochGameLogic.getPlayerCardsText()
+              console.error("------------------------------------ERROR! Internal game state discrepancy --------------------------")
+              console.error("Internal state\n" + sCards)
+          }
+      }
+  }
+
+
   function skipOrPlay(userId, bHumanPlayer)
   {
       if (!userId)
@@ -181,6 +196,8 @@ Item {
 
       if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
       {
+          verifyInternalGameState()
+
 
           if (  (arschlochGameLogic.getCardExchangeNumber(nPlayerIndexLegacy) === 0)
             ||  (arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy) < 0)  )
@@ -193,6 +210,12 @@ Item {
           {
               cardIds = legacyPlebCodeBridge.calcMoveCardExchange(userId, nPlayerIndexLegacy)
               console.assert(cardIds.length === 1)
+              if (cardIds.length !== 1)
+              {
+                  // Nochmal aufrufen nur zun Debuggen
+                  cardIds = legacyPlebCodeBridge.calcMoveCardExchange(userId, nPlayerIndexLegacy)
+                  cardIds = legacyPlebCodeBridge.calcMoveCardExchange(userId, nPlayerIndexLegacy)
+              }
 
               selectedCards = []
               selectedCards.push(entityManager.getEntityById(cardIds[0]))
@@ -207,17 +230,28 @@ Item {
           var nPlayerIndexCardExchange = arschlochGameLogic.getCardExchangePartner(nPlayerIndexLegacy)
           var exchangePartnerHand = playerHands.children[nPlayerIndexCardExchange]
 
+
+          verifyInternalGameState()
+
+
           // Workaround: First deposit the cards to the depot for 1 ms such that the owner is changed correctly
           depositCards(cardIds, userId)
+
+          // Reset Depot
           depot.reset()
+
 
           // ... then hand them over to the exchange partner
           exchangePartnerHand.pickUpCards(selectedCards)
           scaleHand()
 
+
           // Sync legacy gamestate
           for (var n = 0; n < selectedCards.length; n++)
               arschlochGameLogic.giveCardToExchangePartner(nPlayerIndexLegacy, nPlayerIndexCardExchange, selectedCards[n].points - 7)
+
+          verifyInternalGameState()
+
 
           // Card exchange has just finished
           if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
@@ -293,10 +327,17 @@ Item {
       if (activeHand.inHand(cardIds[0]))
       {
           for (var l = 0; l < cardIds.length; l++)
-              activeHand.removeFromHand(cardIds[l])
+              if (!activeHand.removeFromHand(cardIds[l]) )
+              {
+                  var nASKLDJH = 42
+              }
 
           // deposit the cards
           depot.depositCards(cardIds)
+      }
+      else
+      {
+          var nProblem = 42
       }
   }
 
@@ -322,30 +363,30 @@ Item {
       var nPlayerIndexLegacy = getHandIndex(multiplayer.activePlayer.userId)
 
 
-      console.debug("[turnStarted] PlayerId: " + playerId + ", multiplayer.activePlayer.userId: " + multiplayer.activePlayer.userId)
-      console.debug("[turnStarted] Last deposit: " + depot.lastDeposit + " by player " + depot.lastPlayerUserID)
+      console.debug("PlayerId: " + playerId + ", multiplayer.activePlayer.userId: " + multiplayer.activePlayer.userId)
+      console.debug("GameState: \n " + arschlochGameLogic.getPlayerCardsText())
 
       // Player can play a second time in a row, meaning all other players have passed.
       // Then we have to make sure that the depot is cleared
-      if (depot.lastPlayerUserID === multiplayer.activePlayer.userId)
-      {
-          depot.lastPlayerUserID = null
-          depot.lastDeposit = []
-      }
+//      if (depot.lastPlayerUserID === multiplayer.activePlayer.userId)
+//      {
+//          depot.lastPlayerUserID = null
+//          depot.lastDeposit = []
+//      }
 
       // Verify last move
-      if ((depot.lastPlayerUserID === null) !== (arschlochGameLogic.getLastPlayerID() === -1))
-      {
-          var nProblem = 42;
-      }
+//      if ((depot.lastPlayerUserID === null) !== (arschlochGameLogic.getLastPlayerID() === -1))
+//      {
+//          var nProblem = 42;
+//      }
 
 
-      console.assert((depot.lastPlayerUserID === null) === (arschlochGameLogic.getLastPlayerID() === -1), "Last move discrepancy!")
-      if (depot.lastPlayerUserID !== null)
-      {
-          console.assert(depot.lastDeposit.length === arschlochGameLogic.getLastMoveSimpleNumber())
-          console.assert(depot.lastDeposit[0].points - 7 === arschlochGameLogic.getLastMoveSimpleValue())
-      }
+//      console.assert((depot.lastPlayerUserID === null) === (arschlochGameLogic.getLastPlayerID() === -1), "Last move discrepancy!")
+//      if (depot.lastPlayerUserID !== null)
+//      {
+//          console.assert(depot.lastDeposit.length === arschlochGameLogic.getLastMoveSimpleNumber())
+//          console.assert(depot.lastDeposit[0].points - 7 === arschlochGameLogic.getLastMoveSimpleValue())
+//      }
 
 
       // give the connected player <xxx> seconds until the AI takes over
@@ -693,10 +734,11 @@ Item {
           }
 
       // Everybody has finished
-      if (arschlochGameLogic.getNumberPlayers() <= 0)
+//      if (arschlochGameLogic.getNumberPlayers() <= 0)
+      if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielZuEnde())
       {
           console.debug("[endTurn] Ending game")
-          console.assert(arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielZuEnde)
+//          console.assert(arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielZuEnde)
 
           endGame()
           multiplayer.sendMessage(messageEndGame, {userId: userId})
@@ -709,6 +751,12 @@ Item {
           {
               nActualPlayerLegacy = arschlochGameLogic.getActualPlayerID()
               console.assert(nActualPlayerLegacy >= 0)
+
+              if (arschlochGameLogic.getState() !== arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+              {
+                  var nsdfadf = 42;
+              }
+
               console.assert(arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
 
               multiplayer.triggerNextTurn(playerHands.children[nActualPlayerLegacy].player.userId)
@@ -834,15 +882,17 @@ Item {
 
                       // convenience for the player to auto-select groups
                       // if there is a last move by another player which has to be beaten
-                      if (depot.lastPlayerUserID && depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayerUserID)
+//                      if (depot.lastPlayerUserID && depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayerUserID)
+                      if (arschlochGameLogic.getLastPlayerID() >= 0)
                       {
                           var activeHand = getHand(multiplayer.localPlayer.userId).hand
-                          if (selectedCard.selected) {
+                          if (selectedCard.selected)
+                          {
                               var groupSize = 1
                               for (var i = 0; i < activeHand.length; i++) {
                                   if (activeHand[i].entityId !== selectedCard.entityId) {
                                       if (activeHand[i].points === selectedCard.points) {
-                                          if (groupSize < depot.lastDeposit.length) {
+                                          if (groupSize < arschlochGameLogic.getLastMoveSimpleNumber() ) {
                                               activeHand[i].selected = true
                                               activeHand[i].glowImage.visible = false
                                               groupSize++

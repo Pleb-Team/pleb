@@ -18,7 +18,7 @@ Item {
   // the current turn direction
 //  property bool clockwise: true
 
-  property var lastPlayerUserID: null
+//  property var lastPlayerUserID: null
 //  property var finishedUserIDs: []
 
 
@@ -88,13 +88,15 @@ Item {
       }
 
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-      lastPlayerUserID = userId
+//      lastPlayerUserID = userId
   }
 
 
   // check if allowed to play the selected card
   function validCard(cardId)
   {
+      var b
+
       // Make sure this card is (still) in the palyers hand.
       var activeHand = gameLogic.getHand(multiplayer.activePlayer.userId)
       if (!activeHand)
@@ -103,19 +105,32 @@ Item {
           return false
 
       // Depot is empty or this player played last --> This player can play freely
-      if (      !lastPlayerUserID
-            ||  lastDeposit === undefined
-            ||  lastDeposit === null
-            ||  lastDeposit.length === 0
-            ||  multiplayer.activePlayer.userId === lastPlayerUserID
-          )
-      {
-          return true
-      }
+//      if (      !lastPlayerUserID
+//            ||  lastDeposit === undefined
+//            ||  lastDeposit === null
+//            ||  lastDeposit.length === 0
+//            ||  multiplayer.activePlayer.userId === lastPlayerUserID
+//          )
+//      {
+//          b = true
+//      }
+//      else
+//      {
+          var card = entityManager.getEntityById(cardId)
+//          b =   (card.points > lastDeposit[0].points)
+//            &&  (activeHand.countCards(card.points) >= lastDeposit.length)
+//      }
 
-      var card = entityManager.getEntityById(cardId)
-      return    card.points > lastDeposit[0].points
-            &&  activeHand.countCards(card.points) >= lastDeposit.length
+      // Cross check with legacy game logic
+      var c = (     (gameLogic.arschlochGameLogic.getLastPlayerID() < 0) )
+                ||  (gameLogic.arschlochGameLogic.isMoveLegal(gameLogic.arschlochGameLogic.getLastMoveSimpleNumber(), card.points - 7) )
+
+//      if (b !== c)
+//      {
+//          var efg = 42;
+//      }
+
+      return c
   }
 
 
@@ -147,7 +162,6 @@ Item {
       skipped = false
       effectTimer.stop()
       lastDeposit = []
-      lastPlayerUserID = null
   }
 
 

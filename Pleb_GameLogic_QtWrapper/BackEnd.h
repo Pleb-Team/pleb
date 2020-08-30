@@ -118,6 +118,10 @@ public:
     Q_INVOKABLE void removePlayerCards(int nPlayerID, int nNumberCards, int nValueCards) {
         m_GameState.PlayerVerliertKarten(TMoveSimple(nNumberCards, nValueCards), nPlayerID);  }
 
+    // Check if the actual play is allowed to play this move
+    Q_INVOKABLE bool isMoveLegal(int nNumberCards, int nValueCards) {
+        return m_GameState.IsMoveLegal(TMoveSimple(nNumberCards, nValueCards)); }
+
     // Set the last move, i.e. what cards are currently visible in the centre of the table.
     // For the game rules, it is also important who played these cards thus nLastPlayerID must be given
     Q_INVOKABLE int getLastMoveSimpleNumber() { return m_GameState.m_LastMoveSimple.NumberCards;  }

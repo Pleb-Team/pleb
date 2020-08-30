@@ -41,15 +41,8 @@ Item {
         // Last player move, i.e. what do we see in the middle of the table right now?
         // arschlochGameLogicLocal.setLastMoveSimple(int nLastPlayerID, nNumberCards,  nValueCards);
         // Example: Player 3 has played one card of value 8
-        if (depot.lastPlayerUserID && depot.lastDeposit && depot.lastDeposit.length > 0)
-        {
-            var lastPlayerIndex = gameLogic.getHandIndex(depot.lastPlayerUserID)
-            arschlochGameLogicLocal.setLastMoveSimple(lastPlayerIndex, depot.lastDeposit.length, depot.lastDeposit[0].points - 7)
-        }
-        else
-        {
-            // do nothing: last Move is empty, i.e. this player can play freely
-        }
+        if (arschlochGameLogic.getLastPlayerID() >= 0)
+            arschlochGameLogicLocal.setLastMoveSimple(arschlochGameLogic.getLastPlayerID(), arschlochGameLogic.getLastMoveSimpleNumber(), arschlochGameLogic.getLastMoveSimpleValue())
 
         // Whos turn is it? AI will compute a move for this playerS
         arschlochGameLogicLocal.setActualPlayerID(nActualPlayerLegacy)
@@ -70,8 +63,7 @@ Item {
 
 		// Now let the AI think
         arschlochGameLogicLocal.think()
-        console.debug("[calcMove] userId: " + userId + ", retrieveLegacyPlayerId: " + arschlochGameLogicLocal.getActualPlayerID() + ", nActualPlayerLegacy: " + nActualPlayerLegacy)
-        console.debug("[calcMove] AI computed move for Player " + arschlochGameLogicLocal.getActualPlayerID() + ": " + arschlochGameLogicLocal.getMoveSimpleAIText())
+        console.debug("[calcMove] AI computed move for userId: " + userId + ", LegacyPlayerId: " + nActualPlayerLegacy +  ": " + arschlochGameLogicLocal.getMoveSimpleAIText())
 
         // Decode legacy card meanings (Number, Value) to Pleb coding
         var nValueCardsLegacy = arschlochGameLogicLocal.getMoveSimpleAIValue()
@@ -91,12 +83,25 @@ Item {
 
         // Now let the AI think
         arschlochGameLogicLocal.thinkCardExchange(nActualPlayerLegacy)
-        console.debug("[calcMoveCardExchange] userId: " + userId + ", retrieveLegacyPlayerId: " + arschlochGameLogicLocal.getActualPlayerID() + ", nActualPlayerLegacy: " + nActualPlayerLegacy)
-        console.debug("[calcMoveCardExchange] AI computed move for Player " + nActualPlayerLegacy + ": " + arschlochGameLogicLocal.getMoveSimpleAIText())
+        console.debug("[calcMoveCardExchange] AI computed move for userId: " + userId
+                      + ", LegacyPlayerId " + nActualPlayerLegacy
+                      + ", CardExchangenNumber: " + arschlochGameLogicLocal.getCardExchangeNumber(nActualPlayerLegacy)
+                      + ", CardExchangePartner: " + arschlochGameLogicLocal.getCardExchangePartner(nActualPlayerLegacy)
+                      + " --> Card exchange computed: " + arschlochGameLogicLocal.getMoveSimpleAIText() )
 
         // Decode legacy card meanings (Number, Value) to Pleb coding
         var nValueCardsLegacy = arschlochGameLogicLocal.getMoveSimpleAIValue()
         var nNumberCardsLegacy = arschlochGameLogicLocal.getMoveSimpleAINumber()
+
+        console.assert( (nNumberCardsLegacy > 0) && (nValueCardsLegacy >= 0), "Error: Card exchange computed is invalid!")
+        if ((nNumberCardsLegacy <= 0) || (nValueCardsLegacy < 0))
+        {
+            var s = arschlochGameLogicLocal.getPlayerCardsText()
+            console.error("Error: Card exchange computed is invalid! Cards: \n " + s)
+
+            // Nochmal neu starten zum Debuggen
+            arschlochGameLogicLocal.thinkCardExchange(nActualPlayerLegacy)
+        }
 
         // Note: Card_7 in legacy has value = 0, but points = 7 in QML
         return playerHand.findCardIDs(nNumberCardsLegacy, nValueCardsLegacy + 7)
