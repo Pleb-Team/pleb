@@ -21,6 +21,8 @@ Item {
     readonly property int nBorderWidth: 1
     readonly property string sBorderColor: "#28a3c1"
 
+    readonly property int nAnimationDurationMS: 600
+
     // From C++ GameLogic GlobalConstants.h
     readonly property int nGameResultUndefined: -42
 }

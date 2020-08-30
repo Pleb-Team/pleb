@@ -170,7 +170,7 @@ TMoveSimple CPlayerAI::SuchSchlechtesteKarte()
 
     // Hier angekommen heißt: Alle niedrigen Karten sind wenn dann als mind. als Päärchen vorhanden!
     // Dann halt einfach die schlechteste Karte rausrücken
-	for (n = 0; n < NUMBER_VALUE-1; n++)
+    for (n = 0; n < NUMBER_VALUE; n++)
 
 		if ( MYCARDS[n] > 0 )							return TMoveSimple( 1, n );
 

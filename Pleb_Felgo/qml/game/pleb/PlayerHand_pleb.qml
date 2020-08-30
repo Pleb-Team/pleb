@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Felgo 3.0
+import "../../common"
 
 // the cards in the hand of the player
 Item {
@@ -76,15 +77,21 @@ Item {
     width: 170
     height: width
     z: 100
-    visible: depot.skipped && multiplayer.activePlayer == player
+    visible: false // depot.skipped && multiplayer.activePlayer == player
     smooth: true
   }
 
   // start the hand by picking up a specified amount of cards
   function startHand()
   {
-//      pickUpCardsFromDeck(numberCardsAtBeginningOfGame)
-      pickUpCardsFromDeck(2)
+      var cardEntities = []
+
+      if (menuScene.localStorage.debugMode)
+          cardEntities = deck.handOutCards(2)
+      else
+          cardEntities = deck.handOutCards(numberCardsAtBeginningOfGame)
+
+      pickUpCards(cardEntities, true)
   }
 
   // reset the hand by removing all cards
@@ -115,7 +122,8 @@ Item {
       }
 
       // calculate the card position and rotation in the hand and change the z order
-      for (var i = 0; i < hand.length; i ++){
+      for (var i = 0; i < hand.length; i ++)
+      {
           var card = hand[i]
           // angle span for spread cards in hand
           var handAngle = 40
@@ -127,34 +135,28 @@ Item {
           var cardX = (playerHandPleb.originalWidth * zoom - handWidth) / 2 + (i * offset)
 
           card.rotation = cardAngle
-//          card.posX = cardX
-//          card.posY = Math.abs(cardAngle) * 1.5
-//          card.posZ = i + 50 + playerHandImage.z
-
           card.setPosInPlayerHand(cardX, Math.abs(cardAngle) * 1.5, i + 50 + playerHandImage.z)
       }
   }
 
 
   // pick up specified amount of cards
-  function pickUpCardsFromDeck(amount)
+  function pickUpCards(cardEntities, updateLegacyGameState)
   {
-      var cardEntities = deck.handOutCards(amount)
-      pickUpCards(cardEntities)
-  }
+      var nPlayerIndexLegacy = gameLogic.getHandIndex(player.userId)
 
-
-  // pick up specified amount of cards
-  function pickUpCards(cardEntities)
-  {
       // add the stack cards to the playerHand array
       for (var i = 0; i < cardEntities.length; i ++)
       {
           hand.push(cardEntities[i])
-          changeParent(cardEntities[i])
 
+          cardEntities[i].newParent = playerHandPleb
+          cardEntities[i].state = "player"
           cardEntities[i].hidden = (multiplayer.localPlayer !== player)
           drawSound.play()
+
+          if (updateLegacyGameState)
+              gameLogic.arschlochGameLogic.addPlayerCards(nPlayerIndexLegacy, 1, cardEntities[i].points - 7)
       }
 
       // reorganize the hand
@@ -162,39 +164,15 @@ Item {
   }
 
 
-//  // change the current hand card array
-//  function syncHand(cardIDs) {
-//      hand = []
-//      for (var i = 0; i < cardIDs.length; i++){
-//          var tmpCard = entityManager.getEntityById(cardIDs[i])
-//          hand.push(tmpCard)
-//          changeParent(tmpCard)
-//          deck.numberCardsInStack --
-//          if (multiplayer.localPlayer == player){
-//              tmpCard.hidden = false
-//          }
-//          drawSound.play()
-//      }
-//      // reorganize the hand
-//      neatHand()
-//  }
-
-  // change the parent of the card to playerHand
-  function changeParent(card)
-  {
-      card.newParent = playerHandPleb
-      card.state = "player"
-  }
-
-
   // check if a card with a specific id is on this hand
-  function inHand(cardId){
-    for (var i = 0; i < hand.length; i ++){
-      if(hand[i].entityId === cardId){
-        return true
+  function inHand(cardId)
+  {
+      for (var i = 0; i < hand.length; i ++){
+          if(hand[i].entityId === cardId){
+              return true
+          }
       }
-    }
-    return false
+      return false
   }
 
 
@@ -210,8 +188,8 @@ Item {
       // Make sure we found all needed cards
       console.assert(result.length === nNumber, "findCardIDs() failed, cards not found! nNumber, nPoints: " + nNumber + ", " + nPoints)
       if (result.length !== nNumber)
-          result = [
-                  ]
+          result = []
+
       return result
   }
 
@@ -228,25 +206,25 @@ Item {
       // Make sure we found all needed cards
       console.assert(result.length === nNumber, "findCardIDs() failed, cards not found! nNumber, nPoints: " + nNumber + ", " + nPoints)
       if (result.length !== nNumber)
-          result = [
-                  ]
+          result = []
+
       return result
   }
 
   // counts how many cards with the supplied points are in hand
-  function countCards(points) {
+  function countCards(points)
+  {
       var result = 0
-      for (var i = 0; i < hand.length; i ++){
-        if(hand[i].points === points){
-          result++
-        }
-      }
+      for (var i = 0; i < hand.length; i ++)
+          if(hand[i].points === points)
+              result++
+
       return result
   }
 
 
   // remove card with a specific id from hand
-  function removeFromHand(cardId)
+  function removeCardId(cardId)
   {
       for (var i = 0; i < hand.length; i ++)
       {
@@ -257,10 +235,32 @@ Item {
               hand.splice(i, 1)
               depositSound.play()
               neatHand()
-              return
+
+              return true
           }
       }
+
+      return false
   }
+
+  // remove card with a specific id from hand
+  function removeCardEntity(cardEntity)
+  {
+      for (var i = 0; i < hand.length; i ++)
+          if (hand[i] === cardEntity)
+          {
+              hand[i].width = hand[i].originalWidth
+              hand[i].height = hand[i].originalHeight
+              hand.splice(i, 1)
+              depositSound.play()
+              neatHand()
+
+              return true
+          }
+
+      return false
+  }
+
 
 
   function getSelectedCards()
@@ -310,10 +310,12 @@ Item {
   // highlight all valid cards by setting the glowImage visible
   function markValid()
   {
-      if (depot.skipped || gameLogic.arschlochGameLogic.getState() === gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandNix() )
+      if ( /*depot.skipped || */ gameLogic.arschlochGameLogic.getState() === gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandNix() )
           unmark()
 
       var selectedGroup = getSelectedCards()
+      var nPlayerIndexLegacy = gameLogic.getHandIndex(player.userId)
+
       for (var i = 0; i < hand.length; i ++)
       {
           // Unmark invalid cards
@@ -335,11 +337,9 @@ Item {
           // ... already some card selected --> allow further cards to be selected only of same value
           // and correct number of cards
           else if (  selectedGroup[0].points === hand[i].points
-                  &&  (
-                      depot.lastDeposit.length === 0
-                      ||  selectedGroup.length < depot.lastDeposit.length
-                      ||  !depot.lastPlayerUserID
-                      ||  player.userId === depot.lastPlayerUserID
+                  &&  (   gameLogic.arschlochGameLogic.getLastPlayerID() < 0
+                      ||  gameLogic.arschlochGameLogic.getLastPlayerID() === nPlayerIndexLegacy
+                      ||  gameLogic.arschlochGameLogic.getLastMoveSimpleNumber() > selectedGroup.length
                       )
                   )
           {
@@ -378,16 +378,17 @@ Item {
 
 
   // get an array with all valid cards
-  function getValidCards(){
-    var valids = []
-    // put all valid card options in the array
-    for (var i = 0; i < hand.length; i ++){
-      if (depot.validCard(hand[i].entityId)){
-        valids.push(entityManager.getEntityById(hand[i].entityId))
-      }
-    }
-//    console.debug("could play: " + valids)
-    return valids
+  function getValidCards()
+  {
+      var valids = []
+
+      // put all valid card options in the array
+      for (var i = 0; i < hand.length; i ++)
+          if (depot.validCard(hand[i].entityId))
+              valids.push(entityManager.getEntityById(hand[i].entityId))
+
+
+      return valids
   }
 
 
@@ -408,10 +409,10 @@ Item {
 
   // animate the playerHand width and height
   Behavior on width {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 
   Behavior on height {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 }

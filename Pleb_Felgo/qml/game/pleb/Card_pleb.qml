@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Felgo 3.0
 import QtGraphicalEffects 1.0
 import "../../scenes"
+import "../../common"
 
 EntityBase {
   id: cardPleb
@@ -22,11 +23,11 @@ EntityBase {
 
   // hidden cards show the back side  
   // you could also offer an in-app purchase to show the cards of a player for example!
-  property bool hidden: !forceShowAllCards
+  property bool hidden: true
 
   // to show all cards on the screen and to test multiplayer syncing, set this to true
   // it is useful for testing, thus always enable it for debug builds and non-publish builds
-  property bool forceShowAllCards: system.debugBuild && !system.publishBuild
+//  property bool forceShowAllCards: (system.debugBuild && !system.publishBuild) || menuScene.localStorage.debugMode
 
   property bool selected: false
 
@@ -119,33 +120,33 @@ EntityBase {
     id: hiddenAnimation
     running: false
 
-    NumberAnimation { target: scaleTransform; property: "xScale"; easing.type: Easing.InOutQuad; to: 0; duration: 80 }
+//    NumberAnimation { target: scaleTransform; property: "xScale"; easing.type: Easing.InOutQuad; to: 0; duration: 80 }
 
     PropertyAction { target: cardImage; property: "source"; value: updateCardImage() }
 
-    NumberAnimation { target: scaleTransform; property: "xScale"; easing.type: Easing.InOutQuad; to: 1.0; duration: 80 }
+//    NumberAnimation { target: scaleTransform; property: "xScale"; easing.type: Easing.InOutQuad; to: 1.0; duration: 80 }
   }
 
 
   // Behaviors animate the card x and y movement and rotation
   Behavior on x {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 
   Behavior on y {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 
   Behavior on rotation {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 
   Behavior on width {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 
   Behavior on height {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: Constants.nAnimationDurationMS }
   }
 
   // reparent card when it changes its state
@@ -174,9 +175,9 @@ EntityBase {
   // start the card flip animation when the hidden var changes
   onHiddenChanged: {
     // force to set hidden always to false if we are in development mode, this helps in debugging as we can then see all cards
-    if(hidden && forceShowAllCards) {
-      hidden = false
-    }
+//    if(hidden && forceShowAllCards) {
+//      hidden = false
+//    }
 
     hiddenAnimation.start()
   }
@@ -184,7 +185,7 @@ EntityBase {
   // update the card image of turning cards
   function updateCardImage(){
     // hidden cards show the back side without effect
-    if (hidden){
+    if (hidden && !menuScene.localStorage.debugMode){
       cardImage.source = "../../../assets/img/cards/back.png"
     } else if (variationType == "ten") {
         cardImage.source = "../../../assets/img/cards/" + "X" + cardColor.charAt(0).toLowerCase() + ".png"

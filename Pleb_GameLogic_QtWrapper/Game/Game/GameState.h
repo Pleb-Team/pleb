@@ -260,10 +260,10 @@ inline int CGameState::GiveCardToExchangePartner(int nPlayerIDGive, int nPlayerI
     assert(m_nCardExchangeNumber[nPlayerIDGive] != 0);
 
     // Gamestate updaten
-//    if (PlayerVerliertKarten( MoveSimple, nPlayerIDGive ) == JOJO_ERROR)
-//        return JOJO_ERROR;
+    if (PlayerVerliertKarten( MoveSimple, nPlayerIDGive ) == JOJO_ERROR)
+        return JOJO_ERROR;
 
-//    PlayerBekommtKarten( MoveSimple, nPlayerIDReceive );
+    PlayerBekommtKarten( MoveSimple, nPlayerIDReceive );
 
     // Den Counter, wieviele Karten abgegeben werden muessen, updaten
     if (m_nCardExchangeNumber[nPlayerIDGive] > 0)
@@ -380,6 +380,14 @@ inline void CGameState::SpielBeginnen()
     // Nach einem Spiel jedem Spieler mitteilen, mit wem er Karten tauschen soll
     if ( (Neger >= 0) && (VizeNeger >= 0) && (VizeMaster >= 0) && (Master >= 0) )
     {
+        // Verify each position is assigned
+        assert (Neger + VizeNeger + VizeMaster + Master == 0 + 1 + 2 + 3 && L"[GameState::SpielBeginnen] Fehler: Kartenaustauschpartner nicht korrekt gesetzt");
+        if (Neger + VizeNeger + VizeMaster + Master != 0 + 1 + 2 + 3)
+        {
+            m_nZustand = Jojo_Zustand_Nix;
+            return;
+        }
+
         m_nActualPlayer = Neger;
         m_nZustand = Jojo_SpielZustandKartenTauschen;
 
