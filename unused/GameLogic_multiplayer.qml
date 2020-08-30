@@ -342,7 +342,7 @@
     // send the message to the newly joined player
     message.receiverPlayerId = playerId
 
-    message.lastPlayerUserID = depot.lastPlayerUserID
+//    message.lastPlayerUserID = depot.lastPlayerUserID
     message.finishedUserIDs = undefined // depot.finishedUserIDs
 
     console.debug("Send Message: " + JSON.stringify(message))
