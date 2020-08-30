@@ -129,23 +129,23 @@ EntityBase {
 
   // Behaviors animate the card x and y movement and rotation
   Behavior on x {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: 600 }
   }
 
   Behavior on y {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: 600 }
   }
 
   Behavior on rotation {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: 600 }
   }
 
   Behavior on width {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: 600 }
   }
 
   Behavior on height {
-    NumberAnimation { easing.type: Easing.InOutQuad; duration: 400 }
+    NumberAnimation { easing.type: Easing.InOutQuad; duration: 600 }
   }
 
   // reparent card when it changes its state
