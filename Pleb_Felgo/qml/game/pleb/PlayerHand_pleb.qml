@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Felgo 3.0
+import "../../common"
 
 // the cards in the hand of the player
 Item {
@@ -76,7 +77,7 @@ Item {
     width: 170
     height: width
     z: 100
-    visible: depot.skipped && multiplayer.activePlayer == player
+    visible: false // depot.skipped && multiplayer.activePlayer == player
     smooth: true
   }
 
@@ -223,7 +224,7 @@ Item {
 
 
   // remove card with a specific id from hand
-  function removeFromHand(cardId)
+  function removeCardId(cardId)
   {
       for (var i = 0; i < hand.length; i ++)
       {
@@ -241,6 +242,25 @@ Item {
 
       return false
   }
+
+  // remove card with a specific id from hand
+  function removeCardEntity(cardEntity)
+  {
+      for (var i = 0; i < hand.length; i ++)
+          if (hand[i] === cardEntity)
+          {
+              hand[i].width = hand[i].originalWidth
+              hand[i].height = hand[i].originalHeight
+              hand.splice(i, 1)
+              depositSound.play()
+              neatHand()
+
+              return true
+          }
+
+      return false
+  }
+
 
 
   function getSelectedCards()
@@ -290,7 +310,7 @@ Item {
   // highlight all valid cards by setting the glowImage visible
   function markValid()
   {
-      if (depot.skipped || gameLogic.arschlochGameLogic.getState() === gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandNix() )
+      if ( /*depot.skipped || */ gameLogic.arschlochGameLogic.getState() === gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandNix() )
           unmark()
 
       var selectedGroup = getSelectedCards()

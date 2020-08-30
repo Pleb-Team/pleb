@@ -70,7 +70,7 @@ Item {
         var nNumberCardsLegacy = arschlochGameLogicLocal.getMoveSimpleAINumber()
 
         // Note: Card_7 in legacy has value = 0, but points = 7 in QML
-        return playerHand.findCardIDs(nNumberCardsLegacy, nValueCardsLegacy + 7)
+        return playerHand.findCards(nNumberCardsLegacy, nValueCardsLegacy + 7)
     }
 
 
@@ -104,6 +104,6 @@ Item {
         }
 
         // Note: Card_7 in legacy has value = 0, but points = 7 in QML
-        return playerHand.findCardIDs(nNumberCardsLegacy, nValueCardsLegacy + 7)
+        return playerHand.findCards(nNumberCardsLegacy, nValueCardsLegacy + 7)
     }
 }

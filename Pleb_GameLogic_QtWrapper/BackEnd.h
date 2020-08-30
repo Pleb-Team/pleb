@@ -71,6 +71,7 @@ public:
     Q_INVOKABLE void setMoveSimpleValue(const int MoveSimpleValue);
     Q_INVOKABLE int getMoveSimpleNumber() { return m_MoveSimple.NumberCards; }
     Q_INVOKABLE void setMoveSimpleNumber(const int MoveSimpleNumber);
+    Q_INVOKABLE void clearMoveSimple() { m_MoveSimple = c_MoveSimpleSchieben; }
 
     // Maximum number of players possible, e.g. at beginning of game
     Q_INVOKABLE int getNumberPlayersMax() { return NUMBER_PLAYER; }
