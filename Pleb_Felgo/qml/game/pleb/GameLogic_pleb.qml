@@ -242,6 +242,7 @@ Item {
           selectedCards[m].state = "depot"
           selectedCards[m].newParent = depot
           selectedCards[m].selected = false
+          selectedCards[m].glowImage.visible = false
       }
 
 //      depositCardEntities(selectedCards, userId)
@@ -252,6 +253,7 @@ Item {
       // ... then hand them over to the exchange partner
       exchangePartnerHand.pickUpCards(selectedCards)
       scaleHand()
+      getHand(multiplayer.activePlayer.userId).markValid()
 
 
       // Sync legacy gamestate
@@ -392,7 +394,7 @@ Item {
       {
 //          unmark()
           scaleHand()
-          markValid()
+          getHand(multiplayer.localPlayer.userId).markValid()
       }
 
 
@@ -534,7 +536,7 @@ Item {
       })
 
       scaleHand()
-      markValid()
+      getHand(multiplayer.activePlayer.userId).markValid()
 
       console.debug("InitGame finished!")
   }
@@ -619,19 +621,19 @@ Item {
 
 
   // find the playerHand of the active player and mark all valid card options
-  function markValid()
-  {
-//      if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
-//      {
-//      }
-//      else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
-      {
-          if (multiplayer.myTurn && !acted )
-              getHand(multiplayer.activePlayer.userId).markValid()
-          else
-              unmark()
-      }
-  }
+//  function markValid()
+//  {
+////      if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
+////      {
+////      }
+////      else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
+////      {
+////          if (multiplayer.myTurn && !acted )
+//              getHand(multiplayer.activePlayer.userId).markValid()
+////          else
+////              unmark()
+////      }
+//  }
 
   // unmark all valid card options of all players
   function unmark()
@@ -650,7 +652,6 @@ Item {
       {
           if (  multiplayer.myTurn
                   && !acted
-//                  && !depot.skipped
                   && arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen()
                   )
               scale = 1.6
@@ -803,22 +804,22 @@ Item {
               {
                   // Todo: Regeln fürs selektieren einer Karte
                   // Aktuell kann man sogar die Karten der Gegner selektieren
-//                  if (selectedCard.glowImage.visible || selectedCard.selected)
-//                  {
+                  if (selectedCard.glowImage.visible || selectedCard.selected)
+                  {
                       selectedCard.selected = !selectedCard.selected
-//                  }
+                  }
 
                   // refresh hand display
-//                  markValid()
+                  getHand(multiplayer.localPlayer.userId).markValid()
 
                   return
               }
 
 
 
-              if (multiplayer.myTurn && /* !depot.skipped && */  !acted)
+              if (multiplayer.myTurn && !acted)
               {
-                  if (!depot.validCard(cardId))
+                  if (!depot.validCardID(cardId))
                       return
 
 
@@ -865,7 +866,7 @@ Item {
                       }
 
                       // refresh hand display
-                      markValid()
+                      getHand(multiplayer.localPlayer.userId).markValid()
                   }
 
 

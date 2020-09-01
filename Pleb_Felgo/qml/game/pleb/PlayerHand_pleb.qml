@@ -308,49 +308,94 @@ Item {
   }
 
   // highlight all valid cards by setting the glowImage visible
+  // A Card is valid iff
+  // - it is allowed to select this card in order to play it later (possibly together with other cards of the same value)
+  // - and not too many cards are already selected
+  // Pretty complicated, but note that on mobile devices, each card is selected by manually tapping the cards one by one
   function markValid()
   {
-      if ( /*depot.skipped || */ gameLogic.arschlochGameLogic.getState() === gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandNix() )
-          unmark()
-
       var selectedGroup = getSelectedCards()
       var nPlayerIndexLegacy = gameLogic.getHandIndex(player.userId)
+      var cardExchangeNumber = gameLogic.arschlochGameLogic.getCardExchangeNumber(nPlayerIndexLegacy)
+      var i
 
-      for (var i = 0; i < hand.length; i ++)
+      if (gameLogic.arschlochGameLogic.getState() === gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen() )
       {
-          // Unmark invalid cards
-          if (!depot.validCard(hand[i].entityId))
+          if  (     (cardExchangeNumber > 0)
+                &&  (hand.length >= cardExchangeNumber))
           {
-              hand[i].glowImage.visible = false
-              hand[i].selected = false
-              continue
+              // sort all cards ascenting by points
+              var listCards = hand.filter(function(item) {
+                  return !item.selected
+              })
+
+              listCards.sort(function(a, b)
+              {
+                  return a.points - b.points
+              })
+
+              // Pleb must give away all cards with >= this many points. Note that some card might be
+              // already selected which is treated as if it has been given away already
+              var cardExchangeNumberRemaining = cardExchangeNumber - selectedGroup.length
+              var lowestPointsForExchange = 99999
+              if (cardExchangeNumberRemaining > 0)
+                  lowestPointsForExchange = listCards[listCards.length-cardExchangeNumberRemaining].points
+
+
+              for (i = 0; i < hand.length; i ++)
+                  hand[i].glowImage.visible = (hand[i].points >= lowestPointsForExchange) && !hand[i].selected
+          }
+          else if  (cardExchangeNumber < 0)
+          {
+              for (i = 0; i < hand.length; i ++)
+                  hand[i].glowImage.visible = !hand[i].selected
           }
 
-          // Nothing yet selected --> All cards of valid value are allowed
-          if (selectedGroup.length === 0)
+
+      }
+      else if (gameLogic.arschlochGameLogic.getState() === gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen() )
+      {
+          if (player === multiplayer.activePlayer)
           {
-              hand[i].glowImage.visible = true
-              continue
-          }
+              for (i = 0; i < hand.length; i ++)
+              {
+                  // Skip invalid cards immediately
+                  if (!depot.validCardID(hand[i].entityId))
+                  {
+                      hand[i].glowImage.visible = false
+        //                  hand[i].selected = false
+                      continue
+                  }
+
+                  // Nothing yet selected --> All cards of valid value are allowed
+                  if (selectedGroup.length === 0)
+                  {
+                      hand[i].glowImage.visible = true
+                      continue
+                  }
 
 
-          // ... already some card selected --> allow further cards to be selected only of same value
-          // and correct number of cards
-          else if (  selectedGroup[0].points === hand[i].points
-                  &&  (   gameLogic.arschlochGameLogic.getLastPlayerID() < 0
-                      ||  gameLogic.arschlochGameLogic.getLastPlayerID() === nPlayerIndexLegacy
-                      ||  gameLogic.arschlochGameLogic.getLastMoveSimpleNumber() > selectedGroup.length
-                      )
-                  )
-          {
-              hand[i].glowImage.visible = !hand[i].selected
+                  // ... already some card selected --> allow further cards to be selected only of same value
+                  // and correct number of cards
+                  else if (  selectedGroup[0].points === hand[i].points
+                          &&  (   gameLogic.arschlochGameLogic.getLastPlayerID() < 0
+                              ||  gameLogic.arschlochGameLogic.getLastPlayerID() === nPlayerIndexLegacy
+                              ||  gameLogic.arschlochGameLogic.getLastMoveSimpleNumber() > selectedGroup.length
+                              )
+                          )
+                  {
+                      hand[i].glowImage.visible = !hand[i].selected
+                  }
+                  else
+                  {
+                      hand[i].glowImage.visible = false
+                  }
+              }
           }
-          else
-          {
-              hand[i].glowImage.visible = false
-          }
-
-          hand[i].updateCardImage()
+      }
+      else
+      {
+          unmark()
       }
   }
 
@@ -384,7 +429,7 @@ Item {
 
       // put all valid card options in the array
       for (var i = 0; i < hand.length; i ++)
-          if (depot.validCard(hand[i].entityId))
+          if (depot.validCardID(hand[i].entityId))
               valids.push(entityManager.getEntityById(hand[i].entityId))
 
 

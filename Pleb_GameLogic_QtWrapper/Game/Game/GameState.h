@@ -376,6 +376,11 @@ inline void CGameState::SpielBeginnen()
             case RESULT_PRAESI:		Master = n;		break;
         }
 
+    // For debugging, fix result of last game
+//    Neger = 0;
+//    VizeNeger = 1;
+//    VizeMaster = 2;
+//    Master = 3;
 
     // Nach einem Spiel jedem Spieler mitteilen, mit wem er Karten tauschen soll
     if ( (Neger >= 0) && (VizeNeger >= 0) && (VizeMaster >= 0) && (Master >= 0) )
