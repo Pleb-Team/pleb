@@ -58,7 +58,7 @@ android {
 ios {
     QMAKE_INFO_PLIST = ios/Project-Info.plist
     OTHER_FILES += $$QMAKE_INFO_PLIST
-    QMAKE_IOS_DEPLOYMENT_TARGET = 9.3
+#    QMAKE_IOS_DEPLOYMENT_TARGET = 9.3
 
     # Entitlements for Apple Push Notification service - not yet actively used, but theoretically accessible by
     # the Felgo Multiplayer / OneSignal plugin, so AppStore Connect complains without this entitlement.

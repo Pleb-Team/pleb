@@ -166,7 +166,8 @@ SceneBase {
       }
   }
 
-  // Move bacjk to the above column when the other buttons get reactivated
+  // Moved outside the above column s.t. the button is bottom-aigned
+  // Todo: Move back to the above column when the other buttons get reactivated
   MenuButton {
       anchors.horizontalCenter: gameWindowAnchorItem.horizontalCenter
       anchors.bottom: gameWindowAnchorItem.bottom
@@ -293,6 +294,15 @@ SceneBase {
     }
   }
 
+  Text {
+      id: txtVersion
+      anchors.top: parent.top
+      anchors.right: parent.right
+      anchors.margins: 10
+      font.pixelSize: 9
+      color: "black"
+      text: qsTr("Version name: " + Qt.application.version)
+  }
 
 
   // connect to the FelgoGameNetwork to handle new inbox entries
