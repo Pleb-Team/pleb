@@ -93,7 +93,7 @@ Item {
 
 
   // check if allowed to play the selected card
-  function validCard(cardId)
+  function validCardID(cardId)
   {
       // Make sure this card is (still) in the palyers hand.
       var activeHand = gameLogic.getHand(multiplayer.activePlayer.userId)
@@ -134,7 +134,6 @@ Item {
   // reset the depot
   function reset()
   {
-//      skipped = false
       effectTimer.stop()
       lastDeposit = []
   }
