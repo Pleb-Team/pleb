@@ -102,10 +102,13 @@ Item {
       else if (!activeHand.inHand(cardId))
           return false
 
-      // Check if card VALUE is legal, i.e. assume correct number of cards
+      // Check if card value is legal, and whether we have enough cards
       var card = entityManager.getEntityById(cardId)
+      var numberCardsSameValue = activeHand.countCards(card.points)
+      var numberCardsToPlay = Math.min(gameLogic.arschlochGameLogic.getLastMoveSimpleNumber(), numberCardsSameValue)
       return (     (gameLogic.arschlochGameLogic.getLastPlayerID() < 0) )
-               ||  (gameLogic.arschlochGameLogic.isMoveLegal(gameLogic.arschlochGameLogic.getLastMoveSimpleNumber(), card.points - 7) )
+                || (gameLogic.arschlochGameLogic.getLastMoveSimpleNumber() === 0)
+                || (gameLogic.arschlochGameLogic.isMoveLegal(numberCardsToPlay, card.points - 7) )
   }
 
 

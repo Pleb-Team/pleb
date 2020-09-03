@@ -74,7 +74,7 @@ SceneBase {
                 text: "This new implementation of the popular card came 'President' (a.k.a. 'Arschloch', 'Master', ...) is the outcome of our team hackaton in Stuttgart, 2020, " +
                       "established during the crisis. We aim at demonstrating that despite the lockdown, it is possible to stick together and use the " +
                       "time meaningfully e.g. by studying a new, fun technique of creating games." + "\n\n" +
-                      "Contributors: Joachim, Ben, Max, Sebastian, Sven" + "\n" +
+                      "Contributors: Joachim, Ben, Sebastian, Sven" + "\n" +
                       "Happy playing! "
             }
 

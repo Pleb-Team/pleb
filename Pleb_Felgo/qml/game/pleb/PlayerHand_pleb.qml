@@ -363,7 +363,6 @@ Item {
                   if (!depot.validCardID(hand[i].entityId))
                   {
                       hand[i].glowImage.visible = false
-        //                  hand[i].selected = false
                       continue
                   }
 
