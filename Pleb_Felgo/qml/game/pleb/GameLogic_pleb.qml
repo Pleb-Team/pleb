@@ -253,7 +253,7 @@ Item {
       // ... then hand them over to the exchange partner
       exchangePartnerHand.pickUpCards(selectedCards)
       scaleHand()
-      getHand(multiplayer.activePlayer.userId).markValid()
+      getHand(multiplayer.localPlayer.userId).markValid()
 
 
       // Sync legacy gamestate
@@ -536,7 +536,7 @@ Item {
       })
 
       scaleHand()
-      getHand(multiplayer.activePlayer.userId).markValid()
+      getHand(multiplayer.localPlayer.userId).markValid()
 
       console.debug("InitGame finished!")
   }
@@ -619,21 +619,6 @@ Item {
       }
   }
 
-
-  // find the playerHand of the active player and mark all valid card options
-//  function markValid()
-//  {
-////      if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
-////      {
-////      }
-////      else if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen())
-////      {
-////          if (multiplayer.myTurn && !acted )
-//              getHand(multiplayer.activePlayer.userId).markValid()
-////          else
-////              unmark()
-////      }
-//  }
 
   // unmark all valid card options of all players
   function unmark()
@@ -811,7 +796,6 @@ Item {
 
                   // refresh hand display
                   getHand(multiplayer.localPlayer.userId).markValid()
-
                   return
               }
 
@@ -830,7 +814,6 @@ Item {
 
                       // convenience for the player to auto-select groups
                       // if there is a last move by another player which has to be beaten
-//                      if (depot.lastPlayerUserID && depot.lastDeposit.length > 0 && multiplayer.localPlayer.userId !== depot.lastPlayerUserID)
                       if (arschlochGameLogic.getLastPlayerID() >= 0)
                       {
                           var activeHand = getHand(multiplayer.localPlayer.userId).hand

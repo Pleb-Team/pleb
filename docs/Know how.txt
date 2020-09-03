@@ -1,0 +1,17 @@
+Deployment
+
+In QtCreator
+- Increase Version Code, Version Number
+- Get new Felgo license: https://felgo.com/developers/license?linkSource=codeComments
+- Clean rebuild in QtCreator, delete build-Folder in finder beforehand
+
+In XCode
+- Add capability for Push-Service
+- Build
+- Package
+- Validate
+- Distribute to App Store
+
+In App-Store Connect
+- Clarify Export stuff (declare that no encryption is used)
+
