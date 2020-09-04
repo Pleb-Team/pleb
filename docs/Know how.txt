@@ -6,6 +6,7 @@ In QtCreator
 - Clean rebuild in QtCreator, delete build-Folder in finder beforehand
 
 In XCode
+- Select Build target -> generic iOS device (https://help.apple.com/xcode/mac/current/#/devf37a1db04, no idea whether it makes a difference)
 - Add capability for Push-Service
 - Build
 - Package

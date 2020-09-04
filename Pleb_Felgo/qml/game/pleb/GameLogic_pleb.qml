@@ -6,10 +6,6 @@ import io.qt.examples.backend 1.0
 Item {
   id: gameLogicPleb
 
-  property bool singlePlayer: false
-  property bool initialized: false
-  onInitializedChanged: console.debug("GameLogic.initialized changed to:", initialized)
-
   property alias arschlochGameLogic: arschlochGameLogic
 
   // the remaining turn time for the active player
@@ -48,7 +44,7 @@ Item {
   property int messageRequestPlayerTags: 14
 
   // gets set to true when a message is received before the game state got synced. in that case, request a new game state
-  property bool receivedMessageBeforeGameStateInSync: false
+//  property bool receivedMessageBeforeGameStateInSync: false
 
 
   LegacyPlebCodeBridge {
@@ -92,7 +88,7 @@ Item {
 
           elapsedHintTime += 1
 
-          if (      (elapsedHintTime >= 5)
+          if (      (elapsedHintTime >= Constants.dHintDelaySeconds)
                 ||  (menuScene.localStorage.debugMode && elapsedHintTime >= 0) )
           {
               var s2 = ""
@@ -365,11 +361,9 @@ Item {
   function turnStarted(playerId)
   {
       console.debug("[turnStarted]")
-      if (!multiplayer.activePlayer)
-      {
-          console.debug("ERROR: activePlayer not valid in turnStarted!")
-          return
-      }
+      console.assert(multiplayer.activePlayer, "BUG: activePlayer not valid in turnStarted!")
+      console.assert(arschlochGameLogic.getNumberPlayers() >= 2, "BUG: One single player is left in the game")
+
 
       var nPlayerIndexLegacy = getHandIndex(multiplayer.activePlayer.userId)
       console.debug("PlayerId: " + playerId + ", multiplayer.activePlayer.userId: " + multiplayer.activePlayer.userId + ", legacy player IF: " + nPlayerIndexLegacy)
@@ -381,18 +375,11 @@ Item {
 
       // This player has already finished (but is still called?)
       if (arschlochGameLogic.getPlayerGameResult(nPlayerIndexLegacy) !== Constants.nGameResultUndefined)
-          endTurn()
-
-      // This player just became Pleb, as all others finished before him
-      else if (arschlochGameLogic.getNumberPlayers() <= 1)
       {
-          plebFinish(getHand(multiplayer.activePlayer.userId))
           endTurn()
       }
-
       else
       {
-//          unmark()
           scaleHand()
           getHand(multiplayer.localPlayer.userId).markValid()
       }
@@ -413,18 +400,6 @@ Item {
   }
 
 
-//  function plebFinish(plebHand)
-//  {
-//      // let the new Pleb finish its game by playing all its remaining cards
-//      var lastcards = []
-//      for (var l = 0; l < plebHand.hand.length; l++)
-//          lastcards.push(plebHand.hand[l].entityId)
-
-//      multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: lastcards, userId: plebHand.player.userId})
-//      depositCardIDs(lastcards, plebHand.player.userId)
-//  }
-
-
 
   // stop the timers and reset the deck at the end of the game
   function leaveGame()
@@ -439,15 +414,15 @@ Item {
       chat.gConsole.clear()
       multiplayer.leaveGame()
       scaleHand(1.0)
-      initialized = false
-      receivedMessageBeforeGameStateInSync = false
+//      initialized = false
+//      receivedMessageBeforeGameStateInSync = false
 
       console.debug("GameLogic::leaveGame() finish")
   }
 
 
   function joinGame(room){
-    multiplayer.joinGame(room)
+      multiplayer.joinGame(room)
   }
 
 
@@ -459,7 +434,7 @@ Item {
       if (calledFromGameOverScreen)
           console.debug("************************************ NEW GAME ***************************************")
 
-      if(!multiplayer.initialized && !multiplayer.singlePlayer)
+      if (!multiplayer.initialized && !multiplayer.singlePlayer)
           multiplayer.createGame()
 
 
@@ -499,12 +474,9 @@ Item {
       // set the game state for all players
       multiplayer.leaderCode(function ()
       {
-          // NOTE: only the leader must set this to true! the clients only get initialized after the initial syncing game state message is received
-          initialized = true
-
           // if we call this here, gameStarted is called twice. it is not needed to call, because it is already called when the room is setup
           // thus we must not call this! forceStartGame() is called from the MatchMakingView, not from the GameScene!
-          if(calledFromGameOverScreen)
+          if (calledFromGameOverScreen)
               // by calling restartGame, we emit a gameStarted call on the leader and the clients
               multiplayer.restartGame()
 
