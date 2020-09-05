@@ -29,6 +29,27 @@ Item {
   property double offset: width/10
 
 
+  // block the player for a short period of time when he gets skipped
+//  property alias effectTimer: effectTimer
+
+
+
+  // sound effect plays when a player gets skipped
+  SoundEffect {
+    volume: 0.5
+    id: skipSound
+    source: "../../../assets/snd/skip.wav"
+  }
+
+
+  // blocks the player for a short period of time and trigger a new turn when he gets skipped
+  Timer {
+      id: effectTimer
+      repeat: false
+      interval: 1000
+  }
+
+
   // sound effect plays when drawing a card
   SoundEffect {
     volume: 0.5
@@ -50,6 +71,7 @@ Item {
     source: "../../../assets/snd/win.wav"
   }
 
+
   // playerHand background image
   // the image changes for the active player
   Image {
@@ -69,6 +91,7 @@ Item {
     }
   }
 
+
   // playerHand blocked image is visible when the player gets skipped
   Image {
     anchors.bottom: parent.bottom
@@ -77,9 +100,18 @@ Item {
     width: 170
     height: width
     z: 100
-    visible: false // depot.skipped && multiplayer.activePlayer == player
+    visible: effectTimer.running
     smooth: true
   }
+
+
+
+  function playSkipAnimation()
+  {
+      skipSound.play()
+      effectTimer.start()
+  }
+
 
   // start the hand by picking up a specified amount of cards
   function startHand()
@@ -94,6 +126,7 @@ Item {
       pickUpCards(cardEntities, true)
   }
 
+
   // reset the hand by removing all cards
   function reset()
   {
@@ -104,6 +137,7 @@ Item {
 
       scaleHand(1.0)
   }
+
 
   // organize the hand and spread the cards
   function neatHand()
@@ -210,6 +244,7 @@ Item {
 
       return result
   }
+
 
   // counts how many cards with the supplied points are in hand
   function countCards(points)

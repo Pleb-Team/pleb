@@ -167,7 +167,7 @@ SceneBase {
   }
 
   // Moved outside the above column s.t. the button is bottom-aigned
-  // Todo: Move back to the above column when the other buttons get reactivated
+  // Hint: Move back to the above column when the other buttons get reactivated
   MenuButton {
       anchors.horizontalCenter: gameWindowAnchorItem.horizontalCenter
       anchors.bottom: gameWindowAnchorItem.bottom
@@ -228,6 +228,16 @@ SceneBase {
       height: columnButtons.width
       buttonImage.source: "../../assets/img/Settings.png"
     }
+
+//    // button to share the game
+//    ButtonBase {
+//      color: "transparent"
+//      width: columnButtons.width
+//      height: columnButtons.width
+//      buttonImage.source: "../../assets/img/Community.png"
+//      onClicked:
+////          gameScene.switchNameWindow.visible = true
+//    }
 
     // button to share the game
     ButtonBase {

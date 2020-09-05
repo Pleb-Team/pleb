@@ -30,17 +30,6 @@ SceneBase {
         border.width: 1
     }
     
-//    // credits
-//    Text {
-//        anchors.bottom: infoRect.bottom
-//        anchors.bottomMargin: 5
-//        anchors.right: infoRect.right
-//        anchors.rightMargin: 15
-//        font.pixelSize: 8
-//        color: Constants.sBorderColor
-//        text: "Music: Bensound.com, Sound Effects: freesound.org"
-//    }
-
 
     // the header
     Text {

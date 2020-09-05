@@ -25,7 +25,7 @@ Item {
   // shuffle sound in the beginning of the game
   SoundEffect {
     volume: 0.5
-    id: shuffleSound
+    id: soundShuffleCards
     source: "../../../assets/snd/shuffle.wav"
   }
 
@@ -63,7 +63,7 @@ Item {
   // create the card entities with the cardInfo array
   function createCards()
   {
-      shuffleSound.play()
+      soundShuffleCards.play()
       var id
       for (var i = 0; i < cardInfo.length; i ++){
           id = entityManager.createEntityFromUrlWithProperties(

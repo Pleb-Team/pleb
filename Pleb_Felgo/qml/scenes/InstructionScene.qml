@@ -30,17 +30,6 @@ SceneBase {
     border.width: 1
   }
 
-//  // credits
-//  Text {
-//    anchors.bottom: infoRect.bottom
-//    anchors.bottomMargin: 5
-//    anchors.right: infoRect.right
-//    anchors.rightMargin: 15
-//    font.pixelSize: 8
-//    color: "#28a3c1"
-//    text: "Music: Bensound.com, Sound Effects: freesound.org"
-//  }
-
 
   // row with the main game rules
   Row {

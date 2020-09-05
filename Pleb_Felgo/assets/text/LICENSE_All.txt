@@ -8,7 +8,8 @@ Licenses contained in the file
 Artworks
 - Background image: "Secessione della plebe sul Monte Sacro" engraved by B. Barloccini, 1849. Downloaded from Wikipedia as [public domain](https://commons.wikimedia.org/wiki/File:Secessio_plebis.JPG).
 - Music: Bensound.com, https://www.bensound.com
-- Sound: freesound.org, https://www.freesound.org
+- Sounds: freesound.org, https://www.freesound.org
+- Sounds: SoundSnap, https://www.freesound.org
 
 -------------------------------------------------------------------------------
 

@@ -6,10 +6,6 @@ import io.qt.examples.backend 1.0
 Item {
   id: gameLogicPleb
 
-  property bool singlePlayer: false
-  property bool initialized: false
-  onInitializedChanged: console.debug("GameLogic.initialized changed to:", initialized)
-
   property alias arschlochGameLogic: arschlochGameLogic
 
   // the remaining turn time for the active player
@@ -48,23 +44,37 @@ Item {
   property int messageRequestPlayerTags: 14
 
   // gets set to true when a message is received before the game state got synced. in that case, request a new game state
-  property bool receivedMessageBeforeGameStateInSync: false
+//  property bool receivedMessageBeforeGameStateInSync: false
 
 
   LegacyPlebCodeBridge {
       id: legacyPlebCodeBridge
   }
 
+
   BackEnd  {
       id: arschlochGameLogic
   }
 
 
-  // bling sound effect when selecting a color for wild or wild4 cards
   SoundEffect {
     volume: 0.5
-    id: colorSound
-    source: "../../../assets/snd/color.wav"
+    id: soundApplause
+    source: "../../../assets/snd/Applause.wav"
+  }
+
+
+  SoundEffect {
+    volume: 0.5
+    id: soundLoose
+    source: "../../../assets/snd/power_down_5.wav"
+  }
+
+
+  SoundEffect {
+    volume: 0.5
+    id: soundAce
+    source: "../../../assets/snd/alert_39.wav"
   }
 
 
@@ -92,7 +102,7 @@ Item {
 
           elapsedHintTime += 1
 
-          if (      (elapsedHintTime >= 5)
+          if (      (elapsedHintTime >= Constants.dHintDelaySeconds)
                 ||  (menuScene.localStorage.debugMode && elapsedHintTime >= 0) )
           {
               var s2 = ""
@@ -318,7 +328,12 @@ Item {
       {
           depositCardEntities(selectedCards, userId)
 //          multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
+          if (selectedCards[0].variationType == "ace")
+              soundAce.play()
       }
+      else
+          activeHand.playSkipAnimation()
+
 
       endTurn()
   }
@@ -365,11 +380,9 @@ Item {
   function turnStarted(playerId)
   {
       console.debug("[turnStarted]")
-      if (!multiplayer.activePlayer)
-      {
-          console.debug("ERROR: activePlayer not valid in turnStarted!")
-          return
-      }
+      console.assert(multiplayer.activePlayer, "BUG: activePlayer not valid in turnStarted!")
+      console.assert(arschlochGameLogic.getNumberPlayers() >= 2, "BUG: One single player is left in the game")
+
 
       var nPlayerIndexLegacy = getHandIndex(multiplayer.activePlayer.userId)
       console.debug("PlayerId: " + playerId + ", multiplayer.activePlayer.userId: " + multiplayer.activePlayer.userId + ", legacy player IF: " + nPlayerIndexLegacy)
@@ -381,18 +394,11 @@ Item {
 
       // This player has already finished (but is still called?)
       if (arschlochGameLogic.getPlayerGameResult(nPlayerIndexLegacy) !== Constants.nGameResultUndefined)
-          endTurn()
-
-      // This player just became Pleb, as all others finished before him
-      else if (arschlochGameLogic.getNumberPlayers() <= 1)
       {
-          plebFinish(getHand(multiplayer.activePlayer.userId))
           endTurn()
       }
-
       else
       {
-//          unmark()
           scaleHand()
           getHand(multiplayer.localPlayer.userId).markValid()
       }
@@ -413,41 +419,30 @@ Item {
   }
 
 
-//  function plebFinish(plebHand)
-//  {
-//      // let the new Pleb finish its game by playing all its remaining cards
-//      var lastcards = []
-//      for (var l = 0; l < plebHand.hand.length; l++)
-//          lastcards.push(plebHand.hand[l].entityId)
-
-//      multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: lastcards, userId: plebHand.player.userId})
-//      depositCardIDs(lastcards, plebHand.player.userId)
-//  }
-
-
 
   // stop the timers and reset the deck at the end of the game
   function leaveGame()
   {
       console.debug("GameLogic::leaveGame() start")
 
+      arschlochGameLogic.resetGameResult()
+
       aiThinkingTimer.stop()
       hintTimer.stop()
 //      timerPlayerThinking.running = false
-      depot.effectTimer.stop()
       deck.reset()
       chat.gConsole.clear()
       multiplayer.leaveGame()
       scaleHand(1.0)
-      initialized = false
-      receivedMessageBeforeGameStateInSync = false
+//      initialized = false
+//      receivedMessageBeforeGameStateInSync = false
 
       console.debug("GameLogic::leaveGame() finish")
   }
 
 
   function joinGame(room){
-    multiplayer.joinGame(room)
+      multiplayer.joinGame(room)
   }
 
 
@@ -459,17 +454,17 @@ Item {
       if (calledFromGameOverScreen)
           console.debug("************************************ NEW GAME ***************************************")
 
-      if(!multiplayer.initialized && !multiplayer.singlePlayer)
+      if (!multiplayer.initialized && !multiplayer.singlePlayer)
           multiplayer.createGame()
 
 
       console.debug("multiplayer.localPlayer: " + multiplayer.localPlayer)
       console.debug("multiplayer.localPlayer.userId: " + multiplayer.localPlayer.userId)
       console.debug("multiplayer.players.length " + multiplayer.players.length)
+
       for (var i = 0; i < multiplayer.players.length; i++){
           console.debug("multiplayer.players[" + i +"].userId " + multiplayer.players[i].userId)
       }
-      console.debug("multiplayer.myTurn " + multiplayer.myTurn)
 
       // reset all values at the start of the game
       gameScene.gameOverWindow.visible = false
@@ -499,12 +494,9 @@ Item {
       // set the game state for all players
       multiplayer.leaderCode(function ()
       {
-          // NOTE: only the leader must set this to true! the clients only get initialized after the initial syncing game state message is received
-          initialized = true
-
           // if we call this here, gameStarted is called twice. it is not needed to call, because it is already called when the room is setup
           // thus we must not call this! forceStartGame() is called from the MatchMakingView, not from the GameScene!
-          if(calledFromGameOverScreen)
+          if (calledFromGameOverScreen)
               // by calling restartGame, we emit a gameStarted call on the leader and the clients
               multiplayer.restartGame()
 
@@ -590,7 +582,6 @@ Item {
   {
       multiplayer.leaderCode(function () {
           deck.createDeck()
-          depot.createDepot()
       })
   }
 
@@ -668,11 +659,10 @@ Item {
       var playerHand = getHand(userId)
 
       // Check if player just won
-//      if (arschlochGameLogic.getPlayerGameResult(nActualPlayerLegacy) === Constants.nGameResultUndefined)
-          if (playerHand.checkWin())
-          {
-              console.debug("[endTurn] Player " + multiplayer.activePlayer + ", LegacyID: " + nActualPlayerLegacy + " just finished!")
-          }
+      if (playerHand.checkWin())
+      {
+          console.debug("[endTurn] Player " + multiplayer.activePlayer + ", LegacyID: " + nActualPlayerLegacy + " just finished!")
+      }
 
       // Everybody has finished
       if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielZuEnde())
@@ -723,38 +713,43 @@ Item {
   function endGame(userId)
   {
       var nPlayerIndex = getHandIndex(multiplayer.localPlayer.userId)
+      console.assert(nPlayerIndex === 0)
       console.debug("[endGame] called by user: " + userId + ", LegacyPlayerID: " + nPlayerIndex)
 
       // calculate the points of each player and set the name of the winner
       calculateScores()
 
+      // Play sounds depending on game outcome
+      if (arschlochGameLogic.getPlayerGameResult(nPlayerIndex) === arschlochGameLogic.getConstant_Jojo_RESULT_PRAESI())
+          soundApplause.play()
+      else if (arschlochGameLogic.getPlayerGameResult(nPlayerIndex) === arschlochGameLogic.getConstant_Jojo_RESULT_NEGER())
+          soundLoose.play()
+
       // show the gameOver message with the winner and score
       gameScene.gameOverWindow.visible = true
 
       // add points to MultiplayerUser score of the winner
-      if (nPlayerIndex)
-      {
-          var currentHand = playerHands.children[nPlayerIndex]
-          gameNetwork.reportRelativeScore(currentHand.score)
+      var currentHand = playerHands.children[nPlayerIndex]
+      gameNetwork.reportRelativeScore(currentHand.score)
 
-          var currentTag = playerTags.children[nPlayerIndex]
+//      var currentTag = playerTags.children[nPlayerIndex]
 
-          // calculate level with new points and check if there was a level up
-          var oldLevel = currentTag.level
-          currentTag.getPlayerData(false)
-          if (oldLevel !== currentTag.level)
-          {
-              gameScene.gameOverWindow.level = currentTag.level
-              gameScene.gameOverWindow.levelText.visible = true
-          }
-          else
-          {
-              gameScene.gameOverWindow.levelText.visible = false
-          }
-      }
+//      // calculate level with new points and check if there was a level up
+//      var oldLevel = currentTag.level
+//      currentTag.getPlayerData(false)
+//      if (oldLevel !== currentTag.level)
+//      {
+//          gameScene.gameOverWindow.level = currentTag.level
+//          gameScene.gameOverWindow.levelText.visible = true
+//      }
+//      else
+//      {
+//          gameScene.gameOverWindow.levelText.visible = false
+//      }
 
       // show window with text input to switch username
-      if (!multiplayer.singlePlayer && !gameNetwork.user.hasCustomNickName())
+//      if (!multiplayer.singlePlayer && !gameNetwork.user.hasCustomNickName())
+      if (!gameNetwork.user.hasCustomNickName())
           gameScene.switchNameWindow.visible = true
 
       // stop all timers and end the game
@@ -763,8 +758,6 @@ Item {
       gameScene.hintRectangle.visible = false;
       hintTimer.stop()
       aiThinkingTimer.stop()
-//      timerPlayerThinking.running = false
-      depot.effectTimer.stop()
   }
 
 
@@ -787,12 +780,8 @@ Item {
               var selectedCard = entityManager.getEntityById(cardId)
               if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
               {
-                  // Todo: Regeln fürs selektieren einer Karte
-                  // Aktuell kann man sogar die Karten der Gegner selektieren
                   if (selectedCard.glowImage.visible || selectedCard.selected)
-                  {
                       selectedCard.selected = !selectedCard.selected
-                  }
 
                   // refresh hand display
                   getHand(multiplayer.localPlayer.userId).markValid()

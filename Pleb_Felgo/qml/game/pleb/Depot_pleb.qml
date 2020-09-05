@@ -9,48 +9,6 @@ Item {
   // current cards on top of the depot (the cards played in the previous turn)
   property var lastDeposit: []
 
-  // block the player for a short period of time when he gets skipped
-  property alias effectTimer: effectTimer
-
-  // whether the active player is skipped or not
-//  property bool skipped: false
-
-  // the current turn direction
-//  property bool clockwise: true
-
-//  property var lastPlayerUserID: null
-//  property var finishedUserIDs: []
-
-
-  // sound effect plays when a player gets skipped
-  SoundEffect {
-    volume: 0.5
-    id: skipSound
-    source: "../../../assets/snd/skip.wav"
-  }
-
-
-  // blocks the player for a short period of time and trigger a new turn when he gets skipped
-  Timer {
-      id: effectTimer
-      repeat: false
-      interval: 1500
-      onTriggered:
-      {
-          effectTimer.stop()
-//          skipped = false
-          var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-          multiplayer.sendMessage(gameLogic.messageSetSkipped, {skipped: false, userId: userId})
-          console.debug("<<<< Trigger new turn after effect")
-          multiplayer.triggerNextTurn()
-      }
-  }
-
-  // create the depot by placing a single stack card
-  function createDepot(){
-      // first player creates depot by playing first card
-  }
-
 
   // return a random number between two values
   function randomIntFromInterval(min,max)
@@ -88,7 +46,6 @@ Item {
       }
 
       var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-//      lastPlayerUserID = userId
   }
 
 
@@ -112,32 +69,9 @@ Item {
   }
 
 
-//  function skipTurn(skipMove)
-//  {
-//      var userId = multiplayer.activePlayer ? multiplayer.activePlayer.userId : 0
-//      if (skipMove)
-//      {
-//          skipSound.play()
-//          skipped = true
-
-//          if (multiplayer.activePlayer && multiplayer.activePlayer.connected){
-//              multiplayer.leaderCode(function() {
-//                  effectTimer.start()
-//              })
-//          }
-
-//          console.debug("[skipTurn] player " + userId + " was skipped!")
-//      } else
-//      {
-//          skipped = false
-//      }
-//  }
-
-
   // reset the depot
   function reset()
   {
-      effectTimer.stop()
       lastDeposit = []
   }
 

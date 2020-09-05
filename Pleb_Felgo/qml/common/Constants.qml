@@ -23,6 +23,9 @@ Item {
 
     readonly property int nAnimationDurationMS: 600
 
+    // Display Hint after this many seconds
+    readonly property int dHintDelaySeconds: 3
+
     // From C++ GameLogic GlobalConstants.h
     readonly property int nGameResultUndefined: -42
 }
