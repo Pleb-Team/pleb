@@ -51,16 +51,30 @@ Item {
       id: legacyPlebCodeBridge
   }
 
+
   BackEnd  {
       id: arschlochGameLogic
   }
 
 
-  // bling sound effect when selecting a color for wild or wild4 cards
   SoundEffect {
     volume: 0.5
-    id: colorSound
-    source: "../../../assets/snd/color.wav"
+    id: soundApplause
+    source: "../../../assets/snd/Applause.wav"
+  }
+
+
+  SoundEffect {
+    volume: 0.5
+    id: soundLoose
+    source: "../../../assets/snd/power_down_5.wav"
+  }
+
+
+  SoundEffect {
+    volume: 0.5
+    id: soundAce
+    source: "../../../assets/snd/alert_39.wav"
   }
 
 
@@ -314,7 +328,12 @@ Item {
       {
           depositCardEntities(selectedCards, userId)
 //          multiplayer.sendMessage(messageMoveCardsDepot, {cardIds: cardIds, userId: userId})
+          if (selectedCards[0].variationType == "ace")
+              soundAce.play()
       }
+      else
+          activeHand.playSkipAnimation()
+
 
       endTurn()
   }
@@ -409,7 +428,6 @@ Item {
       aiThinkingTimer.stop()
       hintTimer.stop()
 //      timerPlayerThinking.running = false
-      depot.effectTimer.stop()
       deck.reset()
       chat.gConsole.clear()
       multiplayer.leaveGame()
@@ -441,10 +459,10 @@ Item {
       console.debug("multiplayer.localPlayer: " + multiplayer.localPlayer)
       console.debug("multiplayer.localPlayer.userId: " + multiplayer.localPlayer.userId)
       console.debug("multiplayer.players.length " + multiplayer.players.length)
+
       for (var i = 0; i < multiplayer.players.length; i++){
           console.debug("multiplayer.players[" + i +"].userId " + multiplayer.players[i].userId)
       }
-      console.debug("multiplayer.myTurn " + multiplayer.myTurn)
 
       // reset all values at the start of the game
       gameScene.gameOverWindow.visible = false
@@ -700,6 +718,12 @@ Item {
       // calculate the points of each player and set the name of the winner
       calculateScores()
 
+      // Play sounds depending on game outcome
+      if (arschlochGameLogic.getPlayerGameResult(nPlayerIndex) === arschlochGameLogic.getConstant_Jojo_RESULT_PRAESI())
+          soundApplause.play()
+      else if (arschlochGameLogic.getPlayerGameResult(nPlayerIndex) === arschlochGameLogic.getConstant_Jojo_RESULT_NEGER())
+          soundLoose.play()
+
       // show the gameOver message with the winner and score
       gameScene.gameOverWindow.visible = true
 
@@ -735,8 +759,6 @@ Item {
       gameScene.hintRectangle.visible = false;
       hintTimer.stop()
       aiThinkingTimer.stop()
-//      timerPlayerThinking.running = false
-      depot.effectTimer.stop()
   }
 
 

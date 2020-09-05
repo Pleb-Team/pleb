@@ -47,12 +47,17 @@ private:
 public:
     explicit BackEnd(QObject *parent = nullptr);
 
+    Q_INVOKABLE int getConstant_Jojo_RESULT_NEGER() { return RESULT_NEGER; }
+    Q_INVOKABLE int getConstant_Jojo_RESULT_VIZENEGER() { return RESULT_VIZENEGER; }
+    Q_INVOKABLE int getConstant_Jojo_RESULT_VIZEPRAESI() { return RESULT_VIZEPRAESI; }
+    Q_INVOKABLE int getConstant_Jojo_RESULT_PRAESI() { return RESULT_PRAESI; }
+
     // Wrap some constants to the outside world. There is a more generic way using Q_ENUM or Q_ENUM_NS, which would however require
     // to change the original c++ sources. For this small amount of wrapped constants, below is the easier and faster way.
     Q_INVOKABLE int getConstant_Jojo_SpielZustandNix() { return Jojo_Zustand_Nix; }
     Q_INVOKABLE int getConstant_Jojo_SpielZustandKartenTauschen() { return Jojo_SpielZustandKartenTauschen; }
     Q_INVOKABLE int getConstant_Jojo_SpielZustandSpielen() { return Jojo_SpielZustandSpielen; }
-    Q_INVOKABLE int getConstant_Jojo_SpielZustandSpielZuEnde() { return Jojo_SpielZustandSpielZuEnde; }
+    Q_INVOKABLE int getConstant_Jojo_SpielZustandSpielZuEnde() { return Jojo_SpielZustandSpielZuEnde; }    
 
     // Access to the current Player, i.e. the one who is next to play
     // \todo Integrate as a parameter into the rountine think()
