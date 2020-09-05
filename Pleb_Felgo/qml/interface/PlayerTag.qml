@@ -2,6 +2,7 @@ import Felgo 3.0
 import QtQuick 2.2
 
 import "../common"
+import "../game/pleb"
 
 // displayer username, profile image and remaining time
 EntityBase {
@@ -11,6 +12,8 @@ EntityBase {
   height: canvas.height + name.contentHeight + name.anchors.topMargin
 
   property var player: MultiplayerUser{}
+  property int nPlayerIndexLegacy: -1
+
   property int level: 1
   property string activeColor: "#f9c336"
   property string inactiveColor: "#28a3c1"
@@ -46,7 +49,7 @@ EntityBase {
   // username text
   Text {
     id: name
-    text: player && player.name ? player.name : ""
+    text: "Ghost"
     anchors.top: canvas.bottom
     anchors.topMargin: 3
     anchors.horizontalCenter: canvas.horizontalCenter
@@ -62,30 +65,31 @@ EntityBase {
 
   // canvas displays the remaining time as a circle
   Canvas {
-    id: canvas
-    width: 92
-    height: 92
-    anchors.top: parent.top
-    anchors.horizontalCenter: parent.horizontalCenter
-    onPaint: {
-      var ctx = getContext("2d")
-      ctx.reset()
+      id: canvas
+      width: 92
+      height: 92
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      onPaint: {
+          var ctx = getContext("2d")
+          ctx.reset()
 
-      if (multiplayer.activePlayer === player){
-        var centreX = canvas.width / 2
-        var centreY = canvas.height / 2
-        var step = 360 / gameLogic.userInterval - 1
+          if (multiplayer.activePlayer === player)
+          {
+              var centreX = canvas.width / 2
+              var centreY = canvas.height / 2
+              var step = 360 / gameLogic.userInterval - 1
 
-        ctx.beginPath()
-        ctx.fillStyle = player.connected ? activeColor : inactiveColor
-        ctx.moveTo(centreX, centreY)
+              ctx.beginPath()
+              ctx.fillStyle = player.connected ? activeColor : inactiveColor
+              ctx.moveTo(centreX, centreY)
 
-        // x, y, r, startAngle, endAngle, counterclockwise
-        ctx.arc(centreX, centreY, 46, 315 * Math.PI / 180, (gameLogic.userInterval - 1 - gameLogic.remainingTime) * step * Math.PI / 180, true)
-        ctx.lineTo(centreX, centreY)
-        ctx.fill()
+              // x, y, r, startAngle, endAngle, counterclockwise
+              ctx.arc(centreX, centreY, 46, 315 * Math.PI / 180, (gameLogic.userInterval - 1 - gameLogic.remainingTime) * step * Math.PI / 180, true)
+              ctx.lineTo(centreX, centreY)
+              ctx.fill()
+          }
       }
-    }
   }
 
   // circular profile image
@@ -158,11 +162,23 @@ EntityBase {
   MouseArea {
       id: infoButton
       anchors.fill: parent
-      enabled: player && player.connected && Constants.bShowBetaFeatures ? true: false
+//      enabled: player && player.connected && Constants.bShowBetaFeatures ? true: false
+      enabled: player && player.connected ? true: false
       onClicked: {
-          gameScene.playerInfoPopup.visible = true
-          gameScene.playerInfoPopup.refTag = playerTag
+//          gameScene.playerInfoPopup.visible = true
+//          gameScene.playerInfoPopup.refTag = playerTag
+          gameScene.switchNameWindow.visible = true
       }
+  }
+
+  function getPlayerNameNice()
+  {
+      if (player.connected)
+          return player.name
+      else if (nPlayerIndexLegacy >= 0)
+          return Constants.listPlayerNameDefaults[nPlayerIndexLegacy]
+      else
+          return "getPlayerNameNice() empty result"
   }
 
   // get the avatar for auto and connected users
@@ -175,8 +191,12 @@ EntityBase {
   }
 
   // reset the tag at the beginning of the game
-  function initTag(){
-    canvas.requestPaint()
+  function initTag(player_, nPlayerIndexLegacy_)
+  {
+      player = player_
+      nPlayerIndexLegacy = nPlayerIndexLegacy_
+      name.text = getPlayerNameNice()
+      canvas.requestPaint()
   }
 
   /*

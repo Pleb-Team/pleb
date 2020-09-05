@@ -4,14 +4,13 @@ import "../common"
 // gameOver window with winner and score
 Item {
   id: gameOverWindow
-  width: 400
+  width: 500
   height: content.height + content.anchors.topMargin * 2
   z: 110
 
   property int level: 99
-  property var winnerPlayer
-  property string winnerName: winnerPlayer? winnerPlayer.name : "Someone"
-  property alias levelText: levelText
+  property int nPlayerIndexPrasei: -1
+//  property alias levelText: levelText
 
   // don't send the black bg here because we want to encourage adding friends and chatting after a match
   // message background
@@ -41,22 +40,23 @@ Item {
       id: winnerText
       horizontalAlignment: Text.AlignHCenter
       anchors.horizontalCenter: parent.horizontalCenter
-      text: "The winner is <font color=\"#28a3c1\">" + winnerName + "</font>"
+
+      text: nPlayerIndexPrasei >= 0 ? "The winner is: <font color=\"#28a3c1\">" + playerHands.children[nPlayerIndexPrasei].playerTag.getPlayerNameNice() + "</font>" : "Error: nPlayerIndexPrasei not set"
       font.family: standardFont.name
       color: "black"
-      font.pixelSize: 36
+      font.pixelSize: 30
       width: parent.width * 0.8
       wrapMode: Text.Wrap
     }
 
     Text {
       id: scoreText
-      horizontalAlignment: Text.AlignHCenter
+      horizontalAlignment: Text.AlignRight
       anchors.horizontalCenter: parent.horizontalCenter
-      text: gameOverWindow.visible ? playerHands.children[0].player.name + " " + getScoreText(0) + "<br>"
-                                   + playerHands.children[1].player.name + " " + getScoreText(1) + "<br>"
-                                   + playerHands.children[2].player.name + " " + getScoreText(2) + "<br>"
-                                   + playerHands.children[3].player.name + " " + getScoreText(3) : ""
+      text: gameOverWindow.visible ? playerHands.children[0].playerTag.getPlayerNameNice() + " " + getScoreText(0) + "<br>"
+                                   + playerHands.children[1].playerTag.getPlayerNameNice() + " " + getScoreText(1) + "<br>"
+                                   + playerHands.children[2].playerTag.getPlayerNameNice() + " " + getScoreText(2) + "<br>"
+                                   + playerHands.children[3].playerTag.getPlayerNameNice() + " " + getScoreText(3) : ""
       font.family: standardFont.name
       color: "black"
       font.pixelSize: 20
@@ -64,18 +64,18 @@ Item {
       wrapMode: Text.Wrap
     }
 
-    Text {
-      id: levelText
-      horizontalAlignment: Text.AlignHCenter
-      anchors.horizontalCenter: parent.horizontalCenter
-      text: "Congratulations, you've reached level " + level + "!"
-      font.family: standardFont.name
-      color: "black"
-      font.pixelSize: 20
-      width: parent.width * 0.8
-      wrapMode: Text.Wrap
-      visible: false
-    }
+//    Text {
+//      id: levelText
+//      horizontalAlignment: Text.AlignHCenter
+//      anchors.horizontalCenter: parent.horizontalCenter
+//      text: "Congratulations, you've reached level " + level + "!"
+//      font.family: standardFont.name
+//      color: "black"
+//      font.pixelSize: 20
+//      width: parent.width * 0.8
+//      wrapMode: Text.Wrap
+//      visible: false
+//    }
 
     Text {
       id: hintText
@@ -110,7 +110,8 @@ Item {
   }
 
   // get the score of a player with their array index
-  function getScoreText(index){
-    return "Score: " + playerHands.children[index].score + ", Total: " + playerHands.children[index].scoreAllGames
+  function getScoreText(index)
+  {
+      return "    Score: " + playerHands.children[index].score + ", Total: " + playerHands.children[index].scoreAllGames
   }
 }
