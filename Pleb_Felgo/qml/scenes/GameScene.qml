@@ -34,36 +34,36 @@ SceneBase {
     // otherwise, we would handle the playerJoined signal when the player is still in matchmaking view!
     // do not use the visible property here! as visible only gets triggered with the opacity animation in SceneBase
     target: multiplayer
+
     enabled: activeScene === gameScene
 
-    onPlayerJoined: {
-      console.debug("GameScene.onPlayerJoined:", JSON.stringify(player))
-      console.debug(multiplayer.localPlayer.name + " is leader? " + multiplayer.amLeader)
+    onPlayerJoined:
+    {
+        console.debug("GameScene.onPlayerJoined:", JSON.stringify(player))
+        console.debug(multiplayer.localPlayer.name + " is leader? " + multiplayer.amLeader)
 
-      // send a new message with the new sync value to the new player (or actually to all), as we now support late-joins of the game
-      if(multiplayer.amLeader && activeScene === gameScene) {
-        console.debug("Leader send game state to player")
-        gameLogic.sendGameStateToPlayer(player.userId)
-      }
+        // send a new message with the new sync value to the new player (or actually to all), as we now support late-joins of the game
+        if (multiplayer.amLeader && activeScene === gameScene)
+        {
+            console.debug("Leader send game state to player")
+            gameLogic.sendGameStateToPlayer(player.userId)
+        }
     }
 
     onPlayerChanged: {    }
 
     onPlayersReady: {    }
 
-    onGameStarted: {   }
+    onGameStarted: {    }
 
     onPlayerLeft:{    }
 
-    onLeaderPlayerChanged:{
-      console.debug("leaderPlayer changed to:", multiplayer.leaderPlayer)
-    }
+    onLeaderPlayerChanged: console.debug("leaderPlayer changed to:", multiplayer.leaderPlayer)
 
     onActivePlayerChanged:{   }
 
-    onTurnStarted:{
-      gameLogic.turnStarted(playerId)
-    }
+    onTurnStarted: gameLogic.turnStarted(playerId)
+
   }
 
   // background
@@ -83,21 +83,6 @@ SceneBase {
     height: width
     anchors.centerIn: depot
     smooth: true
-//    mirror: !depot.clockwise
-
-//    onMirrorChanged: {
-//      if (!mirror){
-//        mirrorAnimation.from = 0
-//        mirrorAnimation.to = 180
-//      } else {
-//        mirrorAnimation.from = 180
-//        mirrorAnimation.to = 0
-//      }
-//      mirrorAnimation.start()
-//    }
-
-//    NumberAnimation { id: mirrorAnimation; target: depotImage; properties: "rotation";
-//      from: 0; to: 180; duration: 400; easing.type: Easing.InOutQuad }
 
     // clickable depot area
     MouseArea {
@@ -128,73 +113,43 @@ SceneBase {
     onClicked: leaveGameWindow.visible = true
   }
 
-//  // button to finish the game
-//  // the player who clicked the button will be the winner
-//  // for debug purposes
+
 //  ButtonBase {
-//    text: "Close\nRound"
-//    width: buttonText.contentWidth + 30
-//    visible: system.debugBuild && !gameLogic.gameOver
-
-////    anchors.horizontalCenter: onuButton.horizontalCenter
-////    anchors.bottom: onuButton.top
-////    anchors.bottomMargin: 20
-
-//    anchors.right: depot.left
-//    anchors.verticalCenter: depot.verticalCenter
-
+//    text: "Switch Name"
+//    //width: buttonText.contentWidth + 30
+//    // for testing the switch name dialog, only for debugging
+//    visible: menuScene.localStorage.debugMode
+//    anchors.horizontalCenter: parent.horizontalCenter
+//    anchors.top: parent.top
+////    anchors.topMargin: adMobBanner.visible && adMobBanner.height > 0 ? (adMobBanner.height / gameScene.yScaleForScene) + 10 : 10
+//    anchors.topMargin: 10
+//    z: 1
 //    onClicked: {
-//      gameLogic.endGame(multiplayer.localPlayer.userId)
-//      multiplayer.sendMessage(gameLogic.messageEndGame, {userId: multiplayer.localPlayer.userId, test: true})
+//      switchNameWindow.visible = true
 //    }
 //  }
-
-  ButtonBase {
-    text: "Switch Name"
-    //width: buttonText.contentWidth + 30
-    // for testing the switch name dialog, only for debugging
-    visible: system.debugBuild
-    anchors.horizontalCenter: parent.horizontalCenter
-    anchors.top: parent.top
-//    anchors.topMargin: adMobBanner.visible && adMobBanner.height > 0 ? (adMobBanner.height / gameScene.yScaleForScene) + 10 : 10
-    anchors.topMargin: 10
-    z: 1
-    onClicked: {
-      switchNameWindow.visible = true
-    }
-  }
 
 
   // the deck on the right of the depot
   Deck_pleb {
     id: deck
+    visible: false
     anchors.verticalCenter: depot.verticalCenter
     anchors.left: depot.right
     anchors.leftMargin: 90
   }
 
-  // content window
+
   Rectangle {
       id: hintRectangle
       radius: 10
       anchors.left: depotImage.right
-//      anchors.leftMargin: 5
       anchors.verticalCenter: depotImage.verticalCenter
-//      anchors.right: rightHand.left
-//      anchors.rightMargin: 5
-//      anchors.top: depotImage.top
-//      anchors.topMargin: 5
-//      anchors.bottom: depotImage.bottom
-//      anchors.bottomMargin: 5
-
-
-//      width: 180
       width: gameWindowAnchorItem.width / 2 - depotImage.width / 2 - rightHand.height * 1.3;
       height: depotImage.height / 400 * (400 - 35 * 2) // Höhe des grauen Kreises (ohne weiße Pfeile)
       color: "white"
       border.color: Constants.sBorderColor
       border.width: 1
-
 
       Text {
           id: hintRectangleText

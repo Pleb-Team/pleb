@@ -425,6 +425,8 @@ Item {
   {
       console.debug("GameLogic::leaveGame() start")
 
+      arschlochGameLogic.resetGameResult()
+
       aiThinkingTimer.stop()
       hintTimer.stop()
 //      timerPlayerThinking.running = false
@@ -580,7 +582,6 @@ Item {
   {
       multiplayer.leaderCode(function () {
           deck.createDeck()
-          depot.createDepot()
       })
   }
 
@@ -658,11 +659,10 @@ Item {
       var playerHand = getHand(userId)
 
       // Check if player just won
-//      if (arschlochGameLogic.getPlayerGameResult(nActualPlayerLegacy) === Constants.nGameResultUndefined)
-          if (playerHand.checkWin())
-          {
-              console.debug("[endTurn] Player " + multiplayer.activePlayer + ", LegacyID: " + nActualPlayerLegacy + " just finished!")
-          }
+      if (playerHand.checkWin())
+      {
+          console.debug("[endTurn] Player " + multiplayer.activePlayer + ", LegacyID: " + nActualPlayerLegacy + " just finished!")
+      }
 
       // Everybody has finished
       if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandSpielZuEnde())
@@ -713,6 +713,7 @@ Item {
   function endGame(userId)
   {
       var nPlayerIndex = getHandIndex(multiplayer.localPlayer.userId)
+      console.assert(nPlayerIndex === 0)
       console.debug("[endGame] called by user: " + userId + ", LegacyPlayerID: " + nPlayerIndex)
 
       // calculate the points of each player and set the name of the winner
@@ -728,29 +729,27 @@ Item {
       gameScene.gameOverWindow.visible = true
 
       // add points to MultiplayerUser score of the winner
-      if (nPlayerIndex)
-      {
-          var currentHand = playerHands.children[nPlayerIndex]
-          gameNetwork.reportRelativeScore(currentHand.score)
+      var currentHand = playerHands.children[nPlayerIndex]
+      gameNetwork.reportRelativeScore(currentHand.score)
 
-          var currentTag = playerTags.children[nPlayerIndex]
+//      var currentTag = playerTags.children[nPlayerIndex]
 
-          // calculate level with new points and check if there was a level up
-          var oldLevel = currentTag.level
-          currentTag.getPlayerData(false)
-          if (oldLevel !== currentTag.level)
-          {
-              gameScene.gameOverWindow.level = currentTag.level
-              gameScene.gameOverWindow.levelText.visible = true
-          }
-          else
-          {
-              gameScene.gameOverWindow.levelText.visible = false
-          }
-      }
+//      // calculate level with new points and check if there was a level up
+//      var oldLevel = currentTag.level
+//      currentTag.getPlayerData(false)
+//      if (oldLevel !== currentTag.level)
+//      {
+//          gameScene.gameOverWindow.level = currentTag.level
+//          gameScene.gameOverWindow.levelText.visible = true
+//      }
+//      else
+//      {
+//          gameScene.gameOverWindow.levelText.visible = false
+//      }
 
       // show window with text input to switch username
-      if (!multiplayer.singlePlayer && !gameNetwork.user.hasCustomNickName())
+//      if (!multiplayer.singlePlayer && !gameNetwork.user.hasCustomNickName())
+      if (!gameNetwork.user.hasCustomNickName())
           gameScene.switchNameWindow.visible = true
 
       // stop all timers and end the game
@@ -781,12 +780,8 @@ Item {
               var selectedCard = entityManager.getEntityById(cardId)
               if (arschlochGameLogic.getState() === arschlochGameLogic.getConstant_Jojo_SpielZustandKartenTauschen())
               {
-                  // Todo: Regeln fürs selektieren einer Karte
-                  // Aktuell kann man sogar die Karten der Gegner selektieren
                   if (selectedCard.glowImage.visible || selectedCard.selected)
-                  {
                       selectedCard.selected = !selectedCard.selected
-                  }
 
                   // refresh hand display
                   getHand(multiplayer.localPlayer.userId).markValid()
