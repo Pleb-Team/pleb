@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Felgo 3.0
 import "../../common"
+import "../../interface"
 
 // the cards in the hand of the player
 Item {
@@ -17,6 +18,8 @@ Item {
 
   // array with all cards in hand
   property var hand: []
+
+  property var playerTag: PlayerTag{}
 
   // the owner of the cards
   property var player: MultiplayerUser{}

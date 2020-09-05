@@ -37,7 +37,7 @@ Item {
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.top: parent.top
     anchors.topMargin: 40
-    text: infoTag.player.name
+    text: "Anonymous" infoTag.name.text
     font.family: standardFont.name
     color: "black"
     font.pixelSize: 36

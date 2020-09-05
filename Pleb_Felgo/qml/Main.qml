@@ -33,6 +33,8 @@ GameWindow {
 
   readonly property int gamesPlayed: menuScene ? menuScene.localStorage.gamesPlayed : 0
   readonly property int appStarts: menuScene ? menuScene.localStorage.appStarts : 0
+  readonly property var listPlayerNameDefaults: ["Ich", "Chuck Norris", "Kenny", "Homer Simpson"]
+
 
   // create and remove entities at runtime
   EntityManager {
@@ -68,6 +70,7 @@ GameWindow {
 
   FelgoGameNetwork {
     id: gameNetwork
+
     // on mobile, set this to false as you would otherwise simulate a clean app start with no logged in user every time
     // only set it to true if you want to simulate different users
     clearAllUserDataAtStartup: system.desktopPlatform && enableMultiUserSimulation // this can be enabled during development to simulate a first-time app start
@@ -115,17 +118,16 @@ GameWindow {
 
       appKey: Constants.appKey
       pushKey: Constants.pushKey
-      // NOTE: do NOT use these demo keys for publishing your game, we might remove the demo apps in the future!
-      // instead, use your own ones from https://cloud.felgo.com/
 
-      onGameStarted: {
+      onGameStarted:
+      {
           console.debug("[FelgoMultiplayer] onGameStarted")
 
           // increase gamesPlayed counter for every game start and decrease tokens
           if(menuScene)
-          {
               menuScene.localStorage.setGamesPlayed(gamesPlayed + 1)
-          }
+
+          // Now switch to game scene
           window.state = "game"
       }
   }

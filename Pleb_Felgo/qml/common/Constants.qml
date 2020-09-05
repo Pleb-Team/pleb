@@ -28,4 +28,6 @@ Item {
 
     // From C++ GameLogic GlobalConstants.h
     readonly property int nGameResultUndefined: -42
+
+    readonly property var listPlayerNameDefaults: ["Ich", "Chuck Norris", "Kenny", "Homer Simpson"]
 }

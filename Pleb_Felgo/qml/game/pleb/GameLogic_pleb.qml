@@ -409,6 +409,10 @@ Item {
       elapsedHintTime = 0;
       hintTimer.start()
 
+      // repaint the timer circle
+      for (var i = 0; i < playerTags.children.length; i++)
+          playerTags.children[i].canvas.requestPaint()
+
       // schedule AI to play after some time
       multiplayer.leaderCode(function() {
           if (!multiplayer.activePlayer || !multiplayer.activePlayer.connected) {
@@ -462,15 +466,15 @@ Item {
       console.debug("multiplayer.localPlayer.userId: " + multiplayer.localPlayer.userId)
       console.debug("multiplayer.players.length " + multiplayer.players.length)
 
-      for (var i = 0; i < multiplayer.players.length; i++){
+      for (var i = 0; i < multiplayer.players.length; i++)
           console.debug("multiplayer.players[" + i +"].userId " + multiplayer.players[i].userId)
-      }
+
 
       // reset all values at the start of the game
       gameScene.gameOverWindow.visible = false
       gameScene.leaveGameWindow.visible = false
       gameScene.switchNameWindow.visible = false
-      playerInfoPopup.visible = false
+//      playerInfoPopup.visible = false
       chat.reset()
       depot.reset()
 
@@ -603,10 +607,14 @@ Item {
       console.debug("initTags()")
       for (var i = 0; i < playerTags.children.length; i++)
       {
-          playerTags.children[i].initTag()
-          if (playerHands.children[i].player && playerHands.children[i].player.userId === multiplayer.localPlayer.userId){
+          // Init Tag
+          playerTags.children[i].initTag(multiplayer.players[i], i)
+
+          if (playerHands.children[i].player && playerHands.children[i].player.userId === multiplayer.localPlayer.userId)
               playerTags.children[i].getPlayerData(true)
-          }
+
+          // Init Player hand
+          playerHands.children[i].playerTag = playerTags.children[i]
       }
   }
 
@@ -699,8 +707,9 @@ Item {
           playerHand.score = arschlochGameLogic.getPlayerGameResult(i)
           playerHand.scoreAllGames+= playerHand.score
 
-          if (i === 0)
-              gameScene.gameOverWindow.winnerPlayer = playerHand.player
+          if (arschlochGameLogic.getPlayerGameResult(i) === arschlochGameLogic.getConstant_Jojo_RESULT_PRAESI())
+//              gameScene.gameOverWindow.winnerPlayer = playerHand.player
+               gameScene.gameOverWindow.nPlayerIndexPrasei = i
       }
   }
 

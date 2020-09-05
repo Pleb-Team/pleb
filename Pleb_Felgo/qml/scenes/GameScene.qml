@@ -22,7 +22,7 @@ SceneBase {
   property alias leaveGameWindow: leaveGameWindow
   property alias switchNameWindow: switchNameWindow
   property alias bottomHand: bottomHand
-  property alias playerInfoPopup: playerInfoPopup
+//  property alias playerInfoPopup: playerInfoPopup
   property alias hintRectangle: hintRectangle
   property alias hintRectangleText: hintRectangleText
   property alias rightPlayerTag: rightPlayerTag // ad banner will be aligned based on rightPlayerTag
@@ -263,12 +263,12 @@ SceneBase {
     visible: false
   }
 
-  // the playerInfoPopup shows detailed information of a user
-  PlayerInfo {
-    id: playerInfoPopup
-    anchors.centerIn: gameWindowAnchorItem
-    refTag: playerTags.children[0]
-  }
+//  // the playerInfoPopup shows detailed information of a user
+//  PlayerInfo {
+//    id: playerInfoPopup
+//    anchors.centerIn: gameWindowAnchorItem
+//    refTag: playerTags.children[0]
+//  }
 
   // the leaveGame message in the middle of the screen
   LeaveGameWindow {

@@ -71,58 +71,58 @@ SceneBase {
 
 
   // detailed playerInfo window
-  Rectangle {
-      id: playerInfo
-      radius: 15
-      color: "white"
-      border.color: "#28a3c1"
-      border.width: Constants.nBorderWidth
-      visible: Constants.bShowBetaFeatures
-      width: 130
+//  Rectangle {
+//      id: playerInfo
+//      radius: 15
+//      color: "white"
+//      border.color: "#28a3c1"
+//      border.width: Constants.nBorderWidth
+//      visible: Constants.bShowBetaFeatures
+//      width: 130
 
-      anchors {
-          top: localTag.top
-          bottom: localTag.bottom
-          right: localTag.right
-          topMargin: localTag.height / 2 - 9
-          bottomMargin: - 6
-          rightMargin: - 3
-      }
+//      anchors {
+//          top: localTag.top
+//          bottom: localTag.bottom
+//          right: localTag.right
+//          topMargin: localTag.height / 2 - 9
+//          bottomMargin: - 6
+//          rightMargin: - 3
+//      }
 
-      // detailed playerInfo text
-      Item {
-          y: 34
+//      // detailed playerInfo text
+//      Item {
+//          y: 34
 
-          Text {
-              id: infoText
-              text: "Rank: " + rank + "\nLevel: " + localTag.level + "\nScore: " + localTag.highscore
-              font.family: standardFont.name
-              color: "black"
-              font.pixelSize: 8
-              width: contentWidth
-              anchors.verticalCenter: parent.verticalCenter
-              anchors.left: parent.left
-              anchors.leftMargin: 14
-              verticalAlignment: Text.AlignVCenter
+//          Text {
+//              id: infoText
+//              text: "Rank: " + rank + "\nLevel: " + localTag.level + "\nScore: " + localTag.highscore
+//              font.family: standardFont.name
+//              color: "black"
+//              font.pixelSize: 8
+//              width: contentWidth
+//              anchors.verticalCenter: parent.verticalCenter
+//              anchors.left: parent.left
+//              anchors.leftMargin: 14
+//              verticalAlignment: Text.AlignVCenter
 
-              property string rank: localTag.rank > 0 ? "#" + localTag.rank : "-"
-          }
-      }
+//              property string rank: localTag.rank > 0 ? "#" + localTag.rank : "-"
+//          }
+//      }
 
-      // clickable area to hide the detailed playerInfo
-      MouseArea {
-          enabled: Constants.bShowBetaFeatures
-          anchors.fill: parent
-          onClicked: playerInfo.visible ^= true
-      }
-  }
+//      // clickable area to hide the detailed playerInfo
+//      MouseArea {
+//          enabled: Constants.bShowBetaFeatures
+//          anchors.fill: parent
+//          onClicked: playerInfo.visible ^= true
+//      }
+//  }
 
   // local player tag
   PlayerTag {
     id: localTag
     visible: Constants.bShowBetaFeatures
     player: gameNetwork.user
-    nameColor: playerInfo.visible ? "#28a3c1" : "white"
+//    nameColor: playerInfo.visible ? "#28a3c1" : "white"
     menu: true
     avatarSource: gameNetwork.user.profileImageUrl ? gameNetwork.user.profileImageUrl : "../../assets/img/User.png"
     level: Math.max(1, Math.min(Math.floor(gameNetwork.userHighscoreForCurrentActiveLeaderboard / 300), 999))
@@ -137,9 +137,9 @@ SceneBase {
     anchors.rightMargin: 10
 
     infoButton.enabled: player.name !== "" && Constants.bShowBetaFeatures
-    infoButton.onClicked: {
-      playerInfo.visible ^= true
-    }
+//    infoButton.onClicked: {
+//      playerInfo.visible ^= true
+//    }
   }
 
   // main menu
