@@ -54,7 +54,7 @@ EntityBase {
     anchors.topMargin: 3
     anchors.horizontalCenter: canvas.horizontalCenter
     // make as big that a typical player text like "Player 1234567" fits into the width
-    font.pixelSize: 12
+    font.pixelSize: 14
     font.bold: true
     font.family: standardFont.name
     color: player && player.isFriend ? activeColor : "white"
