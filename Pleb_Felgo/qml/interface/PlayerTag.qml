@@ -70,24 +70,40 @@ EntityBase {
       height: 92
       anchors.top: parent.top
       anchors.horizontalCenter: parent.horizontalCenter
-      onPaint: {
+      onPaint:
+      {
           var ctx = getContext("2d")
           ctx.reset()
 
-          if (multiplayer.activePlayer === player)
+          if (!gameLogic)
+              return
+
+          if (!gameLogic.arschlochGameLogic)
+              return
+
+          try
           {
-              var centreX = canvas.width / 2
-              var centreY = canvas.height / 2
-              var step = 360 / gameLogic.userInterval - 1
+              //          if (multiplayer.activePlayer === player)
+              if (  (gameLogic.arschlochGameLogic.getState() === gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen() )
+                      &&  (gameLogic.arschlochGameLogic.getActualPlayerID() === nPlayerIndexLegacy) )
+              {
+                  var centreX = canvas.width / 2
+                  var centreY = canvas.height / 2
+                  var step = 360 / gameLogic.userInterval - 1
 
-              ctx.beginPath()
-              ctx.fillStyle = player.connected ? activeColor : inactiveColor
-              ctx.moveTo(centreX, centreY)
+                  ctx.beginPath()
+                  ctx.fillStyle = player.connected ? activeColor : inactiveColor
+                  ctx.moveTo(centreX, centreY)
 
-              // x, y, r, startAngle, endAngle, counterclockwise
-              ctx.arc(centreX, centreY, 46, 315 * Math.PI / 180, (gameLogic.userInterval - 1 - gameLogic.remainingTime) * step * Math.PI / 180, true)
-              ctx.lineTo(centreX, centreY)
-              ctx.fill()
+                  // x, y, r, startAngle, endAngle, counterclockwise
+//                                ctx.arc(centreX, centreY, 46, 315 * Math.PI / 180, (gameLogic.userInterval - 1 - gameLogic.remainingTime) * step * Math.PI / 180, true)
+                  ctx.arc(centreX, centreY, 46, 0, 2 * Math.PI, false)
+                  ctx.lineTo(centreX, centreY)
+                  ctx.fill()
+              }
+          }
+          catch(error)
+          {
           }
       }
   }

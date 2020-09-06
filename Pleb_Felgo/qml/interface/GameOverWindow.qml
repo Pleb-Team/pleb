@@ -10,7 +10,6 @@ Item {
 
   property int level: 99
   property int nPlayerIndexPrasei: -1
-//  property alias levelText: levelText
 
   // don't send the black bg here because we want to encourage adding friends and chatting after a match
   // message background
@@ -41,7 +40,7 @@ Item {
       horizontalAlignment: Text.AlignHCenter
       anchors.horizontalCenter: parent.horizontalCenter
 
-      text: nPlayerIndexPrasei >= 0 ? "The winner is: <font color=\"#28a3c1\">" + playerHands.children[nPlayerIndexPrasei].playerTag.getPlayerNameNice() + "</font>" : "Error: nPlayerIndexPrasei not set"
+      text: nPlayerIndexPrasei >= 0 ? "The winner is: <font color=\"" + Constants.sBorderColor + "\">" + playerHands.children[nPlayerIndexPrasei].playerTag.getPlayerNameNice() + "</font>" : "Error: nPlayerIndexPrasei not set"
       font.family: standardFont.name
       color: "black"
       font.pixelSize: 30
@@ -53,29 +52,13 @@ Item {
       id: scoreText
       horizontalAlignment: Text.AlignRight
       anchors.horizontalCenter: parent.horizontalCenter
-      text: gameOverWindow.visible ? playerHands.children[0].playerTag.getPlayerNameNice() + " " + getScoreText(0) + "<br>"
-                                   + playerHands.children[1].playerTag.getPlayerNameNice() + " " + getScoreText(1) + "<br>"
-                                   + playerHands.children[2].playerTag.getPlayerNameNice() + " " + getScoreText(2) + "<br>"
-                                   + playerHands.children[3].playerTag.getPlayerNameNice() + " " + getScoreText(3) : ""
+      text: ""
       font.family: standardFont.name
       color: "black"
       font.pixelSize: 20
       width: parent.width * 0.8
       wrapMode: Text.Wrap
     }
-
-//    Text {
-//      id: levelText
-//      horizontalAlignment: Text.AlignHCenter
-//      anchors.horizontalCenter: parent.horizontalCenter
-//      text: "Congratulations, you've reached level " + level + "!"
-//      font.family: standardFont.name
-//      color: "black"
-//      font.pixelSize: 20
-//      width: parent.width * 0.8
-//      wrapMode: Text.Wrap
-//      visible: false
-//    }
 
     Text {
       id: hintText
@@ -109,9 +92,38 @@ Item {
       }
   }
 
-  // get the score of a player with their array index
-  function getScoreText(index)
+  function calcText()
   {
-      return "    Score: " + playerHands.children[index].score + ", Total: " + playerHands.children[index].scoreAllGames
+      var result = ""
+      var sColor = ""
+      var highestScoreAllGames = getHighestScoreAllGames()
+
+      for (var n = 0; n < playerHands.children.length; n++)
+      {
+          if (playerHands.children[n].scoreAllGames === highestScoreAllGames)
+              sColor = Constants.sBorderColor
+          else
+              sColor = "black"
+
+          result = result + playerHands.children[n].playerTag.getPlayerNameNice()
+                  + ": " + playerHands.children[n].score + " points"
+                  + ", <font color=\"" + sColor + "\">Total score: "
+                  + playerHands.children[n].scoreAllGames + "</font><br>"
+      }
+
+      scoreText.text = result
   }
+
+
+  // get the score of a player with their array index
+  function getHighestScoreAllGames()
+  {
+      var result = 0;
+
+      for (var n = 0; n < playerHands.children.length; n++)
+          result = Math.max(result, playerHands.children[n].scoreAllGames)
+
+      return result
+  }
+
 }

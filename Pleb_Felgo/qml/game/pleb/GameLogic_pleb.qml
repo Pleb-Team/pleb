@@ -445,7 +445,8 @@ Item {
   }
 
 
-  function joinGame(room){
+  function joinGame(room)
+  {
       multiplayer.joinGame(room)
   }
 
@@ -530,6 +531,10 @@ Item {
               aiThinkingTimer.repeat = true
           }
       })
+
+      // repaint the timer circle
+      for (var i = 0; i < playerTags.children.length; i++)
+          playerTags.children[i].canvas.requestPaint()
 
       scaleHand()
       getHand(multiplayer.localPlayer.userId).markValid()
@@ -736,6 +741,7 @@ Item {
 
       // show the gameOver message with the winner and score
       gameScene.gameOverWindow.visible = true
+      gameScene.gameOverWindow.calcText()
 
       // add points to MultiplayerUser score of the winner
       var currentHand = playerHands.children[nPlayerIndex]
