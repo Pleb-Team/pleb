@@ -51,11 +51,12 @@ SceneBase {
 
   // background
   Image {
-    id: background
-    source: "../../assets/img/BG.png"
-    anchors.fill: menuScene.gameWindowAnchorItem
-    fillMode: Image.PreserveAspectCrop
-    smooth: true
+      id: backgroundImage
+      source: "../../assets/img/BG.png"
+      //    anchors.fill: gameScene.gameWindowAnchorItem
+      anchors.fill: parent.fullWindowAnchorItem
+      fillMode: Image.PreserveAspectCrop
+      smooth: true
   }
 
   // the title image

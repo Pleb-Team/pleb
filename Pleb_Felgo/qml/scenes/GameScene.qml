@@ -68,9 +68,10 @@ SceneBase {
 
   // background
   Image {
-    id: background
+    id: backgroundImage
     source: "../../assets/img/BG.png"
-    anchors.fill: gameScene.gameWindowAnchorItem
+//    anchors.fill: gameScene.gameWindowAnchorItem
+    anchors.fill: parent.fullWindowAnchorItem
     fillMode: Image.PreserveAspectCrop
     smooth: true
   }
