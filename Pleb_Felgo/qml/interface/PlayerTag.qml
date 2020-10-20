@@ -70,24 +70,40 @@ EntityBase {
       height: 92
       anchors.top: parent.top
       anchors.horizontalCenter: parent.horizontalCenter
-      onPaint: {
+      onPaint:
+      {
           var ctx = getContext("2d")
           ctx.reset()
 
-          if (multiplayer.activePlayer === player)
+          if (!gameLogic)
+              return
+
+          if (!gameLogic.arschlochGameLogic)
+              return
+
+          try
           {
-              var centreX = canvas.width / 2
-              var centreY = canvas.height / 2
-              var step = 360 / gameLogic.userInterval - 1
+              //          if (multiplayer.activePlayer === player)
+              if (  (gameLogic.arschlochGameLogic.getState() === gameLogic.arschlochGameLogic.getConstant_Jojo_SpielZustandSpielen() )
+                      &&  (gameLogic.arschlochGameLogic.getActualPlayerID() === nPlayerIndexLegacy) )
+              {
+                  var centreX = canvas.width / 2
+                  var centreY = canvas.height / 2
+                  var step = 360 / gameLogic.userInterval - 1
 
-              ctx.beginPath()
-              ctx.fillStyle = player.connected ? activeColor : inactiveColor
-              ctx.moveTo(centreX, centreY)
+                  ctx.beginPath()
+                  ctx.fillStyle = player.connected ? activeColor : inactiveColor
+                  ctx.moveTo(centreX, centreY)
 
-              // x, y, r, startAngle, endAngle, counterclockwise
-              ctx.arc(centreX, centreY, 46, 315 * Math.PI / 180, (gameLogic.userInterval - 1 - gameLogic.remainingTime) * step * Math.PI / 180, true)
-              ctx.lineTo(centreX, centreY)
-              ctx.fill()
+                  // x, y, r, startAngle, endAngle, counterclockwise
+//                                ctx.arc(centreX, centreY, 46, 315 * Math.PI / 180, (gameLogic.userInterval - 1 - gameLogic.remainingTime) * step * Math.PI / 180, true)
+                  ctx.arc(centreX, centreY, 46, 0, 2 * Math.PI, false)
+                  ctx.lineTo(centreX, centreY)
+                  ctx.fill()
+              }
+          }
+          catch(error)
+          {
           }
       }
   }
@@ -102,61 +118,61 @@ EntityBase {
     locale: player && player.locale ? player.locale : ""
   }
 
-  Image {
-    height: 38
-    fillMode: Image.PreserveAspectFit
-    visible: ((player && player.connected) || menu) && level > 10
-    anchors.top: canvas.top
-    anchors.left: canvas.left
-    source: {
-      if (level >= 500){
-        return "../../assets/img/PlatinumBadge.png"
-      } else if (level >= 100){
-        return "../../assets/img/GoldBadge.png"
-      } else if (level >= 50){
-        return "../../assets/img/SilverBadge.png"
-      } else {
-        return "../../assets/img/BronzeBadge.png"
-      }
-    }
-  }
+//  Image {
+//      height: 38
+//      fillMode: Image.PreserveAspectFit
+//      visible: ((player && player.connected) || menu) && level > 10
+//      anchors.top: canvas.top
+//      anchors.left: canvas.left
+//      source: {
+//          if (level >= 500){
+//              return "../../assets/img/PlatinumBadge.png"
+//          } else if (level >= 100){
+//              return "../../assets/img/GoldBadge.png"
+//          } else if (level >= 50){
+//              return "../../assets/img/SilverBadge.png"
+//          } else {
+//              return "../../assets/img/BronzeBadge.png"
+//          }
+//      }
+//  }
 
-  // level circle
-  Rectangle {
-    width: 38
-    height: 38
-    color: player && player.connected || menu ? activeColor : inactiveColor
-    radius: width / 2
-    anchors.top: canvas.top
-    anchors.right: canvas.right
-    visible: player && player.connected || menu ? true : false
+//  // level circle
+//  Rectangle {
+//    width: 38
+//    height: 38
+//    color: player && player.connected || menu ? activeColor : inactiveColor
+//    radius: width / 2
+//    anchors.top: canvas.top
+//    anchors.right: canvas.right
+//    visible: player && player.connected || menu ? true : false
 
-    // circle for auto players - unused
-    Rectangle {
-      visible: false
-      width: 15
-      height: 15
-      border.width: 2
-      border.color: "white"
-      color: inactiveColor
-      radius: width / 2
-      anchors.centerIn: parent
-    }
+//    // circle for auto players - unused
+//    Rectangle {
+//      visible: false
+//      width: 15
+//      height: 15
+//      border.width: 2
+//      border.color: "white"
+//      color: inactiveColor
+//      radius: width / 2
+//      anchors.centerIn: parent
+//    }
 
-    // user level
-    Text {
-      id: levelText
-      text: player && player.connected || menu ? level : ""
-      font.bold: true
-      anchors.fill: parent
-      anchors.topMargin: 4 // the font has an offset - topMargin centers the text again
-      horizontalAlignment: Text.AlignHCenter
-      verticalAlignment: Text.AlignVCenter
-      font.pixelSize: 14
-      font.family: standardFont.name
-      color: "white"
-    }
-  }
+//    // user level
+//    Text {
+//      id: levelText
+//      text: player && player.connected || menu ? level : ""
+//      font.bold: true
+//      anchors.fill: parent
+//      anchors.topMargin: 4 // the font has an offset - topMargin centers the text again
+//      horizontalAlignment: Text.AlignHCenter
+//      verticalAlignment: Text.AlignVCenter
+//      font.pixelSize: 14
+//      font.family: standardFont.name
+//      color: "white"
+//    }
+//  }
 
   // displays the detailed playerInfoPopup
   MouseArea {
@@ -181,23 +197,35 @@ EntityBase {
           return "getPlayerNameNice() empty result"
   }
 
-  // get the avatar for auto and connected users
-  function getAvatar(){
-    var tmpAvatar = player && player.connected ? "../../assets/img/User.png" : "../../assets/img/Auto.png"
-    if (player && player.connected && player.profileImageUrl.length > 0){
-      tmpAvatar = player.profileImageUrl
-    }
-    return tmpAvatar
-  }
 
   // reset the tag at the beginning of the game
   function initTag(player_, nPlayerIndexLegacy_)
   {
       player = player_
       nPlayerIndexLegacy = nPlayerIndexLegacy_
+
+      updateTag()
+  }
+
+
+  // reset the tag at the beginning of the game
+  function updateTag()
+  {
       name.text = getPlayerNameNice()
       canvas.requestPaint()
   }
+
+
+  // get the avatar for auto and connected users
+  function getAvatar()
+  {
+      var tmpAvatar = player && player.connected ? "../../assets/img/User.png" : "../../assets/img/Auto.png"
+      if (player && player.connected && player.profileImageUrl.length > 0)
+          tmpAvatar = player.profileImageUrl
+
+      return tmpAvatar
+  }
+
 
   /*
      Explanation for sendToOthers:

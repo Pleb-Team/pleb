@@ -148,9 +148,7 @@ GameWindow {
       id: sceneLoader
       onLoaded:
       {
-          if (    (menuScene.localStorage.getValue("appstarts") === undefined)
-                  || (menuScene.localStorage.getValue("appstarts") <= 3)
-                  )
+          if (menuScene.localStorage.appStarts <= 3)
           {
               console.debug("Loader::onLoaded goint to window.state = introduction")
               window.state = "introduction"
@@ -185,9 +183,6 @@ GameWindow {
           name: "menu"
           PropertyChanges {target: menuScene; opacity: 1}
           PropertyChanges {target: window; activeScene: menuScene}
-          StateChangeScript {
-              script: { menuScene.enterScene() }
-          }
       },
 
       State {

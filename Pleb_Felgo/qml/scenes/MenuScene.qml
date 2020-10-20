@@ -299,7 +299,9 @@ SceneBase {
       onClicked: {
         localStorage.setDebugMode(!localStorage.debugMode)
         if (localStorage.debugMode)
-            nativeUtils.displayMessageBox(qsTr("Test mode is activated - make sure to know what you're doing!"))
+            nativeUtils.displayMessageBox(qsTr("Test mode activated - this is only for development purposes. Make sure to know what you're doing!"))
+        else
+            nativeUtils.displayMessageBox(qsTr("Test mode deactivated, enjoy regular playing."))
       }
     }
   }
@@ -333,18 +335,20 @@ SceneBase {
   // ask the user for feedback after opening the app 5 times
   Storage {
       id: localStorage
+
       property int appStarts: 0
       property int gamesPlayed: 0 // store number of games played
       property real lastLogin: 0   // date (day) of last login (reward received)
       property bool debugMode: false
+      property string playerName: Constants.sPlayerNameDefault
 
       // update app starts counter
       Component.onCompleted:
       {
           // uncomment this to clear the storage
-          //localStorage.clearValue("appstarts")
-          //localStorage.clearValue("gamesplayed")
-          //localStorage.clearValue("lastlogin")
+//          localStorage.clearValue("appstarts")
+//          localStorage.clearValue("gamesplayed")
+//          localStorage.clearValue("lastlogin")
           console.debug("[MenuScene::Storage::onCompleted] Qt.application.version:" + Qt.application.version)
           console.debug("[MenuScene::Storage::onCompleted] Qt.application.name:" + Qt.application.name)
           console.debug("[MenuScene::Storage::onCompleted] Qt.application.organization:" + Qt.application.organization)
@@ -358,12 +362,11 @@ SceneBase {
           localStorage.setValue("appstarts", nr)
           appStarts = nr
 
-          // init or load gamesPlayed counter
+          // init or load each parameter
           if(localStorage.getValue("gamesplayed") === undefined)
               localStorage.setValue("gamesplayed", 0)
           gamesPlayed = localStorage.getValue("gamesplayed")
 
-          // init or load last login day
           if(localStorage.getValue("lastlogin") === undefined)
               localStorage.setValue("lastlogin", 0) // will be correctly set when first checked
           lastLogin = localStorage.getValue("lastlogin")
@@ -371,6 +374,10 @@ SceneBase {
           if(localStorage.getValue("debugMode") === undefined)
               localStorage.setValue("debugMode", false) // will be correctly set when first checked
           debugMode = localStorage.getValue("debugMode")
+
+          if(localStorage.getValue("playerName") === undefined)
+              localStorage.setValue("playerName", Constants.sPlayerNameDefault) // will be correctly set when first checked
+          playerName = localStorage.getValue("playerName")
       }
 
       // set and store gamesPlayed locally
@@ -391,6 +398,12 @@ SceneBase {
           localStorage.debugMode = b
       }
 
+      // set and store last login day
+      function setPlayerName(s) {
+          localStorage.setValue("playerName", s)
+          localStorage.playerName = s
+      }
+
   }
 
   // sync messages on the main menu page
@@ -400,41 +413,4 @@ SceneBase {
       gameNetwork.sync()
     }
   }
-
-  // enter scene will be called whenever menuScene is shown
-  function enterScene() {
-   // checkDailyBonus()
-  }
-
-//  // check date to give daily bonus
-//  function checkDailyBonus() {
-//    if(!enableStoreAndAds)
-//      return
-
-//    var today = new Date()
-//    var todayTruncated = new Date(today.getTime()-today.getHours()*3600000-today.getMinutes()*60000-today.getSeconds()*1000-today.getMilliseconds())
-//    console.debug("Today truncated is " + todayTruncated.getTime().toString())
-//    var storedLastLoginMS = localStorage.lastLogin
-//    console.debug("Read from database " + storedLastLoginMS)
-//    if(storedLastLoginMS === 0) {
-//      // start with 20 tokens
-//      _initialTokens = true
-//      localStorage.setLastLogin(todayTruncated.getTime().toString()) // initialize
-//      if(storeScene.tokens < 20)
-//        storeScene.giveTokens(20 - storeScene.tokens)
-//    }
-//    else if(todayTruncated.getTime().toString() > storedLastLoginMS) {
-//      // give daily bonus
-//      console.debug("Last login was a day ago, give player bonus")
-//      localStorage.setLastLogin(todayTruncated.getTime().toString())
-//      storeScene.giveTokens(gameTokensEarnedPerDay) // increase tokens by 1
-//      dailyTokenDialog.visible = true
-//    }
-
-//    if (!system.publishBuild && !_initialTokens && storeScene.tokens < 20) {
-//      // always start with 20 tokens for debug builds
-//      _initialTokens = true
-//      storeScene.giveTokens(20 - storeScene.tokens)
-//    }
-//  }
 }

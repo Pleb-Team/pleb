@@ -44,7 +44,7 @@ Item {
           id: headerText
           horizontalAlignment: Text.AlignHCenter
           anchors.horizontalCenter: parent.horizontalCenter
-          text: "May I know your name?"
+          text: "Hey buddy, what's your name?"
           font.family: standardFont.name
           color: "black"
           font.pixelSize: 36
@@ -96,35 +96,60 @@ Item {
           }
 
           // check, send and reset the text after hitting enter
-          onAccepted: {
-              if (text)
-              {
-                  var set = gameNetwork.updateUserName(text)
-                  playerHands.children[0].player.nickName = text
-                  playerTags.children[0].player.nickName = text
-
-                  if (set) {
-                      switchNameWindow.visible = false
-                  } else {
-                      hintText.text = "Invalid username"
-                  }
-              }
-          }
+          onAccepted: inputTextAccepted()
       }
   }
 
-  // lets the user close the name input dialog
+  // button Cancel
   ButtonBase {
-      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.left: parent.left
       anchors.top: parent.bottom
       anchors.topMargin: 10
+      width: parent.width / 2 - anchors.topMargin / 2
       height: (20 + buttonText.height + paddingVertical * 2)
       paddingHorizontal: 8
       paddingVertical: 4
       box.border.width: Constants.nBorderWidth
       box.radius: 30
       textSize: 28
-      text: "Do not set a name now"
+      text: "Cancel"
       onClicked: switchNameWindow.visible = false
+  }
+
+  // button OK
+  ButtonBase {
+      anchors.right: parent.right
+      anchors.top: parent.bottom
+      anchors.topMargin: 10
+      width: parent.width / 2 - anchors.topMargin / 2
+      height: (20 + buttonText.height + paddingVertical * 2)
+      paddingHorizontal: 8
+      paddingVertical: 4
+      box.border.width: Constants.nBorderWidth
+      box.radius: 30
+      textSize: 28
+      text: "Ok"
+
+      onClicked: inputTextAccepted()
+  }
+
+
+  function inputTextAccepted()
+  {
+      if (!inputText.text)
+          return
+
+      // Update name in all storage locations
+      var set = gameNetwork.updateUserName(inputText.text)
+      playerHands.children[0].player.nickName = inputText.text
+      menuScene.localStorage.setPlayerName(inputText.text)
+
+      playerTags.children[0].updateTag()
+
+      if (set)
+          switchNameWindow.visible = false
+      else
+          nativeUtils.displayMessageBox(qsTr("Invalid username"))
+
   }
 }
