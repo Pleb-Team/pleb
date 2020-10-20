@@ -3,7 +3,10 @@ Deployment
 In QtCreator
 - Increase Version Code, Version Number
 - Get new Felgo license: https://felgo.com/developers/license?linkSource=codeComments
+  Select: Multiplayer, Felgo GameNetwork
+  Paste the code into .pro
 - Clean rebuild in QtCreator, delete build-Folder in finder beforehand
+
 
 In XCode
 - Editor - Validate settings
@@ -13,6 +16,7 @@ In XCode
 - Validate
 - Distribute to App Store
 - (Add capability for Push-Service) now automatically via Pleb.entitlements file
+
 
 In App-Store Connect
 - Clarify Export stuff (declare that no encryption is used)
