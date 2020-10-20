@@ -402,41 +402,4 @@ SceneBase {
       gameNetwork.sync()
     }
   }
-
-  // enter scene will be called whenever menuScene is shown
-  function enterScene() {
-   // checkDailyBonus()
-  }
-
-//  // check date to give daily bonus
-//  function checkDailyBonus() {
-//    if(!enableStoreAndAds)
-//      return
-
-//    var today = new Date()
-//    var todayTruncated = new Date(today.getTime()-today.getHours()*3600000-today.getMinutes()*60000-today.getSeconds()*1000-today.getMilliseconds())
-//    console.debug("Today truncated is " + todayTruncated.getTime().toString())
-//    var storedLastLoginMS = localStorage.lastLogin
-//    console.debug("Read from database " + storedLastLoginMS)
-//    if(storedLastLoginMS === 0) {
-//      // start with 20 tokens
-//      _initialTokens = true
-//      localStorage.setLastLogin(todayTruncated.getTime().toString()) // initialize
-//      if(storeScene.tokens < 20)
-//        storeScene.giveTokens(20 - storeScene.tokens)
-//    }
-//    else if(todayTruncated.getTime().toString() > storedLastLoginMS) {
-//      // give daily bonus
-//      console.debug("Last login was a day ago, give player bonus")
-//      localStorage.setLastLogin(todayTruncated.getTime().toString())
-//      storeScene.giveTokens(gameTokensEarnedPerDay) // increase tokens by 1
-//      dailyTokenDialog.visible = true
-//    }
-
-//    if (!system.publishBuild && !_initialTokens && storeScene.tokens < 20) {
-//      // always start with 20 tokens for debug builds
-//      _initialTokens = true
-//      storeScene.giveTokens(20 - storeScene.tokens)
-//    }
-//  }
 }

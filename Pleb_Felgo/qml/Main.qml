@@ -185,9 +185,6 @@ GameWindow {
           name: "menu"
           PropertyChanges {target: menuScene; opacity: 1}
           PropertyChanges {target: window; activeScene: menuScene}
-          StateChangeScript {
-              script: { menuScene.enterScene() }
-          }
       },
 
       State {

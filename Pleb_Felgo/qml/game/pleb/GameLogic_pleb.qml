@@ -747,21 +747,6 @@ Item {
       var currentHand = playerHands.children[nPlayerIndex]
       gameNetwork.reportRelativeScore(currentHand.score)
 
-//      var currentTag = playerTags.children[nPlayerIndex]
-
-//      // calculate level with new points and check if there was a level up
-//      var oldLevel = currentTag.level
-//      currentTag.getPlayerData(false)
-//      if (oldLevel !== currentTag.level)
-//      {
-//          gameScene.gameOverWindow.level = currentTag.level
-//          gameScene.gameOverWindow.levelText.visible = true
-//      }
-//      else
-//      {
-//          gameScene.gameOverWindow.levelText.visible = false
-//      }
-
       // show window with text input to switch username
 //      if (!multiplayer.singlePlayer && !gameNetwork.user.hasCustomNickName())
       if (!gameNetwork.user.hasCustomNickName())

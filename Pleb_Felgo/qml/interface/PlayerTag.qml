@@ -118,61 +118,61 @@ EntityBase {
     locale: player && player.locale ? player.locale : ""
   }
 
-  Image {
-    height: 38
-    fillMode: Image.PreserveAspectFit
-    visible: ((player && player.connected) || menu) && level > 10
-    anchors.top: canvas.top
-    anchors.left: canvas.left
-    source: {
-      if (level >= 500){
-        return "../../assets/img/PlatinumBadge.png"
-      } else if (level >= 100){
-        return "../../assets/img/GoldBadge.png"
-      } else if (level >= 50){
-        return "../../assets/img/SilverBadge.png"
-      } else {
-        return "../../assets/img/BronzeBadge.png"
-      }
-    }
-  }
+//  Image {
+//      height: 38
+//      fillMode: Image.PreserveAspectFit
+//      visible: ((player && player.connected) || menu) && level > 10
+//      anchors.top: canvas.top
+//      anchors.left: canvas.left
+//      source: {
+//          if (level >= 500){
+//              return "../../assets/img/PlatinumBadge.png"
+//          } else if (level >= 100){
+//              return "../../assets/img/GoldBadge.png"
+//          } else if (level >= 50){
+//              return "../../assets/img/SilverBadge.png"
+//          } else {
+//              return "../../assets/img/BronzeBadge.png"
+//          }
+//      }
+//  }
 
-  // level circle
-  Rectangle {
-    width: 38
-    height: 38
-    color: player && player.connected || menu ? activeColor : inactiveColor
-    radius: width / 2
-    anchors.top: canvas.top
-    anchors.right: canvas.right
-    visible: player && player.connected || menu ? true : false
+//  // level circle
+//  Rectangle {
+//    width: 38
+//    height: 38
+//    color: player && player.connected || menu ? activeColor : inactiveColor
+//    radius: width / 2
+//    anchors.top: canvas.top
+//    anchors.right: canvas.right
+//    visible: player && player.connected || menu ? true : false
 
-    // circle for auto players - unused
-    Rectangle {
-      visible: false
-      width: 15
-      height: 15
-      border.width: 2
-      border.color: "white"
-      color: inactiveColor
-      radius: width / 2
-      anchors.centerIn: parent
-    }
+//    // circle for auto players - unused
+//    Rectangle {
+//      visible: false
+//      width: 15
+//      height: 15
+//      border.width: 2
+//      border.color: "white"
+//      color: inactiveColor
+//      radius: width / 2
+//      anchors.centerIn: parent
+//    }
 
-    // user level
-    Text {
-      id: levelText
-      text: player && player.connected || menu ? level : ""
-      font.bold: true
-      anchors.fill: parent
-      anchors.topMargin: 4 // the font has an offset - topMargin centers the text again
-      horizontalAlignment: Text.AlignHCenter
-      verticalAlignment: Text.AlignVCenter
-      font.pixelSize: 14
-      font.family: standardFont.name
-      color: "white"
-    }
-  }
+//    // user level
+//    Text {
+//      id: levelText
+//      text: player && player.connected || menu ? level : ""
+//      font.bold: true
+//      anchors.fill: parent
+//      anchors.topMargin: 4 // the font has an offset - topMargin centers the text again
+//      horizontalAlignment: Text.AlignHCenter
+//      verticalAlignment: Text.AlignVCenter
+//      font.pixelSize: 14
+//      font.family: standardFont.name
+//      color: "white"
+//    }
+//  }
 
   // displays the detailed playerInfoPopup
   MouseArea {
