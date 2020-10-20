@@ -197,23 +197,35 @@ EntityBase {
           return "getPlayerNameNice() empty result"
   }
 
-  // get the avatar for auto and connected users
-  function getAvatar(){
-    var tmpAvatar = player && player.connected ? "../../assets/img/User.png" : "../../assets/img/Auto.png"
-    if (player && player.connected && player.profileImageUrl.length > 0){
-      tmpAvatar = player.profileImageUrl
-    }
-    return tmpAvatar
-  }
 
   // reset the tag at the beginning of the game
   function initTag(player_, nPlayerIndexLegacy_)
   {
       player = player_
       nPlayerIndexLegacy = nPlayerIndexLegacy_
+
+      updateTag()
+  }
+
+
+  // reset the tag at the beginning of the game
+  function updateTag()
+  {
       name.text = getPlayerNameNice()
       canvas.requestPaint()
   }
+
+
+  // get the avatar for auto and connected users
+  function getAvatar()
+  {
+      var tmpAvatar = player && player.connected ? "../../assets/img/User.png" : "../../assets/img/Auto.png"
+      if (player && player.connected && player.profileImageUrl.length > 0)
+          tmpAvatar = player.profileImageUrl
+
+      return tmpAvatar
+  }
+
 
   /*
      Explanation for sendToOthers:
