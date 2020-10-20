@@ -2,11 +2,11 @@
 Copyright (c) 2020 Pleb-Team
 
 Contact: stuggihackaton@gmail.com
+Privacy Policy: See https://github.com/Pleb-Team/pleb/blob/master/PrivacyPolicy.md
 
 A cooperative project to write a fancy cross platform card game with various AI styles.
 
 # Table of Contents
-
 1. [Introduction](#introduction)
 1. [About](#about)
 1. [Screenshots](#screenshots)
