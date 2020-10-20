@@ -3,17 +3,30 @@ Copyright (c) 2020 Pleb-Team
 
 Contact: stuggihackaton@gmail.com
 
-
-# Pleb
 A cooperative project to write a fancy cross platform card game with various AI styles.
 
 # Table of Contents
 
+1. [Introduction](#introduction)
 1. [About](#about)
 1. [Screenshots](#screenshots)
 1. [Documentation](#documentation)
 1. [Development](#development)
 1. [Licenses](#licenses)
+
+### Introduction
+Completely free, Open Source, GPLv3 licensed implementation of the traditional card game "President".
+
+Objectives
+Become president and be the first to get rid of all cards in your hand! Or be the last to finish and be the pleb. At the start of each game, the pleb has to pass his or her 2 highest cards to the president, who in turn discards 2 arbitrary (usually lowest) cards back to the pleb [not yet implemented]. 
+
+Rules
+Upon fresh start, you may freely play 1,2,3 or 4 cards of the same value (e.g. one 8 or triple Queen). Else, play the same amount of cards, but exceed the value on the discard pile. If you can't or don't want to play, you pass. If everyone passes, the last player can restart freshly. "
+
+This new implementation of the popular card came "President" (a.k.a. "Arschloch", "Master", ...) is the outcome of our team hackaton in Stuttgart, 2020, established during the crisis. We aim at demonstrating that despite the lockdown, it is possible to stick together and use the time meaningfully e.g. by studying a new, fun technique of creating games.
+
+Contributors: Joachim, Ben, Sebastian, Sven.
+Happy playing!
 
 ### About
 Pleb is an implementation of the popular German card game **Arschloch** and English card game **President**. See at the [documentation](#documentation) for common rules.
