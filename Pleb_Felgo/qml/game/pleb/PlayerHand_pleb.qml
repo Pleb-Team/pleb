@@ -95,7 +95,7 @@ Item {
   }
 
 
-  // playerHand blocked image is visible when the player gets skipped
+  // indicates that the player skipped
   Image {
     anchors.bottom: parent.bottom
     anchors.horizontalCenter: parent.horizontalCenter

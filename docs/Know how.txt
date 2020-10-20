@@ -6,12 +6,13 @@ In QtCreator
 - Clean rebuild in QtCreator, delete build-Folder in finder beforehand
 
 In XCode
+- Editor - Validate settings
 - Select Build target -> generic iOS device (https://help.apple.com/xcode/mac/current/#/devf37a1db04, no idea whether it makes a difference)
-- Add capability for Push-Service
 - Build
 - Package
 - Validate
 - Distribute to App Store
+- (Add capability for Push-Service) now automatically via Pleb.entitlements file
 
 In App-Store Connect
 - Clarify Export stuff (declare that no encryption is used)
