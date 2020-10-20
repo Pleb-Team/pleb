@@ -1,5 +1,5 @@
 Copyright (c) 2020 Pleb-Team:
-Joachim, Ben, Max, Sebastian, Sven
+Joachim, Ben, Sebastian, Sven
 
 Licenses contained in the file
 - Pleb License: GPLv3 
