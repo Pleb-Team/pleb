@@ -299,7 +299,9 @@ SceneBase {
       onClicked: {
         localStorage.setDebugMode(!localStorage.debugMode)
         if (localStorage.debugMode)
-            nativeUtils.displayMessageBox(qsTr("Test mode is activated - make sure to know what you're doing!"))
+            nativeUtils.displayMessageBox(qsTr("Test mode activated - this is only for development purposes. Make sure to know what you're doing!"))
+        else
+            nativeUtils.displayMessageBox(qsTr("Test mode deactivated, enjoy regular playing."))
       }
     }
   }
